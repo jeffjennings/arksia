@@ -17,8 +17,7 @@
       "custom_fstar"    : 200,
       "bestfit"         : {"alpha"   : 1.02, 
                            "wsmooth" : 1e-4,
-                           "method"  : "LogNormal",
-                           "nonneg"  : true
+                           "method"  : "LogNormal"
                           }    
     }    
   },
@@ -41,8 +40,7 @@
       "custom_fstar"    : 100,
       "bestfit"         : {"alpha"   : 1.03, 
                            "wsmooth" : 1e-4,
-                           "method"  : "LogNormal",
-                           "nonneg"  : true
+                           "method"  : "LogNormal"
                           }
     }       
   },
@@ -65,8 +63,7 @@
       "custom_fstar"    : 100,
       "bestfit"         : {"alpha"   : 1.02, 
                            "wsmooth" : 1e-4,
-                           "method"  : "LogNormal",
-                           "nonneg"  : true
+                           "method"  : "LogNormal"
                           }             
     }
   },
@@ -89,8 +86,7 @@
       "custom_fstar"    : 50,
       "bestfit"         : {"alpha"   : 1.02, 
                            "wsmooth" : 1e-4,
-                           "method"  : "LogNormal",
-                           "nonneg"  : true
+                           "method"  : "LogNormal"
                           }            
     }
   },
@@ -113,8 +109,7 @@
       "custom_fstar"    : 300,
       "bestfit"   : {"alpha"   : 1.02, 
                            "wsmooth" : 3e-2,
-                           "method"  : "LogNormal",
-                           "nonneg"  : true
+                           "method"  : "LogNormal"
                           }
     }
   },
@@ -137,8 +132,7 @@
       "custom_fstar"    : 120,
       "bestfit"         : {"alpha"   : 1.1, 
                            "wsmooth" : 1e-4,
-                           "method"  : "LogNormal",
-                           "nonneg"  : true
+                           "method"  : "LogNormal"
                           }    
     }
   },
@@ -161,8 +155,7 @@
       "custom_fstar"    : 30,
       "bestfit"         : {"alpha"   : 1.01, 
                            "wsmooth" : 1e-4,
-                           "method"  : "LogNormal",
-                           "nonneg"  : true
+                           "method"  : "LogNormal"
                           }        
     }
   }
