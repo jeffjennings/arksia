@@ -1,0 +1,44 @@
+{
+  "base" : {
+    "extract_clean_profile" : false,
+    "process_rave_fit"      : false,
+    "run_frank"             : false,
+    "join_vis"              : false,
+    "aspect_ratio_fig"      : true,  
+    "profile_compare"       : false,
+    "bestfit_robust"        : 2.0
+  },
+
+  "clean" : {
+    "rmax"                  : 12.0,
+    "Nr"                    : 300,
+    "Nphi"                  : 120,
+    "phi_wedge"             : 60
+  }, 
+
+  "rave" : {
+    "temp"                  : null
+  },
+
+  "frank" : {
+    "Rmax"                  : 12.0,
+    "N"                     : 300,
+    "alpha"                 : [1.02, 1.03],
+    "wsmooth"               : [1e-4],
+    "method"                : "LogNormal",
+    "I_scale"               : 1e2,
+    "max_iter"              : 300,
+    "set_fstar"             : "MCMC",
+    "scale_heights"         : [-2.5,-1,10], 
+    "nthreads"              : 10,
+    "save_solution"         : true,
+    "save_profile_fit"      : false,
+    "save_vis_fit"          : false,
+    "save_uvtables"         : false,
+    "make_quick_fig"        : true
+  },
+
+  "plot" : {
+    "bin_widths"            : [10e3]
+  }
+}  
