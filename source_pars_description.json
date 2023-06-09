@@ -17,8 +17,7 @@
             "custom_fstar"    : "Custom value for this amplitude, used to drive I(r=0)~0 in frank fit",
             "bestfit"         : {"alpha"   : "Best-fit value for the order parameter for the power spectrum's inverse Gamma prior", 
                                  "wsmooth" : "Best-fit value for the strength of smoothing applied to the power spectrum",
-                                 "method"  : "Best-fit method: 'Normal' for in linear brighness, 'LogNormal' for logarithmic brightness",
-                                 "nonneg"  : "Whether the best-fit is a nonnegative brightness profile"
+                                 "method"  : "Best-fit method: 'Normal' for in linear brighness, 'LogNormal' for logarithmic brightness"
                                 }    
           }    
     }
