@@ -4,7 +4,9 @@
       "process_rave_fit"      : "Whether to run the pipeline module to process/save a profile from an existing rave fit",
       "run_frank"             : "Whether to run the pipeline module to perform a (1D or 1+1D) frank fit",
       "aspect_ratio_fig"      : "Whether to generate a figure showing frank vertical inference results",
-      "profile_compare"       : "Whether to generate figures comparing the clean, rave, frank brightness and visibility profiles, and images"
+      "profile_compare"       : "Whether to generate figures comparing the clean, rave, frank brightness and visibility profiles, and images",
+      "survey_summary_txt"    : "Whether to generate a .txt file containing the clean, rave, frank best-fit brightness profiles for all sources",
+      "survey_summary_fig"    : "Whether to generate a figure showing the clean, rave, frank best-fit brightness profiles for all sources"
     },
   
     "clean" : {
