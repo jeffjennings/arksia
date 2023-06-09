@@ -1,0 +1,38 @@
+{
+    "base" : {
+      "extract_clean_profile" : "Whether to run the pipeline module to obtain a profile from a clean image of the source",
+      "process_rave_fit"      : "Whether to run the pipeline module to process/save a profile from an existing rave fit",
+      "run_frank"             : "Whether to run the pipeline module to perform a (1D or 1+1D) frank fit",
+      "aspect_ratio_fig"      : "Whether to generate a figure showing frank vertical inference results",
+      "profile_compare"       : "Whether to generate figures comparing the clean, rave, frank brightness and visibility profiles, and images"
+    },
+  
+    "clean" : {
+      "robust"                : "Robust weighting parameter value for clean and rave analysis, results processing",
+      "rmax"                  : "Maximum radius for clean image profile extraction [arcsec]",
+      "Nr"                    : "Number of radial bins for clean image profile extraction",
+      "Nphi"                  : "Number of azimuthal bins for clean image profile extraction"
+    }, 
+  
+    "frank" : {
+      "rout"                  : "Maximum disc radius in the fit (best to overestimate size of source) [arcsec]",
+      "N"                     : "Number of collocation points used in the fit (suggested range 100 - 300)",
+      "alpha"                 : "Order parameter for the power spectrum's inverse Gamma prior (suggested range 1.00 - 1.50). If a list, multiple fits will be performed",
+      "wsmooth"               : "Strength of smoothing applied to the power spectrum (suggested range 10^-4 - 10^-1). If a list, multiple fits will be performed",
+      "method"                : "The fit method: 'Normal' to fit in linear brighness, 'LogNormal' to fit in logarithmic brightness",
+      "I_scale"               : "Minimum brightness for frank fit, used for LogNormal model",
+      "max_iter"              : "Maximum number of fit iterations",
+      "set_fstar"             : "Source for visibility amplitude treated as unresolved stellar emission. One of ['MCMC', 'SED', 'custom']",
+      "scale_heights"         : "List of `start`, `stop`, `num` for `np.logspace` call to define scale-height grid over which to run fits. E.g., `[-2, -1, 3]` corresponds to `np.logspace(-2, -1, 3)`", 
+      "nthreads"              : "Number of CPU threads on which to run multiple fits (note a single frank fit is fastest on only 1 thread)",
+      "save_solution"         : "Whether to save `sol` object (see frank.radial_fitters.FrankFitter)",
+      "save_profile_fit"      : "Whether to save fitted brightness profile",
+      "save_vis_fit"          : "Whether to save fitted visibility distribution",
+      "save_uvtables"         : "Whether to save fitted and residual UV tables (these are reprojected)",
+      "make_quick_fig"        : "Whether to make a figure showing basic results of the fit"
+    },
+  
+    "plot" : {
+      "bin_widths"            : "Bin widths in which to bin the observed visibilities. List of float or int [\\lambda]",
+    }
+  }  
