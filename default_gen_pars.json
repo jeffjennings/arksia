@@ -1,10 +1,12 @@
 {
   "base" : {
-    "extract_clean_profile" : true,
-    "process_rave_fit"      : true,
-    "run_frank"             : true,
+    "extract_clean_profile" : false,
+    "process_rave_fit"      : false,
+    "run_frank"             : false,
     "aspect_ratio_fig"      : false,  
-    "compare_models_fig"    : false
+    "compare_models_fig"    : false,
+    "survey_summary_txt"    : false,
+    "survey_summary_fig"    : false
   },
 
   "clean" : {
