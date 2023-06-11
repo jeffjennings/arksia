@@ -49,3 +49,46 @@ def concatenate_vis(in1, in2, out=None):
                     'V': 'Jy', 'weights': 'Jy^-2'})
 
     return [u, v, vis, weights]
+
+
+def get_vis(model):
+    """
+    Load (or generate if it does not exist) an ARKS visibility dataset.
+
+    Parameters
+    ----------
+    model : dict
+        Dictionary containing pipeline parameters
+
+    Returns
+    -------
+    uv_data : list
+        dataset: u-coordinates, v-coordinates, visibility amplitudes 
+        (Re(V) + Im(V) * 1j), weights
+    """
+
+    combined_vis_path = "{}/vis_combined.npz".format(model["base"]["frank_dir"])
+    if os.path.isfile(combined_vis_path):
+        u, v, re, im, weights, _ = np.genfromtxt(combined_vis_path).T
+        vis = re + im * 1j
+        uv_data = [u, v, vis, weights] 
+
+    else:
+        visACA = "{}/{}.ACA.continuum.fav.tav.{}corrected.txt".format(
+            model["base"]["frank_dir"], model["base"]["disk"], model["base"]["SMG_sub"]
+            ) 
+        vis12m = "{}/{}.12m.continuum.fav.tav.{}corrected.txt".format(
+            model["base"]["frank_dir"], model["base"]["disk"], model["base"]["SMG_sub"]
+            ) 
+
+        # join visibility datasets from ACA and 12m obs.
+        # account for sources missing ACA dataset
+        if os.path.isfile(visACA):
+            uv_data = concatenate_vis(visACA, vis12m)
+        else:
+            print("  ACA vis dataset missing --> loading only 12m data")
+            u, v, re, im, weights, _ = np.genfromtxt(vis12m).T
+            vis = re + im * 1j
+            uv_data = [u, v, vis, weights]        
+
+    return uv_data 
