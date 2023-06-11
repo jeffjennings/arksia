@@ -402,3 +402,84 @@ def image_comparison_figure(fits, model):
     return fig
 
 
+def aspect_ratio_figure(model):
+    """
+    Generate a figure showing results of vertical inference with frank 1+1D
+
+    Parameters
+    ----------
+    model : dict
+        Dictionary containing pipeline parameters
+        
+    Returns
+    -------
+    fig : `plt.figure` instance
+        The generated figure
+    """
+
+    # log evidence results over grid of alpha, wsmooth, h values
+    alphas, wsmooths, hs, logevs = np.genfromtxt("{}/frank/vertical_inference.txt".format(model["base"]["save_dir"])).T
+
+    # size of h grid
+    nh = len(np.unique(hs))
+    # first idx of each unique (alpha, wsmooth) pair (used to group results by priors)
+    idx = np.arange(0, len(logevs), nh)
+
+    fig, axes = plt.subplots(ncols=1, nrows=len(idx), figsize=(15,10))
+    fig.suptitle(model["base"]["disk"])
+
+    for ii, jj in enumerate(idx):
+        alpha, wsmooth = alphas[jj], wsmooths[jj]
+        h, logev = hs[jj:jj + np.diff(idx)[0]], logevs[jj:jj + np.diff(idx)[0]]
+        
+        # interpolate
+        h_interp = interp1d(h, logev, kind='quadratic')
+        hgrid = np.logspace(np.log10(h[0]), np.log10(h[-1]), 300)
+        logev_fine = h_interp(hgrid)
+
+        # normalize
+        logev -= logev_fine.max()
+        logev_fine -= logev_fine.max()
+   
+        # h is log-spaced 
+        dh = hgrid * (hgrid[1] / hgrid[0] - 1)
+
+        # cumulative distribution
+        cdf = np.cumsum(10 ** logev_fine * dh)
+        cdf /= cdf.max()
+        cdf, good_idx = np.unique(cdf, return_index=True) # prevent repeat entries of 1.0
+
+        # cumulative dist percentiles
+        pct = interp1d(cdf, hgrid[good_idx], kind='quadratic')
+        h16, h50, h84 = pct([0.16, 0.5, 0.84])
+
+        logp_fine = 10 ** logev_fine
+        logp = 10 ** logev
+
+        # point estimate of h 
+        hmax = hgrid[logp_fine.argmax()]
+
+        axes[ii].plot(h, logp, 'r.', label='PDF samples', zorder=10)
+        axes[ii].plot(hgrid, logp_fine, 'k', label='PDF interp.')
+
+        axes[ii].plot(hgrid[good_idx], cdf, 'c', label='CDF')
+
+        for ll in [h16, h50, h84]:
+            axes[ii].axvline(ll, ls='--', c='g')
+        axes[ii].axvline(hmax, ls='--', c='m', label='point estimate')
+
+        axes[ii].set_xscale('log')
+
+        axes[ii].set_title(r'$\alpha$ = {}, w$_{{smooth}}$ = {:.0e}, h={:.3f}$_{{-{:.3f}}}^{{+{:.3f}}}$'.format(alpha, wsmooth, h50, h50 - h16, h84 - h50)) 
+
+    # show labels on last panel
+    plt.legend()
+    plt.xlabel('h = H / r')
+    plt.ylabel(r'Normalized P(h|V, $\beta$)')
+
+    plt.savefig('{}/vertical_inference_frank.png'.format(
+        model["base"]["save_dir"]), dpi=300
+    )
+
+    return fig
+
