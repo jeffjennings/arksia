@@ -123,3 +123,96 @@ def model_setup(parsed_args):
         model["frank"]["max_iter"] = 2000
 
     return model
+
+
+def extract_clean_profile(model):
+    """Obtain radial profiles from each of a CLEAN image and CLEAN model 
+
+    Parameters
+    ----------
+    model : dict
+        Dictionary containing pipeline parameters
+
+    Returns
+    -------
+    tuple
+        Radial points `r` [arcsec], brightness `I` [Jy/sr] and brightness 
+        uncertainty `I_err` [Jy/sr] for each the CLEAN image profile' `r` and 
+        `I` for the CLEAN model profile
+    """
+    # image filenames 
+    base_path = "{}/{}.combined.{}corrected.briggs.{}.{}.{}".format(
+        model["base"]["clean_dir"], 
+        model["base"]["disk"], 
+        model["base"]["SMG_sub"],
+        model["clean"]["robust"], 
+        model["clean"]["npix"], 
+        model["clean"]["pixel_scale"]
+        )
+
+    # get image arrays
+    clean_fits = base_path + ".pbcor.fits"
+    pb_fits = base_path + ".pb.fits"
+    model_fits = base_path + ".model.fits"
+
+    clean_image, clean_beam = load_fits_image(clean_fits)
+    bmaj, bmin = clean_beam
+    pb_image = load_fits_image(pb_fits, aux_image=True)
+    model_image = load_fits_image(model_fits, aux_image=True)
+
+    print('  extracting profiles from {} and {}'.format(clean_fits, model_fits))
+
+    # profile of clean image.
+    # for radial profile on east side of disk,
+    # range in azimuth (PA +- range) over which to average 
+    f = 1.5
+    phic_rad = find_phic(model["base"]["geom"]["inc"] * np.pi / 180, f)
+    phic_deg = phic_rad / deg_to_rad
+    print('phi crit {} deg'.format(phic_deg))
+
+    phis_E = np.linspace(model["base"]["geom"]["PA"] - phic_deg, 
+                        model["base"]["geom"]["PA"] + phic_deg, 
+                        model["clean"]["Nphi"]
+                        ) 
+    
+    phis_W = phis_E + 180
+
+    # radial profile of east and west sides
+    r_E, I_E, I_err_E = radial_profile_from_image(
+        clean_image, geom=model["base"]["geom"], phis=phis_E, bmaj=bmaj, 
+        bmin=bmin, pb_image=pb_image, **model["clean"])
+    r_W, I_W, I_err_W = radial_profile_from_image(
+        clean_image, geom=model["base"]["geom"], phis=phis_W, bmaj=bmaj,
+        bmin=bmin, pb_image=pb_image, **model["clean"])
+
+    # average of E and W
+    r, I, I_err = r_W, np.mean((I_E, I_W), axis=0), np.hypot(I_err_E, I_err_W) / 2
+
+
+    # profile of CLEAN .model image.
+    # average across all azimuths (no need to take separate E and W profiles)
+    phis_mod = np.linspace(model["base"]["geom"]["PA"] - 180, 
+                                  model["base"]["geom"]["PA"] + 180,
+                                  model["clean"]["Nphi"] 
+                                  )
+    
+    r_mod, I_mod = radial_profile_from_image(
+        model_image, geom=model["base"]["geom"], phis=phis_mod, bmaj=0, 
+        bmin=0, model_image=True, **model["clean"])
+
+    # save radial profiles
+    print('  saving CLEAN image and model profiles')
+    np.savetxt("{}/clean_profile_robust{}.txt".format(
+        model["base"]["clean_dir"], model["clean"]["robust"]), 
+        np.array([r, I, I_err]).T, 
+        header='Extracted from {}\nr [arcsec]\tI [Jy/sr]\tI_err [Jy/sr]'.format(
+            clean_fits.split('/')[-1])
+        )
+
+    np.savetxt("{}/clean_model_profile_robust{}.txt".format(
+        model["base"]["clean_dir"], model["clean"]["robust"]),
+        np.array([r_mod, I_mod]).T,        
+        header='Extracted from {}\nr [arcsec]\tI [Jy/sr]'.format(
+            model_fits.split('/')[-1])
+        )
+ 
