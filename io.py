@@ -128,3 +128,13 @@ def load_fits_image(fits_image, aux_image=False):
         return image, np.array([bmaj, bmin])
 
     return image 
+
+
+def get_last2d(image):
+    "Get last 2 dimensions of an N-dimensional image"
+    if image.ndim <= 2:
+        return image
+    slc = [0] * (image.ndim - 2) + [slice(None), slice(None)]
+    return image[tuple(slc)]
+
+
