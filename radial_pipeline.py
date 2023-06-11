@@ -397,3 +397,43 @@ def compare_models(fits, model):
     return fig1, fig2 
 
 
+def main(*args):
+    """Run a pipeline to extract/fit/analyze radial profiles using 
+    clean/rave/frank for ARKS data.
+
+    Parameters
+    ----------
+    *args : strings
+        Simulates the command line arguments
+    """
+
+    parsed_args = parse_parameters(*args)
+    model = model_setup(parsed_args)
+
+    if True in (model["base"]["survey_summary_txt"], model["base"]["survey_summary_fig"]):
+        survey_summary(model["base"]["survey_summary_txt"], 
+                       model["base"]["survey_summary_fig"],
+                       parsed_args.base_parameter_filename,
+                       parsed_args.source_parameter_filename,
+                       model["clean"]["robust"]
+                       )
+        return
+    
+    if model["base"]["extract_clean_profile"] is True:
+        extract_clean_profile(model)
+
+    if model["base"]["process_rave_fit"] is True:
+        process_rave_fit(model)
+
+    if model["base"]["run_frank"] is True:
+        frank_sols = run_frank(model)
+
+    if model["base"]["compare_models_fig"] is True:
+        fits = load_bestfit_profiles(model)   
+        fig1, fig2 = compare_models(fits, model)
+
+    if model["base"]["aspect_ratio_fig"] is True:
+        fig3 = aspect_ratio_figure(model)
+
+if __name__ == "__main__":
+    main()
