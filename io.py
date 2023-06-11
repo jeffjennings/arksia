@@ -92,3 +92,39 @@ def get_vis(model):
             uv_data = [u, v, vis, weights]        
 
     return uv_data 
+
+
+def load_fits_image(fits_image, aux_image=False):
+    """
+    Load an image from a .fits file.
+
+    Parameters
+    ----------
+    fits_image : string
+        Path to the .fits file
+    aux_image : bool, default=False
+        Whether the .fits image is an 'auxillary' image (such as a dirty image) 
+        or a standard clean output image
+        
+    Returns
+    -------
+    image, [bmaj, bmin] : 2D array, list of floats
+        The image and its major and min axis widths (only `image` is returned 
+        if `aux_image=True`)
+    """
+
+    ff = pyfits.open(fits_image)
+    image = get_last2d(ff[0].data) 
+
+    print('image {}, brightness unit {}'.format(fits_image, ff[0].header['BUNIT']))
+
+    if not aux_image:
+        header = ff[0].header
+        bmaj = float(header['BMAJ'])
+        bmin = float(header['BMIN'])
+        # pixel_scale = float(header['CDELT2']) 
+        # npix = len(im[:,0])
+
+        return image, np.array([bmaj, bmin])
+
+    return image 
