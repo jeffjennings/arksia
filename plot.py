@@ -483,3 +483,116 @@ def aspect_ratio_figure(model):
 
     return fig
 
+
+def survey_summary(profiles_txt=True, profiles_fig=True, 
+                   gen_par_f='default_gen_pars.json', 
+                   source_par_f='default_source_pars.json', 
+                   robust=2.0
+                   ):
+    """
+    Generate radial profile results across all survey sources.
+
+    Parameters
+    ----------
+    profiles_txt : bool, default=True
+        Whether to produce a .txt file per source containting the 
+        clean, rave, frank brightness profiles (sampled at same radii)
+    profiles_fig : bool, default=True
+        Whether to produce a single figure showing brightness profiles for 
+        all sources
+    gen_par_f : string, default='default_gen_pars.json'
+        Path to the general parameter file
+    source_par_f : string, default='default_source_pars.json'
+        Path to the parameter file with custom values for each source
+    robust : float, default=2.0
+        Robust weighting value to use for retrieving clean, rave results
+    
+    Returns
+    -------
+    figs : `plt.figure` instance
+        The generated figures, produced if `profiles_fig` is True
+    """
+
+    # get all source names
+    source_pars = json.load(open(source_par_f, 'r'))
+    disk_names = []
+    for ii in source_pars:
+        disk_names.append(ii)
+
+    for ii, jj in enumerate(disk_names):
+        class parsed_args():
+            base_parameter_filename = gen_par_f
+            disk = jj
+            source_parameter_filename = source_par_f
+
+        # generate model for each source
+        model = model_setup(parsed_args)
+
+        # best-fit clean, rave, frank profile for each source
+        [[rc, Ic, Iec], [grid, Vc]], [[rr, Ir, Ier_lo, Ier_hi], [grid, Vr]], [[rf, If, Ief], [grid, Vf], sol] = load_bestfit_profiles(model, robust)
+
+        # interpolate clean and rave profiles onto frank radial points 
+        Ic_interp = np.interp(rf, rc, Ic)
+        Iec_interp = np.interp(rf, rc, Iec)
+        Ir_interp = np.interp(rf, rr, Ir)
+        Ier_lo_interp = np.interp(rf, rr, Ier_lo)
+        Ier_hi_interp = np.interp(rf, rr, Ier_hi)
+
+        Is_jy_sr = [Ic_interp, Ir_interp, If]
+        Ies_jy_sr = [[Iec_interp, Iec_interp], [Ier_lo_interp, Ier_hi_interp], [Ief, Ief]]
+
+
+        if profiles_txt:
+            # save .txt file per source with clean,rave,frank profiles
+            np.savetxt('./{}_radial_profiles.txt'.format(jj), 
+                    np.array([rf * model["base"]["dist"], Ic_interp, Iec_interp, 
+                              If, Ief, Ir_interp, Ier_lo_interp, Ier_hi_interp
+                              ]).T,
+                    header="dist={} [au].\nAll brightnesses in [Jy/steradian].\nUncertainties not comparable across models. " 
+                    header += "Rave uncertainties have unique lower and upper bounds.\nColumns: "
+                    header += "r [au]\t\tI_clean\t\tsigma_clean\t\tI_frank\t\tsigma_frank\t\tI_rave\t\tsigma_lower_rave\t\tsigma_upper_rave".format(model["base"]["dist"])
+                    )
+
+
+        figs = []
+        if profiles_fig:
+            # generate, save figures for profiles of all sources and profiles with uncertainties.
+            for hh in range(2):
+                fig, axes = plt.subplots(nrows=5, ncols=4, figsize=(10, 10), squeeze=True)
+                cols, labs = ['C1', 'C3', 'C2'], ['clean', 'rave', 'frank']
+
+                for kk, ll in enumerate(Is_jy_sr):     
+                    # plot profile
+                    axes[ii].plot(rf * model["base"]["dist"], ll, c=cols[kk], label=labs[kk])
+                
+                    if hh == 1:
+                        # plot 1 sigma uncertainty band
+                        axes[ii].fill_between(rf * model["base"]["dist"], 
+                                            ll - Ies_jy_sr[kk][0], ll + Ies_jy_sr[kk][1], 
+                                        color=cols[kk], alpha=0.4)
+                
+                axes[ii].axhline(y=0, ls='--', c='k')
+
+                axes[ii].text(0.6, 0.9, jj, transform=axes[ii].transAxes)
+
+                if ii == len(disk_names) - 1:
+                    axes[ii].legend(loc='center right')
+                    axes[ii].set_xlabel('r [au]')
+                    axes[ii].set_ylabel(r'I [Jy sterad$^{-1}$]')
+
+                axes[ii].set_title('$f_*=${:.0f} $\mu$Jy'.format(model["frank"]["fstar"] * 1e6))
+
+                if hh == 1:
+                    suptitle = r'$1\sigma$ uncertainties do not include systematic unc., and are not comparable across models'
+                    fig.suptitle(suptitle)
+                
+                fig.tight_layout()
+
+                if hh == 0:
+                    plt.savefig('./survey_profile_summary.png')
+                else:
+                    plt.savefig('./survey_profile_summary_unc.png')
+
+                figs.append(fig)
+
+        return figs
