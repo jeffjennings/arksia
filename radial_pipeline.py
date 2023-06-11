@@ -388,3 +388,12 @@ def run_frank(model):
 
     return sols
 
+
+def compare_models(fits, model):
+    # make profile comparison figure
+    fig1 = profile_comparison_figure(fits, model)
+    fig2 = image_comparison_figure(fits, model)
+
+    return fig1, fig2 
+
+
