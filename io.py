@@ -138,3 +138,41 @@ def get_last2d(image):
     return image[tuple(slc)]
 
 
+def load_bestfit_frank_uvtable(model, resid_table=False):
+    """
+    Load the frank best-fit 2D reprojected visibilities.
+
+    Parameters
+    ----------
+    model : dict
+        Dictionary containing pipeline parameters
+    resid_table : bool, default=False
+        Whether the visibilities being loaded are the frank fit residuals 
+        or the frank fit itself
+
+    Returns
+    -------
+    uv_data : list
+        frank visibilities: u-coordinates, v-coordinates, visibility amplitudes 
+        (Re(V) + Im(V) * 1j), weights    
+    """    
+    if resid_table:
+        suffix = 'resid'
+    else:
+        suffix = 'fit'
+
+    # enforce the best-fit has 0 scale height
+    path = "{}/{}_alpha{}_w{}_h0.000_fstar{:.0f}uJy_method{}_frank_uv_{}.npz".format(
+                        model["base"]["frank_dir"], 
+                        model["base"]["disk"], 
+                        model["frank"]["bestfit"]["alpha"],
+                        model["frank"]["bestfit"]["wsmooth"], 
+                        model["frank"]["fstar"] * 1e6,
+                        model["frank"]["bestfit"]["method"],
+                        suffix
+    )
+    
+    u, v, V, weights = load_uvtable(path)
+
+    return [u, v, V, weights]
+
