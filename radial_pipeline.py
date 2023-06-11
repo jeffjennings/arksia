@@ -216,3 +216,54 @@ def extract_clean_profile(model):
             model_fits.split('/')[-1])
         )
  
+
+def process_rave_fit(model):
+    """Unpack a fitted RAVE radial profile, convert units, save
+
+    Parameters
+    ----------
+    model : dict
+        Dictionary containing pipeline parameters
+
+    Returns
+    -------
+    list
+        Radial points `r` [arcsec], brightness `I` [Jy/sr] and brightness 
+        uncertainty `I_err` [Jy/sr] for the RAVE radial profile
+    """
+    if model["clean"]["robust"] == 0.5:
+        rave_str = "1"
+    else:
+        rave_str = "2"
+
+    if model['base']['disk'] == "HD161868" and rave_str == "2":
+        raveN = 7
+    else: 
+        raveN = 5
+
+    fit_path = "{}/{}-{}_inc=90_N={}_radial_{}0arcsec.npy".format(
+        model["base"]["rave_dir"], 
+        model["base"]["disk"], 
+        rave_str,
+        raveN,
+        model["rave"]["pixel_scale"]
+        )
+
+    print('  processing RAVE fit {}'.format(fit_path))
+
+    r, I_err_lo, I, I_err_hi = np.load(fit_path)
+    I_err_lo = I - I_err_lo
+    I_err_hi = I_err_hi - I
+
+    I = jy_convert(I, 'arcsec2_sterad')
+    I_err_lo = jy_convert(I_err_lo, 'arcsec2_sterad')
+    I_err_hi = jy_convert(I_err_hi, 'arcsec2_sterad')    
+
+    print('  saving RAVE profile')
+    np.savetxt("{}/rave_profile_robust{}.txt".format(
+        model["base"]["rave_dir"], model["clean"]["robust"]), 
+        np.array([r, I, I_err_lo, I_err_hi]).T, 
+        header='Extracted from {}\nr [arcsec]\tI [Jy/sr]\tI_err (lower bound) [Jy/sr]\tI_err (upper bound) [Jy/sr]'.format(
+            fit_path.split('/')[-1])
+        )
+
