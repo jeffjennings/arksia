@@ -267,3 +267,124 @@ def process_rave_fit(model):
             fit_path.split('/')[-1])
         )
 
+
+def run_frank(model):
+    """Perform a frank fit
+
+    Parameters
+    ----------
+    model : dict
+        Dictionary containing pipeline parameters
+
+    Returns
+    -------
+    sols : list of _HankelRegressor objects
+        frank fit solutions for each set of hyperparameters 
+        (see frank.radial_fitters.FrankFitter)
+    """
+    print('  running frank')
+
+    uv_data = get_vis(model)
+
+    print('  shifting visibilities down by assumed fstar {} uJy'.format(model["frank"]["fstar"] * 1e6))
+    uv_data[2] = uv_data[2] - model["frank"]["fstar"]
+    
+    frank_geom = FixedGeometry(**model["base"]["geom"]) 
+
+    # set scale height
+    if model["frank"]["scale_heights"] is None:
+        hs = [0]
+    else:
+        hs = np.logspace(*model["frank"]["scale_heights"])
+        print("aspect ratios to be sampled: {}".format(hs))      
+
+    nfits = len((model["frank"]["alpha"])) * len(model["frank"]["wsmooth"]) * len(hs)
+    print('{} fits will be performed. Using {} threads ({} available on CPU).'.format(nfits, 
+                                                                                             model["frank"]["nthreads"], 
+                                                                                             multiprocess.cpu_count())
+                                                                                             )
+
+    # perform frank fit(s)
+    def frank_fitter(priors):
+        alpha, wsmooth, h = priors 
+        print('performing fit for alpha {} wsmooth {} h {}'.format(alpha, wsmooth, h))
+
+        if h == 0:
+            scale_height = None  
+        else:
+            def scale_height(R):
+                return h * R
+            
+        # FrankDebrisFitter assumes disk is optically thin
+        FF = FrankDebrisFitter(Rmax=model["frank"]["rout"], 
+                                N=model["frank"]["N"], 
+                                geometry=frank_geom,
+                                scale_height=scale_height, 
+                                alpha=alpha,
+                                weights_smooth=wsmooth,
+                                method=model["frank"]["method"],
+                                I_scale=model["frank"]["I_scale"],
+                                max_iter=model["frank"]["max_iter"],
+                                convergence_failure='warn'
+                                )
+        
+        sol = FF.fit(*uv_data)
+
+        # add non-negative brightness profile to sol
+        if model["frank"]["method"] == "Normal":
+            setattr(sol, '_nonneg', sol.solve_non_negative())
+
+        if scale_height is None:
+            logev = None
+        else:
+            logev = FF.log_evidence_laplace()
+        # add evidence to sol
+        setattr(sol, 'logevidence', logev)
+
+        # save fit outputs
+        save_prefix = "{}/{}_alpha{}_w{}_h{:.3f}_fstar{:.0f}uJy_method{}".format(
+                    model["base"]["frank_dir"], model["base"]["disk"], 
+                    alpha, wsmooth, h,
+                    model["frank"]["fstar"] * 1e6,
+                    model["frank"]["method"]
+                    )
+
+        save_fit(*uv_data, 
+                sol=sol,
+                prefix=save_prefix,
+                save_solution=model["frank"]["save_solution"],
+                save_profile_fit=model["frank"]["save_profile_fit"],
+                save_vis_fit=model["frank"]["save_vis_fit"],
+                save_uvtables=model["frank"]["save_uvtables"]
+                )
+
+        # save fit summary figure
+        if model["frank"]["make_quick_fig"]:
+            make_quick_fig(*uv_data, sol, bin_widths=[5e3, 20e3],
+                        save_prefix=save_prefix,
+                        )
+        
+        return sol
+
+    if nfits == 1:
+        import frank; frank.enable_logging()
+        sols, logevs = frank_fitter([model["frank"]["alpha"][0], model["frank"]["wsmooth"][0], hs[0]])
+    else: 
+        pool = multiprocess.Pool(processes=model["frank"]["nthreads"])
+        g0, g1, g2 = np.meshgrid(model["frank"]["alpha"], model["frank"]["wsmooth"], hs)
+        g0, g1, g2 = g0.flatten(), g1.flatten(), g2.flatten()
+        priors = np.array([g0, g1, g2]).T
+        sols = pool.map(frank_fitter, priors)
+
+    logevs = []
+    for ss in sols:
+        logevs.append(ss.logevidence)
+
+    # save scale heights and log evidences
+    if np.array(hs).any() != 0:
+        np.savetxt("{}/vertical_inference_frank.txt".format(model["base"]["save_dir"]),
+            np.array([g0, g1, g2, logevs]).T, header='alpha\twsmooth\th=H/r\tlog evidence'
+        )
+
+    return sols
+
