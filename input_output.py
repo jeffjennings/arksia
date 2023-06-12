@@ -144,7 +144,23 @@ def get_last2d(image):
 
 
 def parse_rave_filename(model, file_type='rave_fit'):
-    "Interpret rave filename for loading"
+    """Interpret rave filenames for generalizing the loading of rave results.
+
+    Parameters
+    ----------
+    model : dict
+        Dictionary containing pipeline parameters
+    file_type : str, default='rave_fit'
+        Which type of rave file to load: 
+          - 'rave_fit' for a rave brightness profile
+          - 'rave_residual_image' for a 2d rave residual image
+
+    Returns
+    -------
+    file_path : str
+        Path to the desired rave file
+    """    
+
     if model["clean"]["robust"] == 0.5:
         rave_str = "1"
     else:
