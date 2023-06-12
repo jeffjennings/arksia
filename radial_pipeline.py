@@ -102,7 +102,7 @@ def model_setup(parsed_args):
             "dDec" : mcmc["deltaDec-12m.obs1"]["median"]
             }
     model["base"]["geom"] = geom 
-    print('  source geometry from MCMC {}'.format(geom))
+    print('    source geometry from MCMC {}'.format(geom))
 
     # stellar flux to remove from visibilities as point-source
     if model["frank"]["set_fstar"] == "custom":
@@ -114,13 +114,13 @@ def model_setup(parsed_args):
             model["frank"]["fstar"] = mcmc["fstar"]["median"] / 1e3
         except KeyError:
             model["frank"]["fstar"] = 0.0
-            print('  no stellar flux in MCMC file --> setting fstar = 0')
+            print('        no stellar flux in MCMC file --> setting fstar = 0')
     else:
         raise ValueError("Parameter ['frank']['set_fstar'] is '{}'. It should be one of 'MCMC', 'SED', 'custom'".format(model["frank"]["set_fstar"])) 
 
     # enforce a Normal fit if finding scale height (LogNormal fit not compatible with vertical inference)
     if model["frank"]["scale_heights"] is not None:
-        print("'scale_heights' is not None in your parameter file -- enforcing 'method=Normal' with 'max_iter=2000'")
+        print("    'scale_heights' is not None in your parameter file -- enforcing frank 'method=Normal' and 'max_iter=2000'")
         model["frank"]["method"] = "Normal"
         model["frank"]["max_iter"] = 2000
 
@@ -162,15 +162,15 @@ def extract_clean_profile(model):
     pb_image = load_fits_image(pb_fits, aux_image=True)
     model_image = load_fits_image(model_fits, aux_image=True)
 
-    print('  extracting profiles from {} and {}'.format(clean_fits, model_fits))
-
     # profile of clean image.
     # for radial profile on east side of disk,
     # range in azimuth (PA +- range) over which to average 
     f = 1.5
     phic_rad = find_phic(model["base"]["geom"]["inc"] * np.pi / 180, f)
     phic_deg = phic_rad / deg_to_rad
-    print('phi crit {} deg'.format(phic_deg))
+    
+
+    print('  Clean profiles: extracting profiles from {} and {} using phi_crit {:.2f} deg'.format(clean_fits, model_fits, phic_deg))
 
     phis_E = np.linspace(model["base"]["geom"]["PA"] - phic_deg, 
                         model["base"]["geom"]["PA"] + phic_deg, 
@@ -202,17 +202,19 @@ def extract_clean_profile(model):
         model_image, geom=model["base"]["geom"], phis=phis_mod, bmaj=0, 
         bmin=0, model_image=True, **model["clean"])
 
-    # save radial profiles
-    print('  saving CLEAN image and model profiles')
-    np.savetxt("{}/clean_profile_robust{}.txt".format(
-        model["base"]["clean_dir"], model["clean"]["robust"]), 
+    # radial profile save paths
+    ciff = "{}/clean_profile_robust{}.txt".format(
+        model["base"]["clean_dir"], model["clean"]["robust"])
+    cmff = "{}/clean_model_profile_robust{}.txt".format(
+        model["base"]["clean_dir"], model["clean"]["robust"])    
+    
+    print('    saving CLEAN image profile to {} and model profile to {}'.format(ciff, cmff))
+    np.savetxt(ciff, 
         np.array([r, I, I_err]).T, 
         header='Extracted from {}\nr [arcsec]\tI [Jy/sr]\tI_err [Jy/sr]'.format(
             clean_fits.split('/')[-1])
         )
-
-    np.savetxt("{}/clean_model_profile_robust{}.txt".format(
-        model["base"]["clean_dir"], model["clean"]["robust"]),
+    np.savetxt(cmff,
         np.array([r_mod, I_mod]).T,        
         header='Extracted from {}\nr [arcsec]\tI [Jy/sr]'.format(
             model_fits.split('/')[-1])
@@ -261,9 +263,10 @@ def process_rave_fit(model):
     I_err_lo = jy_convert(I_err_lo, 'arcsec2_sterad')
     I_err_hi = jy_convert(I_err_hi, 'arcsec2_sterad')    
 
-    print('  saving RAVE profile')
-    np.savetxt("{}/rave_profile_robust{}.txt".format(
-        model["base"]["rave_dir"], model["clean"]["robust"]), 
+    ff = "{}/rave_profile_robust{}.txt".format(
+        model["base"]["rave_dir"], model["clean"]["robust"])
+    print('    saving RAVE profile to {}'.format(ff))
+    np.savetxt(ff, 
         np.array([r, I, I_err_lo, I_err_hi]).T, 
         header='Extracted from {}\nr [arcsec]\tI [Jy/sr]\tI_err (lower bound) [Jy/sr]\tI_err (upper bound) [Jy/sr]'.format(
             fit_path.split('/')[-1])
@@ -284,11 +287,11 @@ def run_frank(model):
         frank fit solutions for each set of hyperparameters 
         (see frank.radial_fitters.FrankFitter)
     """
-    print('  running frank')
+    print(' Frank fit: running fit')
 
     uv_data = get_vis(model)
 
-    print('  shifting visibilities down by assumed fstar {} uJy'.format(model["frank"]["fstar"] * 1e6))
+    print('    shifting visibilities down by fstar {} uJy according to {}'.format(model["frank"]["fstar"] * 1e6, model["frank"]["set_fstar"]))
     uv_data[2] = uv_data[2] - model["frank"]["fstar"]
     
     frank_geom = FixedGeometry(**model["base"]["geom"]) 
@@ -298,10 +301,10 @@ def run_frank(model):
         hs = [0]
     else:
         hs = np.logspace(*model["frank"]["scale_heights"])
-        print("aspect ratios to be sampled: {}".format(hs))      
+        print("    aspect ratios to be sampled: {}".format(hs))      
 
     nfits = len((model["frank"]["alpha"])) * len(model["frank"]["wsmooth"]) * len(hs)
-    print('{} fits will be performed. Using {} threads ({} available on CPU).'.format(nfits, 
+    print('    {} fits will be performed. Using {} threads ({} available on CPU).'.format(nfits, 
                                                                                              model["frank"]["nthreads"], 
                                                                                              multiprocess.cpu_count())
                                                                                              )
@@ -309,7 +312,7 @@ def run_frank(model):
     # perform frank fit(s)
     def frank_fitter(priors):
         alpha, wsmooth, h = priors 
-        print('performing fit for alpha {} wsmooth {} h {}'.format(alpha, wsmooth, h))
+        print('        performing fit for alpha {} wsmooth {} h {}'.format(alpha, wsmooth, h))
 
         if h == 0:
             scale_height = None  
@@ -351,6 +354,7 @@ def run_frank(model):
                     model["frank"]["method"]
                     )
 
+        print("          saving fit results to {}*".format(save_prefix))
         save_fit(*uv_data, 
                 sol=sol,
                 prefix=save_prefix,
@@ -362,7 +366,7 @@ def run_frank(model):
 
         # save fit summary figure
         if model["frank"]["make_quick_fig"]:
-            make_quick_fig(*uv_data, sol, bin_widths=[5e3, 20e3],
+            make_quick_fig(*uv_data, sol, bin_widths=model["plot"]["bin_widths"],
                         save_prefix=save_prefix,
                         )
         
