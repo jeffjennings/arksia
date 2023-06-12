@@ -13,9 +13,9 @@ from frank.io import save_fit
 from frank.make_figs import make_quick_fig
 from frank.geometry import FixedGeometry
 
-from image_radial_profile import radial_profile_from_image, find_phic
-from io import load_fits_image, get_vis, load_bestfit_profiles
-from plot import profile_comparison_figure, image_comparison_figure, aspect_ratio_figure, survey_summary
+from input_output import get_vis, load_fits_image, load_bestfit_profiles, parse_rave_filename
+from image_radial_profile import find_phic, radial_profile_from_image 
+from plot import aspect_ratio_figure, image_comparison_figure, profile_comparison_figure
 
 def parse_parameters(*args):
     """
