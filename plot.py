@@ -94,23 +94,10 @@ def profile_comparison_figure(fits, model):
     up, vp, Vp = sol.geometry.apply_correction(u, v, vis)
     bls = np.sqrt(up**2 + vp**2)
 
-    # plot 1d rave residual brightness 
-    if model["clean"]["robust"] == 0.5:
-        rave_str = "1"
-    else:
-        rave_str = "2"    
-    if model['base']['disk'] == "HD161868" and rave_str == "2":
-        raveN = 7
-    else: 
-        raveN = 5        
-    rave_resid_im_path = "{}/{}-{}_inc=90_N={}_2Dresiduals.npy".format(
-        model["base"]["rave_dir"], 
-        model["base"]["disk"], 
-        rave_str,
-        raveN
-        )    
-    
+    # plot 1d rave residual brightness   
+    rave_resid_im_path = parse_rave_filename(model, file_type='rave_residual_image')
     rave_resid_im = np.load(rave_resid_im_path)
+    
     # convert Jy / pixel to Jy / arcsec
     rave_resid_im /= model["rave"]["pixel_scale"] ** 2 
 
@@ -287,20 +274,7 @@ def image_comparison_figure(fits, model):
     rave_image = jy_convert(rave_image, 'sterad_arcsec2')
 
     # make rave residual image (again assuming square images)
-    if model["clean"]["robust"] == 0.5:
-        rave_str = "1"
-    else:
-        rave_str = "2"    
-    if model['base']['disk'] == "HD161868" and rave_str == "2":
-        raveN = 7
-    else: 
-        raveN = 5        
-    rave_resid_im_path = "{}/{}-{}_inc=90_N={}_2Dresiduals.npy".format(
-        model["base"]["rave_dir"], 
-        model["base"]["disk"], 
-        rave_str,
-        raveN
-        )    
+    rave_resid_im_path = parse_rave_filename(model, file_type='rave_residual_image')
     rave_resid_im = np.load(rave_resid_im_path)
 
     # convert Jy / pixel to Jy / arcsec
