@@ -64,12 +64,14 @@ def model_setup(parsed_args):
     source_pars = json.load(open(parsed_args.source_parameter_filename, 'r'))
     disk_pars = source_pars[model["base"]["disk"]]
 
-    if not model["base"]["save_dir"]:
+    if not model["base"]["root_dir"]:
         # If not specified, use the directory with `gen_pars.json` to set the save directory
-        model["base"]["save_dir"] = os.path.join(os.path.dirname(parsed_args.base_parameter_filename), "disks/{}".format(model["base"]["disk"]))
-        print("Setting load/save paths as {}/<clean, rave, frank>. Visibility tables should be in frank path.".format(model["base"]["save_dir"]))
-    else:
-        print("Assuming load/save paths are {}/<clean, rave, frank>. Visibility tables should be in frank path.".format(model["base"]["save_dir"]))
+        model["base"]["root_dir"] = os.path.join(os.path.dirname(parsed_args.base_parameter_filename), "disks")
+
+    # expect input files to be in "<root_dir>/<disk name>/<clean or rave or frank>"
+    model["base"]["save_dir"] = os.path.join(model["base"]["root_dir"], "{}".format(model["base"]["disk"]))
+    print("  Model setup: setting load/save paths as {}/<clean, rave, frank>. Visibility tables should be in frank path.".format(model["base"]["save_dir"]))
+
     model["base"]["clean_dir"] = os.path.join(model["base"]["save_dir"], "clean")
     model["base"]["rave_dir"] = os.path.join(model["base"]["save_dir"], "rave")
     model["base"]["frank_dir"] = os.path.join(model["base"]["save_dir"], "frank")
