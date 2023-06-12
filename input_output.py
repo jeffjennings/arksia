@@ -143,6 +143,39 @@ def get_last2d(image):
     return image[tuple(slc)]
 
 
+def parse_rave_filename(model, file_type='rave_fit'):
+    "Interpret rave filename for loading"
+    if model["clean"]["robust"] == 0.5:
+        rave_str = "1"
+    else:
+        rave_str = "2"
+
+    # one source has different rave parameter choices
+    if model['base']['disk'] == "HD161868" and rave_str == "2":
+        raveN = 7
+    else: 
+        raveN = 5
+
+    if file_type == 'rave_fit':
+        # adjust rave fit paths here if neeeded
+        file_path = "{}/{}-{}_inc=90_N={}_radial_{}0arcsec.npy".format(
+            model["base"]["rave_dir"], 
+            model["base"]["disk"], 
+            rave_str,
+            raveN,
+            model["rave"]["pixel_scale"]
+            )
+    
+    elif file_type == 'rave_residual_image':
+        file_path = "{}/{}-{}_inc=90_N={}_2Dresiduals.npy".format(
+            model["base"]["rave_dir"], 
+            model["base"]["disk"], 
+            rave_str,
+            raveN
+            )        
+
+    return file_path
+
 
 def load_bestfit_frank_uvtable(model, resid_table=False):
     """
