@@ -405,15 +405,6 @@ def main(*args):
 
     parsed_args = parse_parameters(*args)
     model = model_setup(parsed_args)
-
-    if True in (model["base"]["survey_summary_txt"], model["base"]["survey_summary_fig"]):
-        survey_summary(model["base"]["survey_summary_txt"], 
-                       model["base"]["survey_summary_fig"],
-                       parsed_args.base_parameter_filename,
-                       parsed_args.source_parameter_filename,
-                       model["clean"]["robust"]
-                       )
-        return
     
     if model["base"]["extract_clean_profile"] is True:
         extract_clean_profile(model)
