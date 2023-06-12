@@ -1,4 +1,4 @@
-"""File to run `radial_pipeline` in a loop over multiple sources."""
+"""Routine to run `radial_pipeline` in a loop over multiple sources (originally written by Jeff Jennings)."""
 
 import os
 import json
@@ -14,7 +14,7 @@ def main(gen_par_f='./default_gen_pars.json', source_par_f='./default_source_par
         print("\nPipeline call {} of {} - disk {}".format(ii, len(disk_names) - 1, jj))
 
         os.system('python radial_pipeline.py -d {} -b {} -s {}'.format(
-        jj, gen_par_f, source_par_f))
+            jj, gen_par_f, source_par_f))
 
 if __name__ == "__main__":
     main()
