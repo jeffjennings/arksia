@@ -1,0 +1,86 @@
+import json
+import numpy as np 
+import matplotlib.pyplot as plt 
+
+from radial_pipeline import model_setup
+from input_output import load_bestfit_profiles
+
+def main(profiles_txt=True, profiles_fig=True, 
+                   gen_par_f='./default_gen_pars.json', 
+                   source_par_f='./default_source_pars.json', 
+                   robust=2.0
+                   ):
+    """
+    Generate radial profile results across all survey sources.
+
+    Parameters
+    ----------
+    profiles_txt : bool, default=True
+        Whether to produce a .txt file per source containting the 
+        clean, rave, frank brightness profiles (sampled at same radii)
+    profiles_fig : bool, default=True
+        Whether to produce a single figure showing brightness profiles for 
+        all sources
+    gen_par_f : string, default='default_gen_pars.json'
+        Path to the general parameter file
+    source_par_f : string, default='default_source_pars.json'
+        Path to the parameter file with custom values for each source
+    robust : float, default=2.0
+        Robust weighting value to use for retrieving clean, rave results
+    
+    Returns
+    -------
+    figs : `plt.figure` instance
+        The generated figures, produced if `profiles_fig` is True
+    """
+
+    # get all source names
+    source_pars = json.load(open(source_par_f, 'r'))
+    disk_names = []
+    for dd in source_pars:
+        disk_names.append(dd)
+
+    fig0, axs0 = plt.subplots(nrows=5, ncols=4, figsize=(10, 10), squeeze=True)
+    fig1, axs1 = plt.subplots(nrows=5, ncols=4, figsize=(10, 10), squeeze=True)
+    figs, axs = [fig0, fig1], [axs0, axs1]
+
+    for ii, jj in enumerate(disk_names):
+        # generate model for each source
+        class parsed_args():
+            base_parameter_filename = gen_par_f
+            source_parameter_filename = source_par_f
+            disk = jj                        
+        model = model_setup(parsed_args)
+
+        # best-fit clean, rave, frank profile for each source
+        [[rc, Ic, Iec], [grid, Vc]], [[rr, Ir, Ier_lo, Ier_hi], [grid, Vr]], [[rf, If, Ief], [grid, Vf], sol] = load_bestfit_profiles(model, robust)
+
+        # interpolate clean and rave profiles onto frank radial points 
+        Ic_interp = np.interp(rf, rc, Ic)
+        Iec_interp = np.interp(rf, rc, Iec)
+        Ir_interp = np.interp(rf, rr, Ir)
+        Ier_lo_interp = np.interp(rf, rr, Ier_lo)
+        Ier_hi_interp = np.interp(rf, rr, Ier_hi)
+
+        Is_interp = [Ic_interp, Ir_interp, If]
+        Ies_interp = [[Iec_interp, Iec_interp], [Ier_lo_interp, Ier_hi_interp], [Ief, Ief]]
+
+
+        if profiles_txt:
+            ff = '{}/{}_radial_profiles.txt'.format(model["base"]["save_dir"], jj)
+            print('  Survey summary: saving radial profiles to {}'.format(ff))
+
+            # save .txt file per source with clean,rave,frank profiles
+            np.savetxt(ff, 
+                    np.array([rf * model["base"]["dist"], Ic_interp, Iec_interp, 
+                              If, Ief, Ir_interp, Ier_lo_interp, Ier_hi_interp
+                              ]).T,
+                    header="dist={} [au].\nAll brightnesses in [Jy/steradian].\nUncertainties not comparable across models. " + \
+                    "Rave uncertainties have unique lower and upper bounds.\nColumns: " + \
+                    "r [au]\t\tI_clean\t\tsigma_clean\t\tI_frank\t\tsigma_frank\t\tI_rave\t\tsigma_lower_rave\t\tsigma_upper_rave".format(model["base"]["dist"])
+                    )
+
+
+    
+if __name__ == "__main__":
+    main()
