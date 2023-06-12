@@ -81,6 +81,49 @@ def main(profiles_txt=True, profiles_fig=True,
                     )
 
 
+        if profiles_fig:
+            # generate, save figures for brightness profiles of all sources and brightness profiles with uncertainties
+            for hh in range(2):
+                fig = figs[hh]
+                ax = axs[hh]
+
+                # flatten axes
+                ax = [bb for aa in ax for bb in aa]
+                cols, labs = ['C1', 'C3', 'C2'], ['clean', 'rave', 'frank']
+
+                for kk, ll in enumerate(Is_interp):     
+                    # plot profile
+                    ax[ii].plot(rf * model["base"]["dist"], ll / 1e6, c=cols[kk], label=labs[kk])
+                
+                    if hh == 1:
+                        # 1 sigma uncertainty band
+                        ax[ii].fill_between(rf * model["base"]["dist"], 
+                                            (ll - Ies_interp[kk][0]) / 1e6, (ll + Ies_interp[kk][1]) / 1e6, 
+                                        color=cols[kk], alpha=0.4)
+                
+                ax[ii].axhline(y=0, ls='--', c='k')
+
+                ax[ii].text(0.6, 0.9, jj, transform=ax[ii].transAxes)
+
+                if ii == len(disk_names) - 1:
+                    ax[ii].legend(loc='center right')
+                    ax[ii].set_xlabel('r [au]')
+                    ax[ii].set_ylabel(r'I [$10^5$ Jy sterad$^{-1}$]')
+
+                ax[ii].set_title('$f_*=${:.0f} $\mu$Jy'.format(model["frank"]["fstar"] * 1e6))
+
+    if profiles_fig:
+        print('  Survey summary: making survey summary figure')
+    fig1.suptitle(r'$1\sigma$ uncertainties do not include systematic unc., and are not comparable across models')    
+
+    ff0 = '{}/survey_profile_summary.png'.format(model["base"]["root_dir"])
+    ff1 = '{}/survey_profile_summary_unc.png'.format(model["base"]["root_dir"])
+    print('    saving figures to {} and {}'.format(ff0, ff1))
+
+    plt.figure(fig0); plt.tight_layout(); plt.savefig(ff0, dpi=300)
+    plt.figure(fig1); plt.tight_layout(); plt.savefig(ff1, dpi=300)
+
+    return figs
     
 if __name__ == "__main__":
     main()
