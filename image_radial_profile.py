@@ -8,7 +8,7 @@ def radial_profile_from_image(image, geom, rmax, Nr, phis,
                             npix, pixel_scale, bmaj, bmin,
                             image_rms, error_std=False, arcsec2=True, 
                             simple_ellipse=False, pb_image=None, 
-                            model_image=False, verbose=1, **kwargs):
+                            model_image=False, verbose=0, **kwargs):
     """
     Function to extract radial profile from an image 
     
@@ -52,7 +52,8 @@ def radial_profile_from_image(image, geom, rmax, Nr, phis,
             print("      beam = {:.2f} x {:.2f} arcsec".format(bmaj, bmin))
 
         if arcsec2:
-            print('converting image to [Jy / arcsec^2]')
+            if verbose > 0:
+                print('converting image to [Jy / arcsec^2]')
             # convert CLEAN image from [Jy / CLEAN beam] to [Jy / arcsec^2]
             image = image / beam_area
             image_rms = image_rms / beam_area
@@ -65,7 +66,7 @@ def radial_profile_from_image(image, geom, rmax, Nr, phis,
 def radial_profile(image, pb_image, geom, rmax, Nr, phis, image_rms, 
                     bmaj, pixel_scale, npix, error_std=False, arcsec2=True, 
                     simple_ellipse=False, model_image=False, rescale_flux=True, 
-                    verbose=1):
+                    verbose=0):
 
     """
     dRA, dDec are RA DEC offsets in arcsec
@@ -95,9 +96,6 @@ def radial_profile(image, pb_image, geom, rmax, Nr, phis, image_rms,
     Is = np.zeros((Nr, Nphi_rad))
     Is_pb = np.zeros((Nr, Nphi_rad))
 
-    print('NR',Nr)
-    print('NPHI_RAD',Nphi_rad)
-    print('IMAGE.SHAPE',image.shape)
     for ii in range(Nr):
         for jj in range(Nphi_rad):
             xx, yy = ellipse(dRA, dDec, phis_rad[jj], chi, rs[ii], PA_rad)
