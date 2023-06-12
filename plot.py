@@ -11,9 +11,8 @@ from frank.utilities import UVDataBinner, sweep_profile, generic_dht, jy_convert
 from mpol.plot import get_image_cmap_norm
 from mpol.gridding import DirtyImager
 
-from io import get_vis, load_fits_image, load_bestfit_profiles, load_bestfit_frank_uvtable
+from input_output import get_vis, load_fits_image, load_bestfit_frank_uvtable, parse_rave_filename
 from image_radial_profile import radial_profile_from_image
-from radial_pipeline import model_setup
 
 def plot_image(image, extent, ax, norm=None, cmap='inferno', title=None, 
                 cbar_label=None, cbar_pad=0.1):
@@ -53,7 +52,7 @@ def profile_comparison_figure(fits, model):
         The generated figure
     """
         
-    print('making profile comparison figure')
+    print('  Figures: making profile comparison figure')
 
     # load best-fit profiles
     [[rc, Ic, Iec], [grid, Vc]], [[rr, Ir, Ier_lo, Ier_hi], [grid, Vr]], [[rf, If, Ief], [grid, Vf], sol] = fits
@@ -61,7 +60,7 @@ def profile_comparison_figure(fits, model):
     fig = plt.figure(figsize=(10,6))
     fig.suptitle("{} -- robust = {} for clean and rave".format(
         model["base"]["disk"],
-        model["base"]["bestfit_robust"])
+        model["clean"]["robust"])
         )
 
     gs = GridSpec(4, 2, figure=fig, hspace=0, left=0.09, right=0.97, top=0.94, bottom=0.09)
@@ -142,7 +141,7 @@ def profile_comparison_figure(fits, model):
         data_im=Vfres.imag,
         )
     frank_resid_im, _ = imager.get_dirty_image(weighting="briggs", 
-                                               robust=model["base"]["bestfit_robust"])
+                                               robust=model["clean"]["robust"])
     frank_resid_im = np.squeeze(frank_resid_im)
 
     phis_mod = np.linspace(model["base"]["geom"]["PA"] - 180, 
@@ -152,7 +151,7 @@ def profile_comparison_figure(fits, model):
     
     frank_resid_r, frank_resid_I = radial_profile_from_image(
         frank_resid_im, geom=model["base"]["geom"], 
-        rmax=model["frank"]["Rmax"], Nr=model["frank"]["N"], phis=phis_mod, 
+        rmax=model["frank"]["rout"], Nr=model["frank"]["N"], phis=phis_mod, 
         npix=model["clean"]["npix"], pixel_scale=model["clean"]["pixel_scale"],
         bmaj=0, bmin=0, image_rms=0, model_image=True, arcsec2=False
         )
@@ -223,9 +222,10 @@ def profile_comparison_figure(fits, model):
     for ax in [ax0, ax1, ax2, ax3]:
         ax.axhline(0, c='c', ls='--', zorder=10)
 
-    plt.savefig('{}/profile_compare_robust{}.png'.format(
-        model["base"]["save_dir"], model["base"]["bestfit_robust"]), dpi=300
-        )
+    ff = '{}/profile_compare_robust{}.png'.format(
+        model["base"]["save_dir"], model["clean"]["robust"])
+    print('    saving figure to {}'.format(ff))
+    plt.savefig(ff, dpi=300)
     
     return fig
 
@@ -247,7 +247,7 @@ def image_comparison_figure(fits, model):
         The generated figure
     """
 
-    print('making image comparison figure')
+    print('  Figures: making image comparison figure')
     [[rc, Ic, Iec], [grid, Vc]], [[rr, Ir, Ier_lo, Ier_hi], [grid, Vr]], [[rf, If, Ief], [grid, Vf], sol] = fits
 
     # get clean images
@@ -255,7 +255,7 @@ def image_comparison_figure(fits, model):
         model["base"]["clean_dir"], 
         model["base"]["disk"], 
         model["base"]["SMG_sub"],
-        model["base"]["bestfit_robust"], 
+        model["clean"]["robust"], 
         model["clean"]["npix"], 
         model["clean"]["pixel_scale"]
         )
@@ -265,7 +265,7 @@ def image_comparison_figure(fits, model):
     clean_image, clean_beam = load_fits_image(clean_fits)
     # convert clean image from Jy / beam to Jy / arcsec^2
     bmaj, bmin = clean_beam * 3600
-    print('clean beam: bmaj {} x bmin {} arcsec'.format(bmaj, bmin))
+    print('    clean beam: bmaj {} x bmin {} arcsec'.format(bmaj, bmin))
     beam_area = np.pi * bmaj * bmin / (4 * np.log(2))
     clean_image = clean_image / beam_area 
 
@@ -319,7 +319,7 @@ def image_comparison_figure(fits, model):
     # load frank residual visibilities (at projected data u,v)
     [ufres, vfres, Vfres, wfres] = load_bestfit_frank_uvtable(model, resid_table=True)
     
-    # generate dirty image of frank residual vis
+    # generate dirty image of frank residual vis at same pixel scale, robust weighting value as clean image
     imager = DirtyImager.from_image_properties( 
         cell_size=model["clean"]["pixel_scale"],
         npix=model["clean"]["npix"],
@@ -330,7 +330,7 @@ def image_comparison_figure(fits, model):
         data_im=Vfres.imag,
         )
     frank_resid_im, _ = imager.get_dirty_image(weighting="briggs", 
-                                               robust=model["base"]["bestfit_robust"])
+                                               robust=model["clean"]["robust"])
     frank_resid_im = np.squeeze(frank_resid_im)
     
     frank_resid_Imax = abs(frank_resid_im).max()
@@ -343,7 +343,7 @@ def image_comparison_figure(fits, model):
     fig = plt.figure(figsize=(10,6))
     fig.suptitle("{} -- robust = {} for clean".format(
         model["base"]["disk"],
-        model["base"]["bestfit_robust"])
+        model["clean"]["robust"])
         )
     gs = GridSpec(2, 3, figure=fig, hspace=0.01, wspace=0.2, left=0.04, right=0.97, top=0.98, bottom=0.01)
 
@@ -395,9 +395,10 @@ def image_comparison_figure(fits, model):
         ax.set_xlim(7,-7)
         ax.set_ylim(-7,7)
 
-    plt.savefig('{}/image_compare_robust{}.png'.format(
-        model["base"]["save_dir"], model["base"]["bestfit_robust"]), dpi=300
-        )
+    ff = '{}/image_compare_robust{}.png'.format(
+        model["base"]["save_dir"], model["clean"]["robust"])
+    print('    saving figure to {}'.format(ff))
+    plt.savefig(ff, dpi=300)
     
     return fig
 
@@ -416,6 +417,8 @@ def aspect_ratio_figure(model):
     fig : `plt.figure` instance
         The generated figure
     """
+    
+    print('  Figures: making aspect ratio figure')
 
     # log evidence results over grid of alpha, wsmooth, h values
     alphas, wsmooths, hs, logevs = np.genfromtxt("{}/frank/vertical_inference.txt".format(model["base"]["save_dir"])).T
