@@ -235,25 +235,9 @@ def process_rave_fit(model):
         Radial points `r` [arcsec], brightness `I` [Jy/sr] and brightness 
         uncertainty `I_err` [Jy/sr] for the RAVE radial profile
     """
-    if model["clean"]["robust"] == 0.5:
-        rave_str = "1"
-    else:
-        rave_str = "2"
-
-    if model['base']['disk'] == "HD161868" and rave_str == "2":
-        raveN = 7
-    else: 
-        raveN = 5
-
-    fit_path = "{}/{}-{}_inc=90_N={}_radial_{}0arcsec.npy".format(
-        model["base"]["rave_dir"], 
-        model["base"]["disk"], 
-        rave_str,
-        raveN,
-        model["rave"]["pixel_scale"]
-        )
-
-    print('  processing RAVE fit {}'.format(fit_path))
+    
+    fit_path = parse_rave_filename(model, file_type='rave_fit')
+    print('  Rave profiles: processing {}'.format(fit_path))
 
     r, I_err_lo, I, I_err_hi = np.load(fit_path)
     I_err_lo = I - I_err_lo
