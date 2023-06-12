@@ -190,6 +190,9 @@ def parse_rave_filename(model, file_type='rave_fit'):
             raveN
             )        
 
+    else: 
+        raise ValueError("'file_type' {} must be one of 'rave_fit', 'rave_residual_image'".format(file_type))
+    
     return file_path
 
 
