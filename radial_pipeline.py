@@ -357,26 +357,32 @@ def run_frank(model):
         return sol
 
     if nfits == 1:
-        import frank; frank.enable_logging()
-        sols, logevs = frank_fitter([model["frank"]["alpha"][0], model["frank"]["wsmooth"][0], hs[0]])
+        # import frank; frank.enable_logging()
+        sol = frank_fitter([model["frank"]["alpha"][0], model["frank"]["wsmooth"][0], hs[0]])
+        return sol
+    
     else: 
         pool = multiprocess.Pool(processes=model["frank"]["nthreads"])
+        # grids of prior values
         g0, g1, g2 = np.meshgrid(model["frank"]["alpha"], model["frank"]["wsmooth"], hs)
         g0, g1, g2 = g0.flatten(), g1.flatten(), g2.flatten()
         priors = np.array([g0, g1, g2]).T
+        # run fits over grids
         sols = pool.map(frank_fitter, priors)
 
-    logevs = []
-    for ss in sols:
-        logevs.append(ss.logevidence)
+        logevs = []
+        for ss in sols:
+            logevs.append(ss.logevidence)
 
-    # save scale heights and log evidences
-    if np.array(hs).any() != 0:
-        np.savetxt("{}/vertical_inference_frank.txt".format(model["base"]["save_dir"]),
-            np.array([g0, g1, g2, logevs]).T, header='alpha\twsmooth\th=H/r\tlog evidence'
-        )
+        # save scale heights and log evidences
+        if np.array(hs).any() != 0:
+            ff = "{}/vertical_inference_frank.txt".format(model["base"]["save_dir"])
+            print("    saving h and log evidence results to {}".format(ff))
+            np.savetxt(ff,
+                np.array([g0, g1, g2, logevs]).T, header='alpha\twsmooth\th=H/r\tlog evidence'
+            )
 
-    return sols
+        return sols
 
 
 def compare_models(fits, model):
