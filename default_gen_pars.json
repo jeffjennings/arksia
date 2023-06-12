@@ -5,9 +5,7 @@
     "run_frank"             : false,
     "aspect_ratio_fig"      : false,  
     "compare_models_fig"    : false,
-    "survey_summary_txt"    : false,
-    "survey_summary_fig"    : false,
-    "save_dir"              : ""
+    "root_dir"              : "../../../arks_prep/disks"
   },
 
   "clean" : {
@@ -15,6 +13,10 @@
     "rmax"                  : 12.0,
     "Nr"                    : 300,
     "Nphi"                  : 120 
+  }, 
+
+  "rave" : {
+    " "                     : null
   }, 
 
   "frank" : {
