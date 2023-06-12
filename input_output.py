@@ -51,50 +51,8 @@ def concatenate_vis(in1, in2, out=None):
     return [u, v, vis, weights]
 
 
-def get_vis(model):
-    """
-    Load (or generate if it does not exist) an ARKS visibility dataset.
 
-    Parameters
-    ----------
-    model : dict
-        Dictionary containing pipeline parameters
-
-    Returns
-    -------
-    uv_data : list
-        dataset: u-coordinates, v-coordinates, visibility amplitudes 
-        (Re(V) + Im(V) * 1j), weights
-    """
-
-    combined_vis_path = "{}/vis_combined.npz".format(model["base"]["frank_dir"])
-    if os.path.isfile(combined_vis_path):
-        u, v, re, im, weights, _ = np.genfromtxt(combined_vis_path).T
-        vis = re + im * 1j
-        uv_data = [u, v, vis, weights] 
-
-    else:
-        visACA = "{}/{}.ACA.continuum.fav.tav.{}corrected.txt".format(
-            model["base"]["frank_dir"], model["base"]["disk"], model["base"]["SMG_sub"]
-            ) 
-        vis12m = "{}/{}.12m.continuum.fav.tav.{}corrected.txt".format(
-            model["base"]["frank_dir"], model["base"]["disk"], model["base"]["SMG_sub"]
-            ) 
-
-        # join visibility datasets from ACA and 12m obs.
-        # account for sources missing ACA dataset
-        if os.path.isfile(visACA):
-            uv_data = concatenate_vis(visACA, vis12m)
-        else:
-            print("  ACA vis dataset missing --> loading only 12m data")
-            u, v, re, im, weights, _ = np.genfromtxt(vis12m).T
-            vis = re + im * 1j
-            uv_data = [u, v, vis, weights]        
-
-    return uv_data 
-
-
-def load_fits_image(fits_image, aux_image=False):
+def load_fits_image(fits_image, aux_image=False, verbose=0):
     """
     Load an image from a .fits file.
 
@@ -105,6 +63,8 @@ def load_fits_image(fits_image, aux_image=False):
     aux_image : bool, default=False
         Whether the .fits image is an 'auxillary' image (such as a dirty image) 
         or a standard clean output image
+    verbose : int, default=0
+        Level of verbosity for print statements
         
     Returns
     -------
@@ -116,7 +76,8 @@ def load_fits_image(fits_image, aux_image=False):
     ff = pyfits.open(fits_image)
     image = get_last2d(ff[0].data) 
 
-    print('image {}, brightness unit {}'.format(fits_image, ff[0].header['BUNIT']))
+    if verbose > 0:
+        print('        loading .fits image {}, brightness unit {}'.format(fits_image, ff[0].header['BUNIT']))
 
     if not aux_image:
         header = ff[0].header
@@ -136,6 +97,7 @@ def get_last2d(image):
         return image
     slc = [0] * (image.ndim - 2) + [slice(None), slice(None)]
     return image[tuple(slc)]
+
 
 
 def load_bestfit_frank_uvtable(model, resid_table=False):
