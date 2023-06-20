@@ -18,6 +18,19 @@ The pipeline is run from the terminal using input parameter files. As of June 20
 - the pipeline runs from general and source-specific parameter files to do any combination of the above
 - the pipeline can be run in bulk (across multiple sources) to perform analysis and summarize results
 
+Prior to running the pipeline
+-----------------------------
+Before running any pipeline routines:
+1) Create the following directory structure:
+- Root directory: <disk name>
+    - Subdirectories: 'clean', 'frank', 'rave'
+
+2) Download and place the following files in these directories:
+- root dir: 'MCMC_results.json' (used to read assumed disk geometry and stellar flux) and 'save_figure.py' (used to read clean image RMS noise)
+- 'clean' dir: Primary beam-corrected CLEAN image ('*.pbcor.fits') and CLEAN model image ('*.model.fits')
+- 'frank' dir: Visibility datasets ('*.corrected.txt')
+- 'rave' dir: Rave fit array files ('*.npy')
+
 Running the pipeline for a single source
 ----------------------------------------
 The main pipeline file is `radial_pipeline.py`. It can be run from the terminal for fits/analysis of a single source with `python radial_pipeline.py -d '<disk name>'`, e.g., `python radial_pipeline.py -d 'HD76582'`. 
