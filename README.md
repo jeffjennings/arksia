@@ -31,6 +31,12 @@ Before running any pipeline routines:
 - 'frank' dir: Visibility datasets ('*.corrected.txt')
 - 'rave' dir: Rave fit array files ('*.npy')
 
+3) Add the disk to your source parameters (.json) file
+-  set 'base: SMG_sub', 'clean: npix' and 'clean: pixel_scale' according to the '.fits' filenames (these will be used to determine the filenames of the appropriate images to load)
+- set 'rave: pixel_scale' according to the Rave model filename
+- set 'base: dist' and 'frank: SED_fstar' according to the github wiki ('ARKS sample')
+- 'frank: custom_fstar' and 'frank: bestfit' will have to be determined by running frank fits
+
 Running the pipeline for a single source
 ----------------------------------------
 The main pipeline file is `radial_pipeline.py`. It can be run from the terminal for fits/analysis of a single source with `python radial_pipeline.py -d '<disk name>'`, e.g., `python radial_pipeline.py -d 'HD76582'`. 
