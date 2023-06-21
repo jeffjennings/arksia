@@ -1,4 +1,27 @@
 {
+  "HD61005"     : {
+    "base"      : {
+      "SMG_sub"     : false,
+      "dist"        : 36
+    },
+    "clean"     : {
+      "npix"        : 1024,
+      "pixel_scale" : 0.01,
+      "image_rms"   : 2.1e-5
+    },
+    "rave"      : {
+      "pixel_scale" : 0.10240
+    },
+    "frank"     : {
+      "SED_fstar"   : 12,
+      "custom_fstar": 0,
+      "bestfit"     : {"alpha"   : 1.01, 
+                       "wsmooth" : 1e-4,
+                       "method"  : "LogNormal"
+                      }   
+    }    
+  },
+
   "HD15257"     : {
     "base"      : {
       "SMG_sub"     : false,
