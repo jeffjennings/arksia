@@ -96,10 +96,17 @@ def model_setup(parsed_args):
 
     # get source geom for clean profile extraction and frank fit
     mcmc = json.load(open(os.path.join(model["base"]["save_dir"], "MCMC_results.json"), 'r'))
+    try: 
+        dRA = mcmc["deltaRA-12m.obs1"]["median"]
+        dDec = mcmc["deltaDec-12m.obs1"]["median"]
+    except KeyError:
+        dRA = mcmc["deltaRA-12mLB.obs1"]["median"]
+        dDec = mcmc["deltaDec-12mLB.obs1"]["median"]        
+
     geom = {"inc" : mcmc["i"]["median"],
             "PA" : mcmc["PA"]["median"], 
-            "dRA" : mcmc["deltaRA-12m.obs1"]["median"], 
-            "dDec" : mcmc["deltaDec-12m.obs1"]["median"]
+            "dRA" : dRA,
+            "dDec" : dDec
             }
     model["base"]["geom"] = geom 
     print('    source geometry from MCMC {}'.format(geom))
