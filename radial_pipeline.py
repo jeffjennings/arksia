@@ -14,8 +14,8 @@ from frank.make_figs import make_quick_fig
 from frank.geometry import FixedGeometry
 
 from input_output import get_vis, load_fits_image, load_bestfit_profiles, parse_rave_filename
-from image_radial_profile import find_phic, radial_profile_from_image 
-from plot import aspect_ratio_figure, image_comparison_figure, profile_comparison_figure
+from extract_radial_profile import find_phic, radial_profile_from_image 
+from plot import aspect_ratio_figure, frank_image_diag_figure, image_comparison_figure, profile_comparison_figure
 
 def parse_parameters(*args):
     """
@@ -363,7 +363,11 @@ def run_frank(model):
             make_quick_fig(*uv_data, sol, bin_widths=model["plot"]["bin_widths"],
                         save_prefix=save_prefix,
                         )
-        
+
+            # reprojected frank residual visibilities
+            uv_data_res = [uv_data[0], uv_data[1], uv_data[2] - sol.predict(uv_data[0], uv_data[1]), uv_data[3]]
+            frank_image_diag_figure(model, sol, uv_data_res, model["clean"]["robust"], save_prefix)
+
         return sol
 
     if nfits == 1:
