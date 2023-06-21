@@ -87,6 +87,9 @@ def model_setup(parsed_args):
     model["clean"]["pixel_scale"] = disk_pars["clean"]["pixel_scale"]
     model["clean"]["image_rms"] = disk_pars["clean"]["image_rms"]
 
+    model["clean"]["bestfit"] = {}
+    model["clean"]["bestfit"]["robust"] = disk_pars["clean"]["bestfit"]["robust"]
+
     model["rave"]["pixel_scale"] = disk_pars["rave"]["pixel_scale"]
     
     model["frank"]["bestfit"] = {}
