@@ -34,7 +34,7 @@
       "save_profile_fit"      : "Whether to save fitted brightness profile",
       "save_vis_fit"          : "Whether to save fitted visibility distribution",
       "save_uvtables"         : "Whether to save fitted and residual UV tables (these are reprojected)",
-      "make_quick_fig"        : "Whether to make a figure showing basic results of the fit"
+      "make_quick_fig"        : "Whether to make two figures showing basic results of the fit"
     },
   
     "plot" : {
