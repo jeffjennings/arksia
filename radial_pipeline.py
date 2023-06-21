@@ -299,12 +299,6 @@ def run_frank(model):
         hs = np.logspace(*model["frank"]["scale_heights"])
         print("    aspect ratios to be sampled: {}".format(hs))      
 
-    nfits = len((model["frank"]["alpha"])) * len(model["frank"]["wsmooth"]) * len(hs)
-    print('    {} fits will be performed. Using {} threads ({} available on CPU).'.format(nfits, 
-                                                                                             model["frank"]["nthreads"], 
-                                                                                             multiprocess.cpu_count())
-                                                                                             )
-
     # perform frank fit(s)
     def frank_fitter(priors):
         alpha, wsmooth, h = priors 
@@ -379,13 +373,21 @@ def run_frank(model):
 
         return sol
 
+    nfits = len((model["frank"]["alpha"])) * len(model["frank"]["wsmooth"]) * len(hs)
     if nfits == 1:
         # import frank; frank.enable_logging()
         sol = frank_fitter([model["frank"]["alpha"][0], model["frank"]["wsmooth"][0], hs[0]])
         return sol
     
     else: 
-        pool = multiprocess.Pool(processes=model["frank"]["nthreads"])
+        # use as many threads as there are fits, up to a maximum of 'model["frank"]["nthreads"]'
+        nthreads = min(nfits, model["frank"]["nthreads"])
+        pool = multiprocess.Pool(processes=nthreads)
+        print('    {} fits will be performed. Using {} threads (1 thread per fit; {} threads available on CPU).'.format(nfits, 
+                                                                                             nthreads, 
+                                                                                             multiprocess.cpu_count())
+                                                                                             )
+
         # grids of prior values
         g0, g1, g2 = np.meshgrid(model["frank"]["alpha"], model["frank"]["wsmooth"], hs)
         g0, g1, g2 = g0.flatten(), g1.flatten(), g2.flatten()
