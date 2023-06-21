@@ -22,7 +22,7 @@ Prior to running the pipeline for a new source
 ----------------------------------------------
 Before running any pipeline routines:
 1) Create the following directory structure:
-- Root directory: '<disk name>'
+- Root directory: '[disk name]'
     - Subdirectories: 'clean', 'frank', 'rave'
 
 2) Download and place the following files in these directories:
