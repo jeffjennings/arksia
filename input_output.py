@@ -65,6 +65,7 @@ def get_vis(model):
     """
 
     combined_vis_path = "{}/vis_combined.npz".format(model["base"]["frank_dir"])
+
     if os.path.isfile(combined_vis_path):
         print('    loading combined visibility file {}'.format(combined_vis_path))
         dat = np.load(combined_vis_path)
@@ -72,23 +73,17 @@ def get_vis(model):
         uv_data = [u, v, vis, weights] 
 
     else:
-        print('    combined visibility file {} not found. Creating it by combining ACA and 12m files.'.format(combined_vis_path))
-        visACA = "{}/{}.ACA.continuum.fav.tav.{}corrected.txt".format(
-            model["base"]["frank_dir"], model["base"]["disk"], model["base"]["SMG_sub"]
-            ) 
-        vis12m = "{}/{}.12m.continuum.fav.tav.{}corrected.txt".format(
-            model["base"]["frank_dir"], model["base"]["disk"], model["base"]["SMG_sub"]
-            ) 
+        print('    combined visibility file {} not found. Creating it by combining .txt files.'.format(combined_vis_path))
 
-        # join visibility datasets from ACA and 12m obs.
-        # account for sources missing ACA dataset
-        if os.path.isfile(visACA):
-            uv_data = concatenate_vis(visACA, vis12m)
-        else:
-            print("        ACA vis dataset missing --> loading only 12m data")
-            u, v, re, im, weights, _ = np.genfromtxt(vis12m).T
-            vis = re + im * 1j
-            uv_data = [u, v, vis, weights]        
+        # input filenames
+        vis_paths = []
+        for ii in ['ACA', '12m', '12mSB', '12mLB']:
+            vis_paths.append("{}/{}.{}.continuum.fav.tav.{}corrected.txt".format(
+                model["base"]["frank_dir"], model["base"]["disk"], ii, model["base"]["SMG_sub"]
+                )
+            )
+
+        uv_data = concatenate_vis(vis_paths, combined_vis_path)
 
     return uv_data 
 
