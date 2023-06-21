@@ -9,10 +9,10 @@ from scipy.interpolate import interp1d
 
 from frank.utilities import UVDataBinner, sweep_profile, generic_dht, jy_convert
 from mpol.plot import get_image_cmap_norm
-from mpol.gridding import DirtyImager
 
-from input_output import get_vis, load_fits_image, load_bestfit_frank_uvtable, parse_rave_filename
-from image_radial_profile import radial_profile_from_image
+from input_output import get_vis, load_bestfit_frank_uvtable, load_fits_image, parse_rave_filename
+from extract_radial_profile import radial_profile_from_image
+from imager import dirty_image
 
 def plot_image(image, extent, ax, norm=None, cmap='inferno', title=None, 
                 cbar_label=None, cbar_pad=0.1):
@@ -114,22 +114,11 @@ def profile_comparison_figure(fits, model):
         )
 
     ax3.plot(rave_resid_r, rave_resid_I * 1e3, c='C3') 
-            
-    # plot 1d frank residual brightness at same pixel scale, robust weighting value as clean image
-    [ufres, vfres, Vfres, wfres] = load_bestfit_frank_uvtable(model, resid_table=True)
 
-    imager = DirtyImager.from_image_properties(
-        cell_size=model["clean"]["pixel_scale"],
-        npix=model["clean"]["npix"],
-        uu=ufres / 1e3,
-        vv=vfres / 1e3,
-        weight=wfres,
-        data_re=Vfres.real,
-        data_im=Vfres.imag,
-        )
-    frank_resid_im, _ = imager.get_dirty_image(weighting="briggs", 
-                                               robust=model["clean"]["robust"])
-    frank_resid_im = np.squeeze(frank_resid_im)
+    # load frank residual visibilities (at projected data u,v)
+    frank_resid_vis = load_bestfit_frank_uvtable(model, resid_table=True)
+    # plot 1d frank residual brightness at same pixel scale, robust weighting value as clean image
+    frank_resid_im = dirty_image(frank_resid_vis, model)
 
     phis_mod = np.linspace(model["base"]["geom"]["PA"] - 180, 
                                   model["base"]["geom"]["PA"] + 180,
@@ -289,24 +278,9 @@ def image_comparison_figure(fits, model):
     frank_image = jy_convert(frank_image, 'sterad_arcsec2')
     frank_extent = [xfim, -xfim, -yfim, yfim]
 
-    # make frank imaged residual vis, using same robust as clean image.
-    # load frank residual visibilities (at projected data u,v)
-    [ufres, vfres, Vfres, wfres] = load_bestfit_frank_uvtable(model, resid_table=True)
-    
-    # generate dirty image of frank residual vis at same pixel scale, robust weighting value as clean image
-    imager = DirtyImager.from_image_properties( 
-        cell_size=model["clean"]["pixel_scale"],
-        npix=model["clean"]["npix"],
-        uu=ufres / 1e3,
-        vv=vfres / 1e3,
-        weight=wfres,
-        data_re=Vfres.real,
-        data_im=Vfres.imag,
-        )
-    frank_resid_im, _ = imager.get_dirty_image(weighting="briggs", 
-                                               robust=model["clean"]["robust"])
-    frank_resid_im = np.squeeze(frank_resid_im)
-    
+    frank_resid_vis = load_bestfit_frank_uvtable(model, resid_table=True)
+    # generate frank residual image
+    frank_resid_im = dirty_image(frank_resid_vis, model)
     frank_resid_Imax = abs(frank_resid_im).max()
 
     # same colormap for clean, rave, frank images
@@ -315,7 +289,7 @@ def image_comparison_figure(fits, model):
     
     # make figure
     fig = plt.figure(figsize=(10,6))
-    fig.suptitle("{} -- robust = {} for clean".format(
+    fig.suptitle("{} -- robust = {} for clean, rave, frank residual image".format(
         model["base"]["disk"],
         model["clean"]["robust"])
         )
