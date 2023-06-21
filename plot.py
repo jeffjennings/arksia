@@ -351,6 +351,76 @@ def image_comparison_figure(fits, model):
     return fig
 
 
+def frank_image_diag_figure(model, sol, uv_data_res, robust=None, save_prefix=None):
+    """
+    Generate a figure showing frank brightness profile reprojected and swept 
+      over 2\pi in azimuth, and reprojected dirty image of frank residual visibilities
+
+    Parameters
+    ----------
+    model : dict
+        Dictionary containing pipeline parameters
+    sol : frank _HankelRegressor object
+        Reconstructed profile using maximum a posteriori power spectrum
+        (see frank.radial_fitters.FrankFitter)     
+    uv_data_res : list
+        frank residual visibilities: u-coordinates, v-coordinates, visibility amplitudes 
+        (Re(V) + Im(V) * 1j), weights             
+    robust : float, default=None
+        Robust weighting parameter. If None, 'model["clean"]["robust"]' will be used
+    save_prefix : string, default = None
+        Prefix for saved figure name. If None, the figure won't be saved
+
+    Returns
+    -------
+    fig : `plt.figure` instance
+        The generated figure
+    """
+    if robust is None:
+        robust = model["clean"]["robust"]
+
+    fig, axes = plt.subplots(1, 2, figsize=(10,5))
+    fig.suptitle("{} -- robust {} for imaged residuals".format(model["base"]["disk"], robust))
+
+    # make frank pseudo-2d image
+    frank_image, xfim, yfim = sweep_profile(sol.r, sol.I, project=True, 
+        phase_shift=True, geom=sol.geometry
+        )
+    frank_image = jy_convert(frank_image, 'sterad_arcsec2')
+    frank_extent = [xfim, -xfim, -yfim, yfim]
+
+    # make frank residual image
+    frank_resid_im = dirty_image(uv_data_res, model)
+    frank_resid_Imax = abs(frank_resid_im).max()    
+
+    # plot frank pseudo-image 
+    plot_image(frank_image * 1e3, frank_extent, axes[0],
+               cbar_label='$I_{frank}$ [mJy arcsec$^{-2}$]'
+               )   
+
+    # plot frank imaged residuals using symmetric colormap
+    frank_resid_norm = Normalize(vmin=-frank_resid_Imax * 1e3, 
+                                 vmax=frank_resid_Imax * 1e3)
+    plot_image(frank_resid_im * 1e3, frank_extent, axes[1], cmap="RdBu", 
+               norm=frank_resid_norm, 
+               cbar_label='$\mathcal{F}(V_{frank\ resid.}$) [mJy arcsec$^{-2}$]'
+               ) 
+    
+    axes[0].set_title("Pixel scale {:.0f} mas\n(mean frank grid spacing)".format(np.diff(sol.r).mean() * 1e3))
+    axes[1].set_title("Pixel scale {:.0f} mas\n(set to match clean)".format(model["clean"]["pixel_scale"] * 1e3))
+
+    for ax in axes:
+        ax.set_xlim(7,-7)
+        ax.set_ylim(-7,7)
+
+    if save_prefix:
+        plt.savefig(save_prefix + '_frank_images.png', dpi=300,
+                    bbox_inches='tight')
+        plt.close()
+
+    return fig, axes
+
+
 def aspect_ratio_figure(model):
     """
     Generate a figure showing results of vertical inference with frank 1+1D
