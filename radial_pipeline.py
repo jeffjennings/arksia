@@ -4,6 +4,7 @@ import os; os.environ.get('OMP_NUM_THREADS', '1')
 import json
 import argparse
 import numpy as np
+import matplotlib.pyplot as plt
 import multiprocess
 
 from frank.constants import deg_to_rad
@@ -12,6 +13,7 @@ from frank.debris_fitters import FrankDebrisFitter
 from frank.io import save_fit
 from frank.make_figs import make_quick_fig
 from frank.geometry import FixedGeometry
+from frank.utilities import get_fit_stat_uncer
 
 from input_output import get_vis, load_fits_image, load_bestfit_profiles, parse_rave_filename
 from extract_radial_profile import find_phic, radial_profile_from_image 
@@ -358,11 +360,18 @@ def run_frank(model):
                 save_uvtables=model["frank"]["save_uvtables"]
                 )
 
-        # save fit summary figure
+        # save fit summary figures
         if model["frank"]["make_quick_fig"]:
-            make_quick_fig(*uv_data, sol, bin_widths=model["plot"]["bin_widths"],
-                        save_prefix=save_prefix,
+            qfig, qaxes = make_quick_fig(*uv_data, sol, bin_widths=model["plot"]["bin_widths"],
+                        save_prefix=None,
                         )
+            # show 1 sigma statistical uncertainty band
+            sigmaI = get_fit_stat_uncer(sol)
+            qaxes[0].fill_between(sol.r, (sol.I - sigmaI) / 1e10, (sol.I + sigmaI) / 1e10, color='r', alpha=0.2)
+            qaxes[1].fill_between(sol.r, (sol.I - sigmaI) / 1e10, (sol.I + sigmaI) / 1e10, color='r', alpha=0.2)
+            plt.savefig(save_prefix + '_frank_fit_quick.png', dpi=300,
+                        bbox_inches='tight')
+            plt.close()            
 
             # reprojected frank residual visibilities
             uv_data_res = [uv_data[0], uv_data[1], uv_data[2] - sol.predict(uv_data[0], uv_data[1]), uv_data[3]]
