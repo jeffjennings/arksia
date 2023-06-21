@@ -227,7 +227,7 @@ def load_bestfit_frank_uvtable(model, resid_table=False):
     return [u, v, V, weights]
 
 
-def load_bestfit_profiles(model, robust=2.0):
+def load_bestfit_profiles(model):
     """
     Load the clean, rave and frank best-fit radial brightness profiles and 
     radial visibility profiles
@@ -236,8 +236,6 @@ def load_bestfit_profiles(model, robust=2.0):
     ----------
     model : dict
         Dictionary containing pipeline parameters
-    robust : float, default=2.0
-        Robust weighting parameter value to use for loading clean, rave best-fits
 
     Returns
     -------
@@ -254,11 +252,11 @@ def load_bestfit_profiles(model, robust=2.0):
     """
 
     clean_bestfit = "{}/clean_profile_robust{}.txt".format(
-        model["base"]["clean_dir"], robust)
+        model["base"]["clean_dir"], model["clean"]["bestfit"]["robust"])
     rc, Ic, Iec = np.genfromtxt(clean_bestfit).T
 
     rave_bestfit = "{}/rave_profile_robust{}.txt".format(
-        model["base"]["rave_dir"], robust)
+        model["base"]["rave_dir"], model["clean"]["bestfit"]["robust"])
     rr, Ir, Ier_lo, Ier_hi = np.genfromtxt(rave_bestfit).T
 
     # enforce the best-fit has 0 scale height
