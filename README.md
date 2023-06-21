@@ -18,11 +18,11 @@ The pipeline is run from the terminal using input parameter files. As of June 20
 - the pipeline runs from general and source-specific parameter files to do any combination of the above
 - the pipeline can be run in bulk (across multiple sources) to perform analysis and summarize results
 
-Prior to running the pipeline
------------------------------
+Prior to running the pipeline for a new source
+----------------------------------------------
 Before running any pipeline routines:
 1) Create the following directory structure:
-- Root directory: <disk name>
+- Root directory: '<disk name>'
     - Subdirectories: 'clean', 'frank', 'rave'
 
 2) Download and place the following files in these directories:
