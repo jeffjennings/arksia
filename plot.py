@@ -451,7 +451,10 @@ def aspect_ratio_figure(model):
 
     for ii, jj in enumerate(idx):
         alpha, wsmooth = alphas[jj], wsmooths[jj]
-        h, logev = hs[jj:jj + np.diff(idx)[0]], logevs[jj:jj + np.diff(idx)[0]]
+        if len(idx) == 1:
+            h, logev = hs * 1, logevs * 1
+        else:
+            h, logev = hs[jj:jj + np.diff(idx)[0]], logevs[jj:jj + np.diff(idx)[0]]
         
         # interpolate
         h_interp = interp1d(h, logev, kind='quadratic')
