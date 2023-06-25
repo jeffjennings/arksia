@@ -439,7 +439,7 @@ def aspect_ratio_figure(model):
     print('  Figures: making aspect ratio figure')
 
     # log evidence results over grid of alpha, wsmooth, h values
-    alphas, wsmooths, hs, logevs = np.genfromtxt("{}/frank/vertical_inference.txt".format(model["base"]["save_dir"])).T
+    alphas, wsmooths, hs, logevs = np.genfromtxt("{}/vertical_inference_frank.txt".format(model["base"]["save_dir"])).T
 
     # size of h grid
     nh = len(np.unique(hs))
