@@ -321,7 +321,7 @@ def image_comparison_figure(fits, model):
     # plot (clean - rave) image using symmetric colormap
     rave_resid_norm = Normalize(vmin=-rave_resid_Imax * 1e3, 
                                  vmax=rave_resid_Imax * 1e3)
-    plot_image(rave_resid_im * 1e3, rave_extent, ax7, cmap="RdBu",
+    plot_image(rave_resid_im * 1e3, rave_extent, ax7, cmap="RdBu_r",
                norm=rave_resid_norm, 
                cbar_label='$I_{clean - rave}$ [mJy arcsec$^{-2}$]'
                )
@@ -334,7 +334,7 @@ def image_comparison_figure(fits, model):
     # plot frank imaged residuals using symmetric colormap
     frank_resid_norm = Normalize(vmin=-frank_resid_Imax * 1e3, 
                                  vmax=frank_resid_Imax * 1e3)
-    plot_image(frank_resid_im * 1e3, frank_extent, ax9, cmap="RdBu", 
+    plot_image(frank_resid_im * 1e3, frank_extent, ax9, cmap="RdBu_r", 
                norm=frank_resid_norm, 
                cbar_label='$\mathcal{F}(V_{frank\ resid.}$) [mJy arcsec$^{-2}$]'
                ) 
@@ -401,7 +401,7 @@ def frank_image_diag_figure(model, sol, uv_data_res, robust=None, save_prefix=No
     # plot frank imaged residuals using symmetric colormap
     frank_resid_norm = Normalize(vmin=-frank_resid_Imax * 1e3, 
                                  vmax=frank_resid_Imax * 1e3)
-    plot_image(frank_resid_im * 1e3, frank_extent, axes[1], cmap="RdBu", 
+    plot_image(frank_resid_im * 1e3, frank_extent, axes[1], cmap="RdBu_r", 
                norm=frank_resid_norm, 
                cbar_label='$\mathcal{F}(V_{frank\ resid.}$) [mJy arcsec$^{-2}$]'
                ) 
