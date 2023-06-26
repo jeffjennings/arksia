@@ -34,6 +34,9 @@ def dirty_image(uv_data, model, npix=None, pixel_scale=None, robust=None):
     if robust is None:
         robust = model["clean"]["robust"]
 
+    # MPoL uses the standard baseline convention, CASA doesn't
+    uv_data[2] = np.conj(uv_data[2])
+
     # generate dirty image at same pixel scale as clean image
     imager = DirtyImager.from_image_properties( 
         cell_size=pixel_scale,
