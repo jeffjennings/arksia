@@ -489,8 +489,9 @@ def aspect_ratio_figure(model):
 
         axes[ii].plot(hgrid[good_idx], cdf, 'c', label='CDF')
 
-        for ll in [h16, h50, h84]:
-            axes[ii].axvline(ll, ls='--', c='g')
+        axes[ii].axvline(h16, ls='--', c='g', label='$\mu')
+        axes[ii].axvline(h50, ls='--', c='c', label='$-1\sigma$')
+        axes[ii].axvline(h84, ls='--', c='r', label='$+1\sigma$')
         axes[ii].axvline(hmax, ls='--', c='m', label='point estimate')
 
         axes[ii].set_xscale('log')
