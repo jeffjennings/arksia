@@ -42,12 +42,12 @@ def parse_parameters(*args):
 
     parser.add_argument("-b", "--base_parameter_filename",
                         type=str,
-                        default="./default_gen_pars.json",
+                        default="./pars_gen.json",
                         help="Parameter file (.json) with generic pars")
     
     parser.add_argument("-s", "--source_parameter_filename",
                         type=str,
-                        default="./default_source_pars.json",
+                        default="./pars_source.json",
                         help="Parameter file (.json) with source-specific pars")
 
     args = parser.parse_args(*args)
@@ -67,7 +67,7 @@ def model_setup(parsed_args):
     disk_pars = source_pars[model["base"]["disk"]]
 
     if not model["base"]["root_dir"]:
-        # If not specified, use the directory with `gen_pars.json` to set the save directory
+        # If not specified, use the directory with `pars_gen.json` to set the save directory
         model["base"]["root_dir"] = os.path.join(os.path.dirname(parsed_args.base_parameter_filename), "disks")
 
     # expect input files to be in "<root_dir>/<disk name>/<clean or rave or frank>"
@@ -411,7 +411,7 @@ def run_frank(model):
 
 
 def compare_models(fits, model):
-    # make profile comparison figure
+    # make model comparison figures
     fig1 = profile_comparison_figure(fits, model)
     fig2 = image_comparison_figure(fits, model)
 

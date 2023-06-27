@@ -42,7 +42,7 @@ def profile_comparison_figure(fits, model):
     Parameters
     ----------
     fits : nested list
-        Clean, rave, frank profiles to be plotted. Output of `io.load_bestfit_profiles`
+        Clean, rave, frank profiles to be plotted. Output of `input_output.load_bestfit_profiles`
     model : dict
         Dictionary containing pipeline parameters
         
