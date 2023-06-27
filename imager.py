@@ -51,6 +51,6 @@ def dirty_image(uv_data, model, npix=None, pixel_scale=None, robust=None, casa_v
         data_re=uv_data[2].real,
         data_im=uv_data[2].imag,
         )
-    im, _ = imager.get_dirty_image(weighting="briggs", robust=robust)
+    im, _ = imager.get_dirty_image(weighting="briggs", robust=robust, unit='Jy/arcsec^2')
 
     return np.squeeze(im)
