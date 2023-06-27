@@ -96,16 +96,33 @@ def radial_profile(image, pb_image, geom, rmax, Nr, phis, image_rms,
     Is = np.zeros((Nr, Nphi_rad))
     Is_pb = np.zeros((Nr, Nphi_rad))
 
+    err_count = 0
+    err_count_pb = 0 
+
     for ii in range(Nr):
         for jj in range(Nphi_rad):
             xx, yy = ellipse(dRA, dDec, phis_rad[jj], chi, rs[ii], PA_rad)
             
             ip = -int(xx / pixel_scale) + npix // 2
             jp = int(yy / pixel_scale) + npix // 2
-
-            Is[ii, jj] = image[jp, ip]
+            try:
+                Is[ii, jj] = image[jp, ip]
+            except IndexError:
+                if err_count == 0:
+                    print('Warning: radial profile extends beyond image. Padding with nan.')
+                err_count += 1
+                Is[ii, jj] = np.nan
             if not model_image:
-                Is_pb[ii, jj] = pb_image[jp, ip]
+                try:
+                    Is_pb[ii, jj] = pb_image[jp, ip]
+                except IndexError:
+                    if err_count_pb == 0:
+                        print('Warning: radial profile extends beyond PB image. Padding with nan.')
+                    err_count_pb += 1
+                    Is_pb[ii, jj] = np.nan
+
+    print('  Image padded with {} nan'.format(err_count))
+    print('  PB image padded with {} nan'.format(err_count_pb))
 
     # radial intensity [Jy/arcsec]
     Ir = np.nanmean(Is, axis=1) 
