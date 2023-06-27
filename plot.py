@@ -60,7 +60,7 @@ def profile_comparison_figure(fits, model):
     fig = plt.figure(figsize=(10,6))
     fig.suptitle("{} -- robust = {} for clean and rave".format(
         model["base"]["disk"],
-        model["clean"]["robust"])
+        model["clean"]["bestfit"]["robust"])
         )
 
     gs = GridSpec(4, 2, figure=fig, hspace=0, left=0.09, right=0.97, top=0.94, bottom=0.09)
@@ -79,6 +79,7 @@ def profile_comparison_figure(fits, model):
     rs = [rc, rr, rf]
 
     for ii, jj in enumerate(Is_jy_sr):     
+        # convert Jy / sterad to mJy / arcsec^2
         I_mjy_as2 = jy_convert(jj, 'sterad_arcsec2') * 1e3
         ax0.plot(rs[ii], I_mjy_as2, c=cols[ii], label=labs[ii])
     
@@ -213,7 +214,7 @@ def image_comparison_figure(fits, model):
     Parameters
     ----------
     fits : nested list
-        Clean, rave, frank profiles to be plotted. Output of `io.load_bestfit_profiles`
+        Clean, rave, frank profiles to be plotted. Output of `input_output.load_bestfit_profiles`
     model : dict
         Dictionary containing pipeline parameters
         
@@ -291,7 +292,7 @@ def image_comparison_figure(fits, model):
     fig = plt.figure(figsize=(10,6))
     fig.suptitle("{} -- robust = {} for clean, rave, frank residual image".format(
         model["base"]["disk"],
-        model["clean"]["robust"])
+        model["clean"]["bestfit"]["robust"])
         )
     gs = GridSpec(2, 3, figure=fig, hspace=0.01, wspace=0.2, left=0.04, right=0.97, top=0.98, bottom=0.01)
 
