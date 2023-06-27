@@ -28,7 +28,7 @@
     "I_scale"               : 1e2,
     "max_iter"              : 1000,
     "set_fstar"             : "SED",
-    "scale_heights"         : [-2.5, -1, 10], 
+    "scale_heights"         : [-2.5, -1, 10],
     "nthreads"              : 10,
     "save_solution"         : true,
     "save_profile_fit"      : true,
