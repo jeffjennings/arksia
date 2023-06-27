@@ -72,7 +72,7 @@ def profile_comparison_figure(fits, model):
     ax2 = fig.add_subplot(gs[3, 1])
 
     cols, marks, labs = ['C1', 'C3', 'C2'], ['.', 'x', '+'], ['clean', 'rave', 'frank']
-    # plot clean, rave, frank I(r) in mJy / arcsec^2
+    # clean, rave, frank I(r)
     Is_jy_sr = [Ic, Ir, If]
     # rave fits have dfft lower and upper uncertainties; clean and frank don't
     Ies_jy_sr = [[Iec, Iec], [Ier_lo, Ier_hi], [Ief, Ief]]
@@ -283,14 +283,10 @@ def image_comparison_figure(fits, model):
     # generate frank residual image
     frank_resid_im = dirty_image(frank_resid_vis, model)
     frank_resid_Imax = abs(frank_resid_im).max()
-
-    # same colormap for clean, rave, frank images
-    maxI = max(np.nanmax(rave_image), np.nanmax(frank_image)) 
-    uniform_norm = Normalize(vmin=0 * 1e3, vmax=maxI * 1e3)
     
     # make figure
     fig = plt.figure(figsize=(10,6))
-    fig.suptitle("{} -- robust = {} for clean, rave, frank residual image".format(
+    fig.suptitle("{} -- robust = {} for clean, rave, frank residual image.\nclean image colormap forced to minimum of 0.".format(
         model["base"]["disk"],
         model["clean"]["bestfit"]["robust"])
         )
@@ -304,7 +300,8 @@ def image_comparison_figure(fits, model):
     ax9 = fig.add_subplot(gs[1, 1])
 
     # plot clean image
-    plot_image(clean_image * 1e3, clean_extent, ax4, norm=uniform_norm,
+    norm = Normalize(vmin=0, vmax=np.nanmax(clean_image) * 1e3)
+    plot_image(clean_image * 1e3, clean_extent, ax4, norm=norm,
                cbar_label='$I_{clean}$ [mJy arcsec$^{-2}$]'
                )
 
@@ -315,7 +312,7 @@ def image_comparison_figure(fits, model):
                )            
 
     # plot rave pseudo-image
-    plot_image(rave_image * 1e3, rave_extent, ax6, norm=uniform_norm, 
+    plot_image(rave_image * 1e3, rave_extent, ax6, 
                cbar_label='$I_{rave}$ [mJy arcsec$^{-2}$]'
                )
 
@@ -328,7 +325,7 @@ def image_comparison_figure(fits, model):
                )
 
     # plot frank pseudo-image 
-    plot_image(frank_image * 1e3, frank_extent, ax8, norm=uniform_norm,
+    plot_image(frank_image * 1e3, frank_extent, ax8,
                cbar_label='$I_{frank}$ [mJy arcsec$^{-2}$]'
                )   
 
