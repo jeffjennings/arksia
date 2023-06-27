@@ -174,7 +174,7 @@ def profile_comparison_figure(fits, model):
 
     # symmetric y-bounds for residuals
     resid_yscale = np.array([resid_yscale_guess]) * 1e3
-    ax2.set_ylim(-resid_yscale.max(), resid_yscale.max())
+    ax2.set_ylim(-np.nanmax(resid_yscale), np.nanmax(resid_yscale))
 
     resid_yscale_I = np.max((np.abs(frank_resid_I).max(), np.abs(rave_resid_I).max())) * 1e3
     ax3.set_ylim(-resid_yscale_I * 1.1, resid_yscale_I * 1.1)
