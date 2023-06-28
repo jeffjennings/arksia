@@ -15,6 +15,8 @@ def dirty_image(vis, model, robust, npix=None, pixel_scale=None, casa_vis=True):
         (Re(V) + Im(V) * 1j), weights   
     model : dict
         Dictionary containing pipeline parameters
+    robust : float
+        Robust weighting parameter.
     npix : int, default=None
         Number of pixels in image. If None, 'model["clean"]["npix"]' will be used
     pixel_scale : float, default=None
@@ -32,8 +34,6 @@ def dirty_image(vis, model, robust, npix=None, pixel_scale=None, casa_vis=True):
         npix = model["clean"]["npix"]
     if pixel_scale is None:
         pixel_scale = model["clean"]["pixel_scale"]
-    if robust is None:
-        robust = model["clean"]["robust"]
 
     if casa_vis:
         # MPoL uses the standard baseline convention, CASA doesn't
