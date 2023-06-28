@@ -7,7 +7,7 @@ from matplotlib.gridspec import GridSpec
 from matplotlib.colors import Normalize
 from scipy.interpolate import interp1d 
 
-from frank.utilities import UVDataBinner, sweep_profile, generic_dht, jy_convert
+from frank.utilities import UVDataBinner, make_image, sweep_profile, generic_dht, jy_convert
 from mpol.plot import get_image_cmap_norm
 
 from input_output import get_vis, load_bestfit_frank_uvtable, load_fits_image, parse_rave_filename
@@ -276,12 +276,10 @@ def image_comparison_figure(fits, model, resid_im_robust=-2.0):
     rave_resid_Imax = abs(rave_resid_im).max()
 
     # make frank pseudo-2d image
-    frank_image, xfim, yfim = sweep_profile(rf, If, project=True, 
-        phase_shift=True, geom=sol.geometry
-        )
-
+    xf, yf, frank_image = make_image(sol, 1200, project=True)
+    frank_image = frank_image.T
     frank_image = jy_convert(frank_image, 'sterad_arcsec2')
-    frank_extent = [xfim, -xfim, -yfim, yfim]
+    frank_extent = [xf[-1], xf[0], yf[-1], yf[0]]
 
     frank_resid_vis = load_bestfit_frank_uvtable(model, resid_table=True)
     # generate frank residual image
@@ -379,14 +377,14 @@ def frank_image_diag_figure(model, sol, uv_data_res, resid_im_robust=-2.0, save_
     fig : `plt.figure` instance
         The generated figure
     """
+    fig, axes = plt.subplots(1, 2, figsize=(10,5))
     fig.suptitle("{} -- robust {} for imaged residuals".format(model["base"]["disk"],resid_im_robust))
 
     # make frank pseudo-2d image
-    frank_image, xfim, yfim = sweep_profile(sol.r, sol.I, project=True, 
-        phase_shift=True, geom=sol.geometry
-        )
+    xf, yf, frank_image = make_image(sol, 1200, project=True)
+    frank_image = frank_image.T
     frank_image = jy_convert(frank_image, 'sterad_arcsec2')
-    frank_extent = [xfim, -xfim, -yfim, yfim]
+    frank_extent = [xf[-1], xf[0], yf[-1], yf[0]]
 
     # make frank residual image
     frank_resid_im = dirty_image(uv_data_res, model, robust=resid_im_robust)
