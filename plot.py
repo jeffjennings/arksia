@@ -35,7 +35,7 @@ def plot_image(image, extent, ax, norm=None, cmap='inferno', title=None,
     ax.set_title(title)  
 
 
-def profile_comparison_figure(fits, model):
+def profile_comparison_figure(fits, model, resid_im_robust=-2.0):
     """
     Generate a figure comparing clean, rave, frank radial brightness and visibility profiles.
 
@@ -45,7 +45,9 @@ def profile_comparison_figure(fits, model):
         Clean, rave, frank profiles to be plotted. Output of `input_output.load_bestfit_profiles`
     model : dict
         Dictionary containing pipeline parameters
-        
+    resid_im_robust : float, default=-2.0
+        Robust weighting parameter used for imaging frank residual visibilities.
+
     Returns
     -------
     fig : `plt.figure` instance
@@ -118,8 +120,8 @@ def profile_comparison_figure(fits, model):
 
     # load frank residual visibilities (at projected data u,v)
     frank_resid_vis = load_bestfit_frank_uvtable(model, resid_table=True)
-    # plot 1d frank residual brightness at same pixel scale, robust weighting value as clean image
-    frank_resid_im = dirty_image(frank_resid_vis, model)
+    # plot 1d frank residual brightness at same pixel scale as clean image
+    frank_resid_im = dirty_image(frank_resid_vis, model, robust=resid_im_robust)
 
     phis_mod = np.linspace(model["base"]["geom"]["PA"] - 180, 
                                   model["base"]["geom"]["PA"] + 180,
@@ -207,7 +209,7 @@ def profile_comparison_figure(fits, model):
     return fig
 
 
-def image_comparison_figure(fits, model):
+def image_comparison_figure(fits, model, resid_im_robust=-2.0):
     """
     Generate a figure comparing clean, rave, frank 2d image
 
@@ -217,6 +219,8 @@ def image_comparison_figure(fits, model):
         Clean, rave, frank profiles to be plotted. Output of `input_output.load_bestfit_profiles`
     model : dict
         Dictionary containing pipeline parameters
+    resid_im_robust : float, default=-2.0
+        Robust weighting parameter used for imaging frank residual visibilities.
         
     Returns
     -------
@@ -281,14 +285,15 @@ def image_comparison_figure(fits, model):
 
     frank_resid_vis = load_bestfit_frank_uvtable(model, resid_table=True)
     # generate frank residual image
-    frank_resid_im = dirty_image(frank_resid_vis, model)
+    frank_resid_im = dirty_image(frank_resid_vis, model, robust=resid_im_robust)
     frank_resid_Imax = abs(frank_resid_im).max()
     
     # make figure
     fig = plt.figure(figsize=(10,6))
-    fig.suptitle("{} -- robust = {} for clean, rave, frank residual image.\nclean image colormap forced to minimum of 0.".format(
+    fig.suptitle("{} -- robust = {} for clean, rave; {} for frank imaged residuals.\nclean image colormap forced to minimum of 0.".format(
         model["base"]["disk"],
-        model["clean"]["bestfit"]["robust"])
+        model["clean"]["bestfit"]["robust"],
+        resid_im_robust)
         )
     gs = GridSpec(2, 3, figure=fig, hspace=0.01, wspace=0.2, left=0.04, right=0.97, top=0.98, bottom=0.01)
 
@@ -349,7 +354,7 @@ def image_comparison_figure(fits, model):
     return fig
 
 
-def frank_image_diag_figure(model, sol, uv_data_res, robust=None, save_prefix=None):
+def frank_image_diag_figure(model, sol, uv_data_res, resid_im_robust=-2.0, save_prefix=None):
     """
     Generate a figure showing frank brightness profile reprojected and swept 
       over 2\pi in azimuth, and reprojected dirty image of frank residual visibilities
@@ -364,8 +369,8 @@ def frank_image_diag_figure(model, sol, uv_data_res, robust=None, save_prefix=No
     uv_data_res : list
         frank residual visibilities: u-coordinates, v-coordinates, visibility amplitudes 
         (Re(V) + Im(V) * 1j), weights             
-    robust : float, default=None
-        Robust weighting parameter. If None, 'model["clean"]["robust"]' will be used
+    resid_im_robust : float, default=-2.0
+        Robust weighting parameter used for imaging frank residual visibilities.
     save_prefix : string, default = None
         Prefix for saved figure name. If None, the figure won't be saved
 
@@ -374,11 +379,7 @@ def frank_image_diag_figure(model, sol, uv_data_res, robust=None, save_prefix=No
     fig : `plt.figure` instance
         The generated figure
     """
-    if robust is None:
-        robust = model["clean"]["robust"]
-
-    fig, axes = plt.subplots(1, 2, figsize=(10,5))
-    fig.suptitle("{} -- robust {} for imaged residuals".format(model["base"]["disk"], robust))
+    fig.suptitle("{} -- robust {} for imaged residuals".format(model["base"]["disk"],resid_im_robust))
 
     # make frank pseudo-2d image
     frank_image, xfim, yfim = sweep_profile(sol.r, sol.I, project=True, 
@@ -388,7 +389,7 @@ def frank_image_diag_figure(model, sol, uv_data_res, robust=None, save_prefix=No
     frank_extent = [xfim, -xfim, -yfim, yfim]
 
     # make frank residual image
-    frank_resid_im = dirty_image(uv_data_res, model)
+    frank_resid_im = dirty_image(uv_data_res, model, robust=resid_im_robust)
     frank_resid_Imax = abs(frank_resid_im).max()    
 
     # plot frank pseudo-image 
