@@ -369,7 +369,7 @@ def run_frank(model):
 
             # reprojected frank residual visibilities
             uv_data_res = [uv_data[0], uv_data[1], uv_data[2] - sol.predict(uv_data[0], uv_data[1]), uv_data[3]]
-            frank_image_diag_figure(model, sol, uv_data_res, model["clean"]["robust"], save_prefix)
+            frank_image_diag_figure(model, sol, uv_data_res, save_prefix=save_prefix)
 
         return sol
 
