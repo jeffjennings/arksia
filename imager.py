@@ -4,25 +4,23 @@ import numpy as np
 
 from mpol.gridding import DirtyImager
 
-def dirty_image(uv_data, model, npix=None, pixel_scale=None, robust=None, casa_vis=True):
+def dirty_image(vis, model, robust, npix=None, pixel_scale=None, casa_vis=True):
     """
     Produce a dirty image (2D array) given visibilities
 
     Parameters
     ----------
-    uv_data : list
+    vis : list
         visibilities: u-coordinates, v-coordinates, visibility amplitudes 
         (Re(V) + Im(V) * 1j), weights   
     model : dict
         Dictionary containing pipeline parameters
     npix : int, default=None
-        Number of pixels in image. If None, 'model["clean"]["npix"]' will be used        
+        Number of pixels in image. If None, 'model["clean"]["npix"]' will be used
     pixel_scale : float, default=None
-        Pixel width [arcsec]. If None, 'model["clean"]["pixel_scale"]' will be used        
-    robust : float, default=None
-        Robust weighting parameter. If None, 'model["clean"]["robust"]' will be used
+        Pixel width [arcsec]. If None, 'model["clean"]["pixel_scale"]' will be used
     casa_vis : bool, default=True
-        Whether the 'uv_data' were produced with CASA, in which case their 
+        Whether the 'vis' were produced with CASA, in which case their 
         complex conjugate will be taken to image with MPoL
         
     Returns
@@ -39,17 +37,17 @@ def dirty_image(uv_data, model, npix=None, pixel_scale=None, robust=None, casa_v
 
     if casa_vis:
         # MPoL uses the standard baseline convention, CASA doesn't
-        uv_data[2] = np.conj(uv_data[2])
+        vis[2] = np.conj(vis[2])
 
     # generate dirty image at same pixel scale as clean image
     imager = DirtyImager.from_image_properties( 
         cell_size=pixel_scale,
         npix=npix,
-        uu=uv_data[0] / 1e3,
-        vv=uv_data[1] / 1e3,
-        weight=uv_data[3],
-        data_re=uv_data[2].real,
-        data_im=uv_data[2].imag,
+        uu=vis[0] / 1e3,
+        vv=vis[1] / 1e3,
+        weight=vis[3],
+        data_re=vis[2].real,
+        data_im=vis[2].imag,
         )
     im, _ = imager.get_dirty_image(weighting="briggs", robust=robust, unit='Jy/arcsec^2')
 
