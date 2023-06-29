@@ -47,7 +47,9 @@ def profile_comparison_figure(fits, model, resid_im_robust=2.0, npix=1200):
         Dictionary containing pipeline parameters
     resid_im_robust : float, default=2.0
         Robust weighting parameter used for imaging frank residual visibilities.
-
+    npix : int, default=1200
+        Number of pixels along one axis used to make frank images
+        
     Returns
     -------
     fig : `plt.figure` instance
@@ -221,7 +223,9 @@ def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1200):
         Dictionary containing pipeline parameters
     resid_im_robust : float, default=2.0
         Robust weighting parameter used for imaging frank residual visibilities.
-        
+    npix : int, default=1200
+        Number of pixels along one axis used to make frank images
+
     Returns
     -------
     fig : `plt.figure` instance
@@ -276,7 +280,7 @@ def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1200):
     rave_resid_Imax = abs(rave_resid_im).max()
 
     # make frank pseudo-2d image
-    xf, yf, frank_image = make_image(sol, 1200, project=True)
+    xf, yf, frank_image = make_image(sol, npix, project=True)
     frank_image = frank_image.T
     frank_image = jy_convert(frank_image, 'sterad_arcsec2')
     frank_extent = [xf[-1], xf[0], yf[-1], yf[0]]
@@ -371,6 +375,8 @@ def frank_image_diag_figure(model, sol, frank_resid_vis, resid_im_robust=2.0,
         (Re(V) + Im(V) * 1j), weights             
     resid_im_robust : float, default=2.0
         Robust weighting parameter used for imaging frank residual visibilities.
+    npix : int, default=2400
+        Number of pixels along one axis used to make frank images
     save_prefix : string, default = None
         Prefix for saved figure name. If None, the figure won't be saved
 
@@ -382,7 +388,7 @@ def frank_image_diag_figure(model, sol, frank_resid_vis, resid_im_robust=2.0,
     fig, axes = plt.subplots(1, 2, figsize=(10,5))
     
     # make frank pseudo-2d image
-    xf, yf, frank_image = make_image(sol, 1200, project=True)
+    xf, yf, frank_image = make_image(sol, npix, project=True)
     frank_image = frank_image.T
     frank_image = jy_convert(frank_image, 'sterad_arcsec2')
     frank_extent = [xf[-1], xf[0], yf[-1], yf[0]]
