@@ -349,6 +349,7 @@ def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1200):
                norm=frank_resid_norm, 
                cbar_label='$\mathcal{F}(V_{frank\ resid.}$) [mJy arcsec$^{-2}$]'
                ) 
+    ax9.set_title('Pixel scale {:.1f} mas'.format(frank_pixel_scale * 1e3))
 
     for ax in [ax4, ax5, ax6, ax7, ax8, ax9]:
         ax.set_xlim(7,-7)
