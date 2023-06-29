@@ -368,8 +368,8 @@ def run_frank(model):
             plt.close()            
 
             # reprojected frank residual visibilities
-            uv_data_res = [uv_data[0], uv_data[1], uv_data[2] - sol.predict(uv_data[0], uv_data[1]), uv_data[3]]
-            frank_image_diag_figure(model, sol, uv_data_res, save_prefix=save_prefix)
+            frank_resid_vis = [uv_data[0], uv_data[1], uv_data[2] - sol.predict(uv_data[0], uv_data[1]), uv_data[3]]
+            frank_image_diag_figure(model, sol, frank_resid_vis, save_prefix=save_prefix)
 
         return sol
 
