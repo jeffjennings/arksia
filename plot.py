@@ -122,8 +122,12 @@ def profile_comparison_figure(fits, model, resid_im_robust=2.0, npix=1200):
 
     # load frank residual visibilities (at projected data u,v)
     frank_resid_vis = load_bestfit_frank_uvtable(model, resid_table=True)
-    # plot 1d frank residual brightness at same pixel scale as clean image
-    frank_resid_im = dirty_image(frank_resid_vis, model, robust=resid_im_robust)
+    # get pixel scale
+    xf, _, _ = make_image(sol, npix, project=True)
+    frank_pixel_scale = np.diff(xf).mean()
+    # plot 1d frank residual brightness
+    frank_resid_im = dirty_image(frank_resid_vis, robust=resid_im_robust, npix=npix, pixel_scale=frank_pixel_scale)
+
 
     phis_mod = np.linspace(model["base"]["geom"]["PA"] - 180, 
                                   model["base"]["geom"]["PA"] + 180,
@@ -284,12 +288,14 @@ def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1200):
     frank_image = frank_image.T
     frank_image = jy_convert(frank_image, 'sterad_arcsec2')
     frank_extent = [xf[-1], xf[0], yf[-1], yf[0]]
+    frank_pixel_scale = np.diff(xf).mean()
 
     frank_resid_vis = load_bestfit_frank_uvtable(model, resid_table=True)
     # generate frank residual image
-    frank_resid_im = dirty_image(frank_resid_vis, model, robust=resid_im_robust)
+    frank_resid_im = dirty_image(frank_resid_vis, robust=resid_im_robust, npix=npix, pixel_scale=frank_pixel_scale)
     frank_resid_Imax = abs(frank_resid_im).max()
-    
+    frank_resid_extent = [xf[-1], xf[0], yf[0], yf[-1]]
+
     # make figure
     fig = plt.figure(figsize=(10,6))
     fig.suptitle("{} -- robust = {} for clean, rave; {} for frank imaged residuals.\nclean image colormap forced to minimum of 0.".format(
@@ -339,7 +345,7 @@ def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1200):
     # plot frank imaged residuals using symmetric colormap
     frank_resid_norm = Normalize(vmin=-frank_resid_Imax * 1e3, 
                                  vmax=frank_resid_Imax * 1e3)
-    plot_image(frank_resid_im * 1e3, frank_extent, ax9, cmap="RdBu_r", 
+    plot_image(frank_resid_im * 1e3, frank_resid_extent, ax9, cmap="RdBu_r", 
                norm=frank_resid_norm, 
                cbar_label='$\mathcal{F}(V_{frank\ resid.}$) [mJy arcsec$^{-2}$]'
                ) 
@@ -370,7 +376,7 @@ def frank_image_diag_figure(model, sol, frank_resid_vis, resid_im_robust=2.0,
     sol : frank _HankelRegressor object
         Reconstructed profile using maximum a posteriori power spectrum
         (see frank.radial_fitters.FrankFitter)     
-    uv_data_res : list
+    frank_resid_vis : list
         frank residual visibilities: u-coordinates, v-coordinates, visibility amplitudes 
         (Re(V) + Im(V) * 1j), weights             
     resid_im_robust : float, default=2.0
@@ -392,26 +398,25 @@ def frank_image_diag_figure(model, sol, frank_resid_vis, resid_im_robust=2.0,
     frank_image = frank_image.T
     frank_image = jy_convert(frank_image, 'sterad_arcsec2')
     frank_extent = [xf[-1], xf[0], yf[-1], yf[0]]
+    frank_pixel_scale = np.diff(xf).mean()
 
     # make frank residual image
-    frank_resid_im = dirty_image(uv_data_res, model, robust=resid_im_robust)
+    frank_resid_im = dirty_image(frank_resid_vis, robust=resid_im_robust, npix=npix, pixel_scale=frank_pixel_scale)
     frank_resid_Imax = abs(frank_resid_im).max()    
+    frank_resid_extent = [xf[-1], xf[0], yf[0], yf[-1]]
 
     # plot frank pseudo-image 
-    plot_image(frank_image * 1e3, frank_extent, axes[0],
+    plot_image(frank_image * 1e3, frank_extent, axes[0], 
                cbar_label='$I_{frank}$ [mJy arcsec$^{-2}$]'
                )   
 
     # plot frank imaged residuals using symmetric colormap
     frank_resid_norm = Normalize(vmin=-frank_resid_Imax * 1e3, 
                                  vmax=frank_resid_Imax * 1e3)
-    plot_image(frank_resid_im * 1e3, frank_extent, axes[1], cmap="RdBu_r", 
+    plot_image(frank_resid_im * 1e3, frank_resid_extent, axes[1], cmap="RdBu_r", 
                norm=frank_resid_norm, 
                cbar_label='$\mathcal{F}(V_{frank\ resid.}$) [mJy arcsec$^{-2}$]'
                ) 
-    
-    axes[0].set_title("Pixel scale {:.0f} mas\n(mean frank grid spacing)".format(np.diff(sol.r).mean() * 1e3))
-    axes[1].set_title("Pixel scale {:.0f} mas\n(set to match clean)".format(model["clean"]["pixel_scale"] * 1e3))
 
     for ax in axes:
         ax.set_xlim(7,-7)
