@@ -35,7 +35,7 @@ def plot_image(image, extent, ax, norm=None, cmap='inferno', title=None,
     ax.set_title(title)  
 
 
-def profile_comparison_figure(fits, model, resid_im_robust=-2.0):
+def profile_comparison_figure(fits, model, resid_im_robust=2.0, npix=1200):
     """
     Generate a figure comparing clean, rave, frank radial brightness and visibility profiles.
 
@@ -45,7 +45,7 @@ def profile_comparison_figure(fits, model, resid_im_robust=-2.0):
         Clean, rave, frank profiles to be plotted. Output of `input_output.load_bestfit_profiles`
     model : dict
         Dictionary containing pipeline parameters
-    resid_im_robust : float, default=-2.0
+    resid_im_robust : float, default=2.0
         Robust weighting parameter used for imaging frank residual visibilities.
 
     Returns
@@ -209,7 +209,7 @@ def profile_comparison_figure(fits, model, resid_im_robust=-2.0):
     return fig
 
 
-def image_comparison_figure(fits, model, resid_im_robust=-2.0):
+def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1200):
     """
     Generate a figure comparing clean, rave, frank 2d image
 
@@ -219,7 +219,7 @@ def image_comparison_figure(fits, model, resid_im_robust=-2.0):
         Clean, rave, frank profiles to be plotted. Output of `input_output.load_bestfit_profiles`
     model : dict
         Dictionary containing pipeline parameters
-    resid_im_robust : float, default=-2.0
+    resid_im_robust : float, default=2.0
         Robust weighting parameter used for imaging frank residual visibilities.
         
     Returns
@@ -352,10 +352,12 @@ def image_comparison_figure(fits, model, resid_im_robust=-2.0):
     return fig
 
 
-def frank_image_diag_figure(model, sol, uv_data_res, resid_im_robust=-2.0, save_prefix=None):
+def frank_image_diag_figure(model, sol, frank_resid_vis, resid_im_robust=2.0, 
+                            npix=1800, save_prefix=None
+                            ):
     """
     Generate a figure showing frank brightness profile reprojected and swept 
-      over 2\pi in azimuth, and reprojected dirty image of frank residual visibilities
+    over 2\pi in azimuth, and reprojected dirty image of frank residual visibilities
 
     Parameters
     ----------
@@ -367,7 +369,7 @@ def frank_image_diag_figure(model, sol, uv_data_res, resid_im_robust=-2.0, save_
     uv_data_res : list
         frank residual visibilities: u-coordinates, v-coordinates, visibility amplitudes 
         (Re(V) + Im(V) * 1j), weights             
-    resid_im_robust : float, default=-2.0
+    resid_im_robust : float, default=2.0
         Robust weighting parameter used for imaging frank residual visibilities.
     save_prefix : string, default = None
         Prefix for saved figure name. If None, the figure won't be saved
@@ -378,8 +380,7 @@ def frank_image_diag_figure(model, sol, uv_data_res, resid_im_robust=-2.0, save_
         The generated figure
     """
     fig, axes = plt.subplots(1, 2, figsize=(10,5))
-    fig.suptitle("{} -- robust {} for imaged residuals".format(model["base"]["disk"],resid_im_robust))
-
+    
     # make frank pseudo-2d image
     xf, yf, frank_image = make_image(sol, 1200, project=True)
     frank_image = frank_image.T
@@ -410,6 +411,11 @@ def frank_image_diag_figure(model, sol, uv_data_res, resid_im_robust=-2.0, save_
         ax.set_xlim(7,-7)
         ax.set_ylim(-7,7)
 
+    fig.suptitle("{} -- robust {} for imaged residuals. Pixel scale {:.1f} mas".format(model["base"]["disk"],
+                                                                                   resid_im_robust,
+                                                                                   frank_pixel_scale * 1e3)
+                                                                                   )
+    
     if save_prefix:
         plt.savefig(save_prefix + '_frank_images.png', dpi=300,
                     bbox_inches='tight')
@@ -443,7 +449,7 @@ def aspect_ratio_figure(model):
     # first idx of each unique (alpha, wsmooth) pair (used to group results by priors)
     idx = np.arange(0, len(logevs), nh)
 
-    fig, axes = plt.subplots(ncols=1, nrows=len(idx), figsize=(15,10))
+    fig, axes = plt.subplots(ncols=1, nrows=len(idx), figsize=(7.5,5))
     fig.suptitle(model["base"]["disk"])
 
     for ii, jj in enumerate(idx):
@@ -486,7 +492,7 @@ def aspect_ratio_figure(model):
 
         axes[ii].plot(hgrid[good_idx], cdf, 'c', label='CDF')
 
-        axes[ii].axvline(h16, ls='--', c='g', label='$\mu')
+        axes[ii].axvline(h16, ls='--', c='g', label='$\mu$')
         axes[ii].axvline(h50, ls='--', c='c', label='$-1\sigma$')
         axes[ii].axvline(h84, ls='--', c='r', label='$+1\sigma$')
         axes[ii].axvline(hmax, ls='--', c='m', label='point estimate')
