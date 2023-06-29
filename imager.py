@@ -4,7 +4,7 @@ import numpy as np
 
 from mpol.gridding import DirtyImager
 
-def dirty_image(vis, model, robust, npix=None, pixel_scale=None, casa_vis=True):
+def dirty_image(vis, robust, npix, pixel_scale, casa_vis=True):
     """
     Produce a dirty image (2D array) given visibilities
 
@@ -13,14 +13,12 @@ def dirty_image(vis, model, robust, npix=None, pixel_scale=None, casa_vis=True):
     vis : list
         visibilities: u-coordinates, v-coordinates, visibility amplitudes 
         (Re(V) + Im(V) * 1j), weights   
-    model : dict
-        Dictionary containing pipeline parameters
     robust : float
         Robust weighting parameter.
     npix : int, default=None
-        Number of pixels in image. If None, 'model["clean"]["npix"]' will be used
+        Number of pixels in image. 
     pixel_scale : float, default=None
-        Pixel width [arcsec]. If None, 'model["clean"]["pixel_scale"]' will be used
+        Pixel width [arcsec]. 
     casa_vis : bool, default=True
         Whether the 'vis' were produced with CASA, in which case their 
         complex conjugate will be taken to image with MPoL
@@ -30,11 +28,6 @@ def dirty_image(vis, model, robust, npix=None, pixel_scale=None, casa_vis=True):
     im : array
         Dirty image
     """    
-    if npix is None:
-        npix = model["clean"]["npix"]
-    if pixel_scale is None:
-        pixel_scale = model["clean"]["pixel_scale"]
-
     if casa_vis:
         # MPoL uses the standard baseline convention, CASA doesn't
         vis[2] = np.conj(vis[2])
