@@ -227,6 +227,9 @@ def ellipse(x0, y0, phi, chi, a, PA):
     # a/chi semi-minor axis
     # PA  pa of ellipse 0 is north and pi/2 is east
 
+    if a==0.:
+        return x0*np.ones_like(phi), y0*np.ones_like(phi)
+    
     phipp = phi - PA
     xpp = x_phi(np.pi / 2 - phipp, a/chi, a)
     ypp = y_phi(np.pi / 2 - phipp, a/chi, a)
