@@ -2,7 +2,7 @@ Pipeline for radial profile (team 2) extraction and analysis. Contact Jeff Jenni
 
 Dependencies
 ------------
-- frank ('debris_update' branch - `pip install git+https://github.com/discsim/frank.git@debris_update`)
+- frank (newest codebase - `pip install git+https://github.com/discsim/frank.git`)
 - MPoL (newest codebase - `pip install git+https://github.com/MPoL-dev/MPoL.git`)
 
 Pipeline scope
