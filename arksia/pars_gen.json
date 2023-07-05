@@ -5,7 +5,7 @@
     "run_frank"             : false,
     "aspect_ratio_fig"      : false,  
     "compare_models_fig"    : false,
-    "root_dir"              : "../../../arks_prep/disks"
+    "root_dir"              : "."
   },
 
   "clean" : {
