@@ -47,6 +47,7 @@ def parse_parameters(*args):
     
     parser.add_argument("-s", "--source_parameter_filename",
                         type=str,
+                        default="./pars_source.json",
                         help="Parameter file (.json) with source-specific pars")
 
     args = parser.parse_args(*args)

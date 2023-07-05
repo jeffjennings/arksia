@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from radial_pipeline import model_setup
 from input_output import load_bestfit_profiles
 
-def main(source_par_f, gen_par_f='./pars_gen.json', 
+def main(source_par_f='./pars_source.json', gen_par_f='./pars_gen.json', 
          profiles_txt=True, profiles_fig=True, robust=2.0
                    ):
     """
@@ -15,7 +15,7 @@ def main(source_par_f, gen_par_f='./pars_gen.json',
 
     Parameters
     ----------
-    source_par_f : string
+    source_par_f : string, default='pars_source.json'
         Path to the parameter file with custom values for each source        
     gen_par_f : string, default='pars_gen.json'
         Path to the general parameter file    
