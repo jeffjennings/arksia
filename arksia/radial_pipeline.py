@@ -15,9 +15,8 @@ from frank.make_figs import make_quick_fig
 from frank.geometry import FixedGeometry
 from frank.utilities import get_fit_stat_uncer
 
-from input_output import get_vis, load_fits_image, load_bestfit_profiles, parse_rave_filename
-from extract_radial_profile import find_phic, radial_profile_from_image 
-from plot import aspect_ratio_figure, frank_image_diag_figure, image_comparison_figure, profile_comparison_figure
+import arksia 
+from arksia import input_output, extract_radial_profile, plot
 
 def parse_parameters(*args):
     """
@@ -173,16 +172,16 @@ def extract_clean_profile(model):
     pb_fits = base_path + ".pb.fits"
     model_fits = base_path + ".model.fits"
 
-    clean_image, clean_beam = load_fits_image(clean_fits)
+    clean_image, clean_beam = input_output.load_fits_image(clean_fits)
     bmaj, bmin = clean_beam
-    pb_image = load_fits_image(pb_fits, aux_image=True)
-    model_image = load_fits_image(model_fits, aux_image=True)
+    pb_image = input_output.load_fits_image(pb_fits, aux_image=True)
+    model_image = input_output.load_fits_image(model_fits, aux_image=True)
 
     # profile of clean image.
     # for radial profile on east side of disk,
     # range in azimuth (PA +- range) over which to average 
     f = 1.3
-    phic_rad = find_phic(model["base"]["geom"]["inc"] * np.pi / 180, f)
+    phic_rad = extract_radial_profile.find_phic(model["base"]["geom"]["inc"] * np.pi / 180, f)
     phic_deg = phic_rad / deg_to_rad
     
 
@@ -196,10 +195,10 @@ def extract_clean_profile(model):
     phis_W = phis_E + 180
 
     # radial profile of east and west sides
-    r_E, I_E, I_err_E = radial_profile_from_image(
+    r_E, I_E, I_err_E = extract_radial_profile.radial_profile_from_image(
         clean_image, geom=model["base"]["geom"], phis=phis_E, bmaj=bmaj, 
         bmin=bmin, pb_image=pb_image, **model["clean"])
-    r_W, I_W, I_err_W = radial_profile_from_image(
+    r_W, I_W, I_err_W = extract_radial_profile.radial_profile_from_image(
         clean_image, geom=model["base"]["geom"], phis=phis_W, bmaj=bmaj,
         bmin=bmin, pb_image=pb_image, **model["clean"])
 
@@ -214,7 +213,7 @@ def extract_clean_profile(model):
                                   model["clean"]["Nphi"] 
                                   )
     
-    r_mod, I_mod = radial_profile_from_image(
+    r_mod, I_mod = extract_radial_profile.radial_profile_from_image(
         model_image, geom=model["base"]["geom"], phis=phis_mod, bmaj=0, 
         bmin=0, model_image=True, **model["clean"])
 
@@ -252,7 +251,7 @@ def process_rave_fit(model):
         uncertainty `I_err` [Jy/sr] for the RAVE radial profile
     """
     
-    fit_path = parse_rave_filename(model, file_type='rave_fit')
+    fit_path = input_output.parse_rave_filename(model, file_type='rave_fit')
     print('  Rave profiles: processing {}'.format(fit_path))
 
     r, I_err_lo, I, I_err_hi = np.load(fit_path)
@@ -289,7 +288,7 @@ def run_frank(model):
     """
     print(' Frank fit: running fit')
 
-    uv_data = get_vis(model)
+    uv_data = input_output.get_vis(model)
 
     print('    shifting visibilities down by fstar {} uJy according to {}'.format(model["frank"]["fstar"] * 1e6, model["frank"]["set_fstar"]))
     uv_data[2] = uv_data[2] - model["frank"]["fstar"]
@@ -373,7 +372,7 @@ def run_frank(model):
 
             # reprojected frank residual visibilities
             frank_resid_vis = [uv_data[0], uv_data[1], uv_data[2] - sol.predict(uv_data[0], uv_data[1]), uv_data[3]]
-            frank_image_diag_figure(model, sol, frank_resid_vis, save_prefix=save_prefix)
+            plot.frank_image_diag_figure(model, sol, frank_resid_vis, save_prefix=save_prefix)
 
         return sol
 
@@ -416,8 +415,8 @@ def run_frank(model):
 
 def compare_models(fits, model):
     # make model comparison figures
-    fig1 = profile_comparison_figure(fits, model)
-    fig2 = image_comparison_figure(fits, model)
+    fig1 = plot.profile_comparison_figure(fits, model)
+    fig2 = plot.image_comparison_figure(fits, model)
 
     return fig1, fig2 
 
@@ -445,11 +444,11 @@ def main(*args):
         frank_sols = run_frank(model)
 
     if model["base"]["compare_models_fig"] is True:
-        fits = load_bestfit_profiles(model)   
+        fits = input_output.load_bestfit_profiles(model)   
         fig1, fig2 = compare_models(fits, model)
 
     if model["base"]["aspect_ratio_fig"] is True:
-        fig3 = aspect_ratio_figure(model)
+        fig3 = plot.aspect_ratio_figure(model)
 
 if __name__ == "__main__":
     main()

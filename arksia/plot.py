@@ -10,9 +10,9 @@ from scipy.interpolate import interp1d
 from frank.utilities import UVDataBinner, make_image, sweep_profile, generic_dht, jy_convert
 from mpol.plot import get_image_cmap_norm
 
-from input_output import get_vis, load_bestfit_frank_uvtable, load_fits_image, parse_rave_filename
-from extract_radial_profile import radial_profile_from_image
-from imager import dirty_image
+from arksia.input_output import get_vis, load_bestfit_frank_uvtable, load_fits_image, parse_rave_filename
+from arksia.extract_radial_profile import radial_profile_from_image
+from arksia.imager import dirty_image
 
 def plot_image(image, extent, ax, norm=None, cmap='inferno', title=None, 
                 cbar_label=None, cbar_pad=0.1):
