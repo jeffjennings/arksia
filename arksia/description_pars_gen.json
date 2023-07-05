@@ -38,6 +38,6 @@
     },
   
     "plot" : {
-      "bin_widths"            : "Widths in which to bin the observed visibilities for plotting. List of float [\\lambda]",
+      "bin_widths"            : "Widths in which to bin the observed visibilities for plotting. List of float [\\lambda]"
     }
   }  
