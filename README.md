@@ -26,14 +26,13 @@ Before running any pipeline routines:
     - Subdirectories: 'clean', 'frank', 'rave'
 
 2) Download and place the following files in these directories:
-- root dir: 'MCMC_results.json' (used to read assumed disk geometry and stellar flux) and 'save_figure.py' (contains clean image RMS noise per robust value)
+- root dir: 'MCMC_results.json' (used to read assumed disk geometry and stellar flux) and 'pars_image.json' (contains clean image RMS noise per robust value)
 - 'clean' dir: Primary beam-corrected CLEAN image ('*.pbcor.fits'), primary beam image ('*.pb.fits'), CLEAN model image ('*.model.fits') for each robust value
 - 'frank' dir: Visibility datasets ('*.corrected.txt')
 - 'rave' dir: Rave fit array files ('*.npy') for each robust value
 
 3) Add the disk to your source parameters (.json) file
 -  set 'base: SMG_sub', 'clean: npix' and 'clean: pixel_scale' according to the '.fits' filenames (these will be used to determine the filenames of the appropriate images to load)
-- set 'clean: image_rms' as the value of `rms` (corresponding to the correct `robust` value, assumed `2.0`) in 'save_figure.py'
 - set 'rave: pixel_scale' according to the Rave model filename
 - set 'base: dist' and 'frank: SED_fstar' according to the github wiki (see 'ARKS sample' there)
 - 'frank: custom_fstar' and 'frank: bestfit' will be determined by running frank fits
