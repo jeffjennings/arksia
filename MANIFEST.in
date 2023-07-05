@@ -1,0 +1,6 @@
+include README.md AUTHORS.rst HISTORY.rst LICENSE.txt
+prune docs
+prune .ci
+exclude .clang-format
+exclude .gitattributes
+exclude .gitignore
