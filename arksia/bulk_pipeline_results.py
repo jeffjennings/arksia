@@ -7,26 +7,24 @@ import matplotlib.pyplot as plt
 from radial_pipeline import model_setup
 from input_output import load_bestfit_profiles
 
-def main(profiles_txt=True, profiles_fig=True, 
-                   gen_par_f='./pars_gen.json', 
-                   source_par_f='./pars_source.json', 
-                   robust=2.0
+def main(source_par_f, gen_par_f='./pars_gen.json', 
+         profiles_txt=True, profiles_fig=True, robust=2.0
                    ):
     """
     Generate radial profile results across all survey sources.
 
     Parameters
     ----------
+    source_par_f : string
+        Path to the parameter file with custom values for each source        
+    gen_par_f : string, default='pars_gen.json'
+        Path to the general parameter file    
     profiles_txt : bool, default=True
         Whether to produce a .txt file per source containting the 
         clean, rave, frank brightness profiles (sampled at same radii)
     profiles_fig : bool, default=True
         Whether to produce a single figure showing brightness profiles for 
         all sources
-    gen_par_f : string, default='pars_gen.json'
-        Path to the general parameter file
-    source_par_f : string, default='pars_source.json'
-        Path to the parameter file with custom values for each source
     robust : float, default=2.0
         Robust weighting value to use for retrieving clean, rave results
     
