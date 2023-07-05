@@ -1,4 +1,4 @@
-_arksia_ - ARKS Image Analysis - a pipeline for 1D image analysis of the ALMA large program ARKS ('ALMA survey to Resolve exoKuiper belt Substructures').
+_arksia_ ('ARKS Image Analysis') - a pipeline for 1D image analysis of the ALMA large program ARKS ('ALMA survey to Resolve exoKuiper belt Substructures').
 
 Dependencies
 ------------
