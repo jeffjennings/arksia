@@ -1,9 +1,14 @@
-Pipeline for 1D image analysis of the ALMA large program ARKS.
+_arksia_ - ARKS Image Analysis - a pipeline for 1D image analysis of the ALMA large program ARKS ('ALMA survey to Resolve exoKuiper belt Substructures').
 
 Dependencies
 ------------
-- frank (newest codebase - `pip install git+https://github.com/discsim/frank.git`)
-- MPoL (newest codebase - `pip install git+https://github.com/MPoL-dev/MPoL.git`)
+Use the newest versions of `frank` and `MPoL`:
+- frank - `pip install git+https://github.com/discsim/frank.git`
+- MPoL - `pip install git+https://github.com/MPoL-dev/MPoL.git`
+
+Install
+-------
+Just do `pip install arksia`!
 
 Pipeline scope
 --------------
