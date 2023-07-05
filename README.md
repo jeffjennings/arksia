@@ -8,7 +8,6 @@ Use the newest versions of `frank` and `MPoL`:
 
 Install
 -------
-Just use pip: 
 ```pip install arksia```
 
 Pipeline scope
