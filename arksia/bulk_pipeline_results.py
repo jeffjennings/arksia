@@ -4,8 +4,8 @@ import json
 import numpy as np 
 import matplotlib.pyplot as plt 
 
-from radial_pipeline import model_setup
-from input_output import load_bestfit_profiles
+from arksia.pipeline import model_setup
+from arksia.input_output import load_bestfit_profiles
 
 def main(source_par_f='./pars_source.json', gen_par_f='./pars_gen.json', 
          profiles_txt=True, profiles_fig=True, robust=2.0
