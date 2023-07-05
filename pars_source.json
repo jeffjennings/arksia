@@ -7,7 +7,6 @@
     "clean"     : {
       "npix"        : 1024,
       "pixel_scale" : 0.01,
-      "image_rms"   : 1.89e-5,
       "bestfit"     : {"robust"  : 2.0
                       }
     },
@@ -32,7 +31,6 @@
     "clean"     : {
       "npix"        : 512,
       "pixel_scale" : 0.08,
-      "image_rms"   : 2.18e-5,
       "bestfit"     : {"robust"  : 2.0
                       }      
     },
@@ -57,7 +55,6 @@
     "clean"     : {
       "npix"        : 512,
       "pixel_scale" : 0.08,
-      "image_rms"   : 1.64e-5,
       "bestfit"     : {"robust"  : 2.0
                       }         
     },
@@ -82,7 +79,6 @@
     "clean"     : {
       "npix"        : 1024,
       "pixel_scale" : 0.04,
-      "image_rms"   : 1.20e-5,
       "bestfit"     : {"robust"  : 2.0
                       }            
     },
@@ -107,7 +103,6 @@
     "clean"     : {
       "npix"        : 1024,
       "pixel_scale" : 0.04,
-      "image_rms"   : 1.70e-5,
       "bestfit"     : {"robust"  : 2.0
                       }                
     },
@@ -132,7 +127,6 @@
     "clean"     : {
       "npix"        : 512,
       "pixel_scale" : 0.08,
-      "image_rms"   : 1.61e-5,
       "bestfit"     : {"robust"  : 2.0
                       }         
     },
@@ -157,7 +151,6 @@
     "clean"     : {
       "npix"        : 1024,
       "pixel_scale" : 0.04,
-      "image_rms"   : 1.90e-5,
       "bestfit"     : {"robust"  : 2.0
                       }         
     },
@@ -182,7 +175,6 @@
     "clean"     : {
       "npix"        : 1024,
       "pixel_scale" : 0.04,
-      "image_rms"   : 2.15e-5,
       "bestfit"     : {"robust"  : 2.0
                       }               
     },
