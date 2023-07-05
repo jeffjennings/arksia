@@ -45,7 +45,7 @@ Before running any pipeline routines:
 
 Running the pipeline for a single source
 ----------------------------------------
-The main pipeline file is `radial_pipeline.py`. It can be run from the terminal for fits/analysis of a single source with `python radial_pipeline.py -d '<disk name>'`, e.g., `python radial_pipeline.py -d 'HD76582'`.
+The main pipeline file is `radial_pipeline.py`. It can be run from the terminal for fits/analysis of a single source with `python -m arksia.pipeline -d '<disk name>'`, e.g., `python radial_pipeline.py -d 'HD76582'`.
 
 By default the pipeline runs using the parameter files `./pars_gen.json` (which contains parameters to choose which of the above pipeline modules run, as well as sensible choices for the pipeline parameters applicable to all sources) and `./pars_gen.json` (which contains sensible choices for source-specific, best-fit parameters). For a description of the parameters, see `description_pars_gen.json` and `description_pars_source.json`.
 
