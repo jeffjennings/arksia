@@ -33,7 +33,7 @@ Before running any pipeline routines:
 
 3) Add the disk to your source parameters (.json) file
 -  set 'base: SMG_sub', 'clean: npix' and 'clean: pixel_scale' according to the '.fits' filenames (these will be used to determine the filenames of the appropriate images to load)
-- set 'clean: image_rms' as the value of `rms` (corresponding to the correct `robust` value) in `save_figure.py`
+- set 'clean: image_rms' as the value of `rms` (corresponding to the correct `robust` value) in 'save_figure.py'
 - set 'rave: pixel_scale' according to the Rave model filename
 - set 'base: dist' and 'frank: SED_fstar' according to the github wiki (see 'ARKS sample' there)
 - 'frank: custom_fstar' and 'frank: bestfit' will be determined by running frank fits
