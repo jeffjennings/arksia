@@ -1,4 +1,4 @@
-Pipeline for radial profile (team 2) extraction and analysis. Contact Jeff Jennings with questions.
+Pipeline for 1D image analysis of the ALMA large program ARKS.
 
 Dependencies
 ------------
@@ -7,7 +7,7 @@ Dependencies
 
 Pipeline scope
 --------------
-The pipeline is run from the terminal using input parameter files. As of June 2023, it has the following, modular capabilities:
+The pipeline is run from the terminal using input parameter files. It has the following, modular capabilities:
 - extracts a radial brightness profile from a clean image
 - processes an existing rave fit to obtain a brightness profile and 1d, 2d residuals in consistent units
 - runs frank to obtain a brightness profile, obtain 1d residuals, image the 2d residuals (using MPoL)
@@ -41,14 +41,14 @@ Running the pipeline for a single source
 ----------------------------------------
 The main pipeline file is `radial_pipeline.py`. It can be run from the terminal for fits/analysis of a single source with `python radial_pipeline.py -d '<disk name>'`, e.g., `python radial_pipeline.py -d 'HD76582'`. 
 
-By default the pipeline runs using the parameter files `./pars_gen.json` (contains parameters to choose which of the above pipeline modules run, as well as sensible choices for the pipeline parameters applicable to all sources) and `./pars_source.json` (contains sensible choices for source-specific, best-fit parameters). 
+By default the pipeline runs using the parameter files `./pars_gen.json` (contains parameters to choose which of the above pipeline modules run, as well as sensible choices for the pipeline parameters applicable to all sources) and a user-supplied `pars_source.json` (contains sensible choices for source-specific, best-fit parameters). 
 
 For descriptions of the `.json` parameters, see `description_pars_gen.json` and `description_pars_source.json`.
 
 ### Setting up frank fits ###
-- For running frank, you will likely want to adjust the `alpha`, `wsmooth` and `scale_heights` parameters in `./pars_gen.json`. 
+- To run frank, you will likely want to adjust the `alpha`, `wsmooth` and `scale_heights` parameters in `./pars_gen.json`. 
 
-- When performing frank fits to find a radial profile, I recommend setting `method` to `"LogNormal"` to perform fits in logarithmic brightness space. Not all parts of the pipeline support linear brightness space fits with enforced non-negativity; this is because the logarithmic fits are in general a better choice. The exception is that when running a frank 1+1D fit to find _h_, `method` must be `"Normal"` (it will be enforced), because `"LogNormal"` is not supported within frank.
+- When performing frank fits to find a radial profile, I recommend setting `method` to `"LogNormal"` to perform fits in logarithmic brightness space. Not all parts of the pipeline support linear brightness space fits with enforced non-negativity; this is because the logarithmic fits are in general a better choice. The exception is that when running a frank 1+1D fit to find _h_, `method` must be `"Normal"` (it will be enforced).
 
 Running the pipeline for multiple/all sources
 ---------------------------------------------
@@ -56,4 +56,4 @@ The pipeline can be looped over multiple sources using `bulk_pipeline_run.py` vi
 
 Obtaining key results for multiple/all sources
 ----------------------------------------------
-Survey-wide results are a `.txt` file per source with all radial brightness profiles (clean, rave, frank) sampled at the same radii, and a figures with a panel for each source showing the clean, rave, frank brightness profiles (one figure without uncertainties, one figure with). These are generated with `bulk_pipeline_results.py` via `python bulk_pipeline_results.py` (you may want to adjust the referenced `.json` parameter files there).
+Survey-wide results are a `.txt` file per source with all radial brightness profiles (clean, rave, frank) sampled at the same radii, and figures with a panel for each source showing the clean, rave, frank brightness profiles (one figure without uncertainties, one figure with). These are generated with `bulk_pipeline_results.py` via `python bulk_pipeline_results.py` (you may want to adjust the referenced `.json` parameter files there).
