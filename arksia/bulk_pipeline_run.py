@@ -1,4 +1,4 @@
-"""Routine to run `radial_pipeline` in a loop over multiple sources (originally written by Jeff Jennings)."""
+"""Routine to run `pipeline` in a loop over multiple sources (originally written by Jeff Jennings)."""
 
 import os
 import json
@@ -13,7 +13,7 @@ def main(source_par_f='./pars_source.json', gen_par_f='./pars_gen.json'):
     for ii, jj in enumerate(disk_names):
         print("\nPipeline call {} of {} - disk {}".format(ii, len(disk_names) - 1, jj))
 
-        os.system('python radial_pipeline.py -d {} -b {} -s {}'.format(
+        os.system('python -m arksia.pipeline -d {} -b {} -s {}'.format(
             jj, gen_par_f, source_par_f))
 
 if __name__ == "__main__":
