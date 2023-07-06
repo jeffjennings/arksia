@@ -1,11 +1,5 @@
 _arksia_ ('ARKS Image Analysis') - a pipeline for 1D image analysis of the ALMA large program ARKS ('ALMA survey to Resolve exoKuiper belt Substructures').
 
-Dependencies
-------------
-Use the newest versions of `frank` and `MPoL`:
-- frank - `pip install git+https://github.com/discsim/frank.git`
-- MPoL - `pip install git+https://github.com/MPoL-dev/MPoL.git`
-
 Install
 -------
 ```pip install arksia```
