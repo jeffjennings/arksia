@@ -21,16 +21,15 @@ Prior to running the pipeline for a new source
 ----------------------------------------------
 Before running any pipeline routines:
 1) Create the following, nested directory structure, downloading and placing the appropriate files in these directories:
-- Root directory (e.g., 'arks_prep/disks'), with the following files and subdirectories:
+- Root directory (e.g., 'arks_prep/disks'), containing the following files:
     * 'pars_image.json' (contains clean image RMS noise per robust value)
     * 'pars_gen.json' (contains parameters to choose which of the above pipeline modules run, as well as sensible choices for the pipeline parameters applicable to all sources)
     * 'pars_source.json' (contains sensible choices for source-specific, best-fit parameters)
-    * Source directory: '[disk name]'
-          - mcmc_results.json (used to read assumed disk geometry and stellar flux)
-          - Subdirectories:
-              * 'clean': containing primary beam-corrected CLEAN image ('*.pbcor.fits'), primary beam image ('*.pb.fits'), CLEAN model image ('*.model.fits') for each robust value
-              * 'frank': containing visibility datasets ('*.corrected.txt')
-              * 'rave': containing rave fit array files ('*.npy') for each robust value
+- Within the root directory, create a subdirectory named as '[disk name]', containing the following files:
+    * mcmc_results.json (used to read assumed disk geometry and stellar flux)
+    * subdirectory 'clean': containing primary beam-corrected CLEAN image ('*.pbcor.fits'), primary beam image ('*.pb.fits'), CLEAN model image ('*.model.fits') for each robust value
+    * subdirectory 'frank': containing visibility datasets ('*.corrected.txt')
+    * subdirectory 'rave': containing rave fit array files ('*.npy') for each robust value
 
 2) Add the disk information to the source parameters (.json) file
 - set 'base: SMG_sub', 'clean: npix' and 'clean: pixel_scale' according to the '.fits' filenames (these will be used to determine the filenames of the appropriate images to load)
