@@ -65,10 +65,6 @@ def model_setup(parsed_args):
     source_pars = json.load(open(parsed_args.source_parameter_filename, 'r'))
     disk_pars = source_pars[model["base"]["disk"]]
 
-    if not model["base"]["root_dir"]:
-        # If not specified, use the directory with `pars_gen.json` to set the save directory
-        model["base"]["root_dir"] = os.path.join(os.path.dirname(parsed_args.base_parameter_filename), "disks")
-
     # expect input files to be in "<root_dir>/<disk name>/<clean or rave or frank>"
     model["base"]["save_dir"] = os.path.join(model["base"]["root_dir"], "{}".format(model["base"]["disk"]))
     print("  Model setup: setting load/save paths as {}/<clean, rave, frank>. Visibility tables should be in frank path.".format(model["base"]["save_dir"]))
