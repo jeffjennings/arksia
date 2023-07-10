@@ -31,7 +31,7 @@ Before running any pipeline routines:
     * subdirectory 'frank': containing visibility datasets ('*.corrected.txt')
     * subdirectory 'rave': containing rave fit array files ('*.npy') for each robust value
 
-2) Add the disk information to the source parameters (.json) file
+2) Add the disk information to the source parameters (.json) file:
 - set 'base: SMG_sub', 'clean: npix' and 'clean: pixel_scale' according to the '.fits' filenames (these will be used to determine the filenames of the appropriate images to load)
 - set 'rave: pixel_scale' according to the Rave model filename
 - set 'base: dist' and 'frank: SED_fstar' according to the github wiki (see 'ARKS sample' there)
