@@ -121,8 +121,10 @@ def radial_profile(image, pb_image, geom, rmax, Nr, phis, image_rms,
                     err_count_pb += 1
                     Is_pb[ii, jj] = np.nan
 
-    print('  Image padded with {} nan'.format(err_count))
-    print('  PB image padded with {} nan'.format(err_count_pb))
+    if err_count > 0:
+        print('  Image padded with {} nan'.format(err_count))
+    if err_count_pb > 0:
+        print('  PB image padded with {} nan'.format(err_count_pb))
 
     # radial intensity [Jy/arcsec]
     Ir = np.nanmean(Is, axis=1) 
