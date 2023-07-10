@@ -27,9 +27,9 @@ Before running any pipeline routines:
     * 'pars_source.json' (contains sensible choices for source-specific, best-fit parameters)
 - Within the root directory, create a subdirectory named as '[disk name]', containing the following files:
     * mcmc_results.json (used to read assumed disk geometry and stellar flux)
-    * subdirectory 'clean': containing primary beam-corrected CLEAN image ('*.pbcor.fits'), primary beam image ('*.pb.fits'), CLEAN model image ('*.model.fits') for each robust value
-    * subdirectory 'frank': containing visibility datasets ('*.corrected.txt')
-    * subdirectory 'rave': containing rave fit array files ('*.npy') for each robust value
+    * subdirectory 'clean': containing primary beam-corrected CLEAN image ('<>.pbcor.fits'), primary beam image ('<>.pb.fits'), CLEAN model image ('<>.model.fits') for each robust value
+    * subdirectory 'frank': containing visibility datasets ('<>.corrected.txt')
+    * subdirectory 'rave': containing rave fit array files ('<>.npy') for each robust value
 
 2) Add the disk information to the source parameters (.json) file:
 - set 'base: SMG_sub', 'clean: npix' and 'clean: pixel_scale' according to the '.fits' filenames (these will be used to determine the filenames of the appropriate images to load)
