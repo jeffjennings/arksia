@@ -40,7 +40,7 @@ Running the pipeline for a single source
 ----------------------------------------
 The main pipeline file is `pipeline.py`. It can be run from the terminal for fits/analysis of a single source with `python -m arksia.pipeline -d '<disk name>'`, where the disk name is, e.g., `'HD76582'`.
 
-By default the pipeline runs using the parameter files `./pars_gen.json` (which contains parameters to choose which of the above pipeline modules run, as well as sensible choices for the pipeline parameters applicable to all sources) and `./pars_gen.json` (which contains sensible choices for source-specific, best-fit parameters). For a description of the parameters, see `description_pars_gen.json` and `description_pars_source.json`.
+By default the pipeline runs using the parameter files `./pars_gen.json` (which contains parameters to choose which of the above pipeline modules run, as well as sensible choices for the pipeline parameters applicable to all sources) and `./pars_source.json` (which contains sensible choices for source-specific, best-fit parameters). For a description of the parameters, see `description_pars_gen.json` and `description_pars_source.json`.
 
 ### Setting up frank fits ###
 - To run frank, you will likely want to adjust the `alpha`, `wsmooth` and `scale_heights` parameters in `./pars_gen.json`. 
