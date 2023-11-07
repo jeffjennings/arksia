@@ -11,7 +11,9 @@ The pipeline is run from the terminal using input parameter files. It has the fo
 - processes an existing rave fit to obtain a brightness profile and 1d, 2d residuals in consistent units
 - runs frank to obtain a brightness profile, obtain 1d residuals, image the 2d residuals (using MPoL)
 - runs frank for 1+1D vertical (disk aspect ratio) inference
+- runs parametric fits to a nonparametric radial brightness profile using a range of physically motivated parametric forms
 - produces plots to compare clean, rave, frank brightness profiles, radial visibility profiles, images, residuals
+- produces plots to compare nonparametric and parametric brightness profiles
 - produces plots to assess frank vertical inference over grids of _h_, _alpha_, _wsmooth_
 - adds utilites to prepare visibility files for the above and to save/load/interface with all of the above
 - the pipeline runs from general and source-specific parameter files to do any combination of the above
@@ -19,13 +21,15 @@ The pipeline is run from the terminal using input parameter files. It has the fo
 
 Prior to running the pipeline for a new source
 ----------------------------------------------
+NOTE: These steps will be unnecessary once the associated ARKS paper is published and the data public. 
+
 Before running any pipeline routines:
 1) Create the following, nested directory structure, downloading and placing the appropriate files in these directories:
 - Root directory (e.g., 'arks_prep/disks'), containing the following files:
     * 'pars_image.json' (contains clean image RMS noise per robust value)
     * 'pars_gen.json' (contains parameters to choose which of the above pipeline modules run, as well as sensible choices for the pipeline parameters applicable to all sources)
     * 'pars_source.json' (contains sensible choices for source-specific, best-fit parameters)
-- Within the root directory, create a subdirectory named as '[disk name]', containing the following files:
+- Within the root directory, create a subdirectory named '[disk name]', containing the following files:
     * mcmc_results.json (used to read assumed disk geometry and stellar flux)
     * subdirectory 'clean': containing primary beam-corrected CLEAN image ('<>.pbcor.fits'), primary beam image ('<>.pb.fits'), CLEAN model image ('<>.model.fits') for each robust value
     * subdirectory 'frank': containing visibility datasets ('<>.corrected.txt')
