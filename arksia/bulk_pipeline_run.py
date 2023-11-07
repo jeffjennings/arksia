@@ -1,4 +1,5 @@
-"""Routine to run `pipeline` in a loop over multiple sources (originally written by Jeff Jennings)."""
+"""This module contains a function to run `pipeline` in a loop over multiple sources 
+(written by Jeff Jennings)."""
 
 import os
 import json

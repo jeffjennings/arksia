@@ -1,5 +1,7 @@
 
-"""Routines for generating images from visibilities (originally written by Jeff Jennings)."""
+"""This module contains a function for generating images from visibilities 
+(written by Jeff Jennings)."""
+
 import numpy as np 
 
 from mpol.gridding import DirtyImager

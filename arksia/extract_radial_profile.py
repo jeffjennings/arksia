@@ -1,4 +1,5 @@
-"""Routines to obtain a radial brightness profile from a clean image (originally written by Seba Marino, modified by Jeff Jennings)."""
+"""This module contains functions to obtain a radial brightness profile from a CLEAN image 
+(written by Seba Marino and Jeff Jennings)."""
 
 import numpy as np
 from scipy.optimize import fsolve
