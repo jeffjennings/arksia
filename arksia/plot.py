@@ -1,4 +1,5 @@
-"""Routines for plotting pipeline results (originally written by Jeff Jennings)."""
+"""This module contains functions for plotting pipeline results 
+(written by Jeff Jennings)."""
 
 import json 
 import numpy as np 
