@@ -71,3 +71,14 @@ class ParametricFit():
         # return (jnp.mean((y - y_hat) ** 2)) ** 0.5 # RMSE loss
         return ((y - y_hat) ** 2 / err ** 2).sum()
 
+
+
+    def _fit(self, params: optax.Params, optimizer: optax.GradientTransformation, 
+            niter: int) -> tuple[optax.Params, jnp.ndarray]:
+        """
+        # TODO
+        """
+
+        opt_state = optimizer.init(params)
+
+        # TODO: set bounds for each param 
