@@ -267,6 +267,7 @@ def process_rave_fit(model):
     ff = "{}/rave_profile_robust{}.txt".format(
         model["base"]["rave_dir"], model["clean"]["robust"])
     print('    saving RAVE profile to {}'.format(ff))
+
     np.savetxt(ff, 
         np.array([r, I, I_err_lo, I_err_hi]).T, 
         header='Extracted from {}\nr [arcsec]\tI [Jy/sr]\tI_err (lower bound) [Jy/sr]\tI_err (upper bound) [Jy/sr]'.format(
@@ -364,7 +365,7 @@ def run_frank(model):
             qfig, qaxes = make_quick_fig(*uv_data, sol, bin_widths=model["plot"]["bin_widths"],
                         save_prefix=None,
                         )
-            # show 1 sigma statistical uncertainty band
+            # add 1 sigma statistical uncertainty band to plot
             sigmaI = get_fit_stat_uncer(sol)
             qaxes[0].fill_between(sol.r, (sol.I - sigmaI) / 1e10, (sol.I + sigmaI) / 1e10, color='r', alpha=0.2)
             qaxes[1].fill_between(sol.r, (sol.I - sigmaI) / 1e10, (sol.I + sigmaI) / 1e10, color='r', alpha=0.2)
@@ -424,15 +425,22 @@ def compare_models(fits, model):
 
 
 def fit_parametric_to_frank(fits, model):
+    """
     # TODO
+    """
+
+    # get frank best-fit profile
     _, _, results = fits
-    rf, If, Ief = results[0]
+    frank_profile = results[0]
 
-    parametric_fitter.ParametricFit(rf, If, Ief)
+    # run parametric fits
+    PF = parametric_fitter.ParametricFit(frank_profile, 
+                                         model, 
+                                         learn_rate=1e-3, 
+                                         niter=10000)
+    para_params, loss = PF.fit()
 
-    para_fits = {}
-
-    return para_fits 
+    return para_params, loss 
 
 
 def main(*args):
