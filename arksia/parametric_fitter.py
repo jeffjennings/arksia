@@ -8,3 +8,6 @@ from tqdm.auto import tqdm
 import jax.numpy as jnp
 import jax
 import optax 
+
+from arksia.parametric_forms import *
+
