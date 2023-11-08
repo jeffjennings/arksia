@@ -48,9 +48,9 @@ def double_powerlaw(params: optax.Params, r: jnp.ndarray):
                                     params['gamma'])) ** (-1 / params['gamma'])
 
     if params['Rin'] is not None:
-        value *= (1 + erf((r - params['Rin']) / params['lin']))
+        value *= (1 + erf((r - params['Rin']) / params['l_in']))
     if params['Rout'] is not None:
-        value *= (1 + erf((params['Rout'] - r) / params['lout']))
+        value *= (1 + erf((params['Rout'] - r) / params['l_out']))
 
     return value
 

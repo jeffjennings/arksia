@@ -29,6 +29,7 @@ class ParametricFit():
         self._learn_rate = learn_rate
         self._niter = niter
 
+        self._initial_params = {"form": model["parametric"]["form"] }
 
         # check if jax is on a gpu or tpu
         self._device = jax.default_backend()
