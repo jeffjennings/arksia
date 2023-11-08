@@ -98,6 +98,25 @@ def double_powerlaw_gauss(params: optax.Params, r: jnp.ndarray):
     return gaussian * dpl
 
 
+def double_powerlaw_double_gauss(params: optax.Params, r: jnp.ndarray):
+    """
+    Double power law function with two Gaussians, \Sigma(r) of the form:
+
+        .. math::
+
+            \Sigma(r) =  a_1 * \exp(-(r - R_1)^2 / (2 * \sigma_1^2) + 
+              a_2 * \exp(-(r - R_2)^2 / (2 * \sigma_2^2) + 
+              [(r / R_3)^{\alpha_1 * \gamma} + (r / R_3)^{\alpha_2 * \gamma}]^{-1 / \gamma}
+    """      
+
+    gaussian1 = gauss(r, params['a1'], params['R1'], params['sigma1'])
+    gaussian2 = gauss(r, params['a2'], params['R2'], params['sigma2'])
+
+    dpl = double_powerlaw(r, params['R3'], params['alpha1'], params['alpha2'], params['gamma'])
+    
+    return dpl + gaussian1 + gaussian2
+
+
 def single_erf_powerlaw(params: optax.Params, r: jnp.ndarray):
     """
     Single error function and power law function f(r) of the form:
