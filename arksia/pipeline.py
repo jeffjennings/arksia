@@ -474,7 +474,7 @@ def main(*args):
 
     if model["base"]["fit_parametric"] is True:
         fits = input_output.load_bestfit_profiles(model)
-        fit_parametric_to_frank(fits, model)
+        para_params, loss = fit_parametric_to_frank(fits, model)
 
     if model["base"]["parametric_fig"] is True:
         fig4 = plot.parametric_fit_figure(model)
