@@ -417,6 +417,12 @@ def compare_models(fits, model):
     return fig1, fig2 
 
 
+def fit_parametric_to_frank(fits, model):
+    # TODO
+    para_fits = {}
+
+    return para_fits 
+
 def main(*args):
     """Run a pipeline to extract/fit/analyze radial profiles using 
     clean/rave/frank for ARKS data.
@@ -445,6 +451,13 @@ def main(*args):
 
     if model["base"]["aspect_ratio_fig"] is True:
         fig3 = plot.aspect_ratio_figure(model)
+
+    if model["base"]["fit_parametric"] is True:
+        fits = input_output.load_bestfit_profiles(model)
+        fit_parametric_to_frank(fits, model)
+
+    if model["base"]["parametric_fig"] is True:
+        fig4 = plot.parametric_fit_figure(model)
 
 if __name__ == "__main__":
     main()
