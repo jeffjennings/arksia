@@ -104,7 +104,10 @@ class ParametricFit():
             if i % 100 == 0:
                 progress.set_description(f"{loss_arr[i]:.2f}")
 
-        return params, loss_arr
+        self._loss_arr = loss_arr
+        self._params = params 
+
+        return self._params, self._loss_arr
 
 
     def fit(self):
