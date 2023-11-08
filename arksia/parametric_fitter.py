@@ -37,3 +37,25 @@ class ParametricFit():
         if self._device == 'cpu':
             print("      Using the CPU will slow computation of parametric fits.")
 
+    def parametric_model(self, params: optax.Params, x: jnp.ndarray):
+        """
+        # TODO
+        """
+        
+        form = params['form']
+
+        if form == 'asym_gauss':
+            return asym_gauss(params, x) 
+        
+        elif form == 'double_powerlaw':
+            return double_powerlaw(params, x)
+        
+        elif form == 'single_erf_powerlaw':
+            return single_erf_powerlaw(params, x)
+        
+        elif form == 'double_erf_powerlaw':
+            return double_erf_powerlaw(params, x)
+        
+        else:
+            raise ValueError(f"{form} invalid")
+        
