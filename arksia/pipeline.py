@@ -16,7 +16,7 @@ from frank.geometry import FixedGeometry
 from frank.utilities import get_fit_stat_uncer
 
 import arksia 
-from arksia import input_output, extract_radial_profile, plot
+from arksia import input_output, extract_radial_profile, plot, parametric_fitter
 
 def parse_parameters(*args):
     """
@@ -419,9 +419,15 @@ def compare_models(fits, model):
 
 def fit_parametric_to_frank(fits, model):
     # TODO
+    _, _, results = fits
+    rf, If, Ief = results[0]
+
+    parametric_fitter.ParametricFit(rf, If, Ief)
+
     para_fits = {}
 
     return para_fits 
+
 
 def main(*args):
     """Run a pipeline to extract/fit/analyze radial profiles using 
