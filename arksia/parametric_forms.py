@@ -7,11 +7,11 @@ import optax
 
 def gauss(r: jnp.ndarray, a: jnp.float32, Rc: jnp.float32, sigma: jnp.float32):
     """
-    Gaussian function f(r) of the form: 
+    Gaussian function \Sigma(r) of the form: 
 
         ..math::
 
-            \Sigma(r) = \exp(-(r - Rc)^2 / (2 * \sigma^2)
+            \Sigma(r) = a * \exp(-(r - R_c)^2 / (2 * \sigma^2)
     """        
 
     return a * jnp.exp(-(r - Rc) ** 2 / (2 * sigma ** 2))
