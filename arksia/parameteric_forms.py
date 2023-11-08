@@ -71,3 +71,20 @@ def single_erf_powerlaw(params: optax.Params, r: jnp.ndarray):
     return inner_edge * (r / params['Rc']) ** -params['alpha_out']
 
 
+def double_erf_powerlaw(params: optax.Params, r: jnp.ndarray):
+    """
+    Double error function and power law function f(r) of the form:
+
+        ..math::
+
+            \Sigma(r) = \left( 1 - \rm{erf}\left(\dfrac{R_{\rm{in}}-r}{\sqrt{2} \:\sigma_{\rm{in}} R_{\rm{in}}} \right) \right)
+                         \left( 1 - \rm{erf}\left(\dfrac{r-R_{\rm{out}}}{\sqrt{2} \:\sigma_{\rm{out}} R_{\rm{out}}} \right) \right)
+                         \left( \dfrac{r}{R_{\rm{in}}} \right)^{-\alpha
+    """      
+
+    inner_edge = 1 - erf((params['Rin'] - r) / 
+                         (2 ** 0.5 * params['sigma_in'] * params['Rin']))
+    outer_edge = 1 - erf((r - params['Rout']) / 
+                         (2 ** 0.5 * params['sigma_out'] * params['Rout']))
+
+    return inner_edge * outer_edge * (r / params['Rin']) ** (-params['alpha'])
