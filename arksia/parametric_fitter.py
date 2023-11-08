@@ -124,3 +124,18 @@ class ParametricFit():
         return self._fit(self._initial_params, optimizer, self._niter)
 
 
+    @property
+    def initial_params(self):
+        """Dictionary of initial guess values for model parameters"""
+        return self._initial_params
+    
+    @property    
+    def bestfit_params(self):
+        """Dictionary of best fit values for model parameters"""
+        return self._params
+
+    @property
+    def losses(self):
+        """Array of loss values over optimization loop"""
+        return self._loss_arr
+    
