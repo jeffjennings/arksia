@@ -92,3 +92,14 @@ class ParametricFit():
 
             return params, opt_state, loss_value
 
+        loss_arr = jnp.zeros(niter)
+        loss_arr[0] = self.loss(params, self._x, self._y, self._err)
+
+        progress = tqdm(range(1, niter))
+
+        for i in progress:
+            params, opt_state, loss_arr[i] = step(params, opt_state, 
+                                                  self._x, self._y, self._err)
+            if i % 100 == 0:
+                progress.set_description(f"{loss_arr[i]:.2f}")
+
