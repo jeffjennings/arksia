@@ -19,12 +19,12 @@ def gauss(r: jnp.ndarray, a: jnp.float32, Rc: jnp.float32, sigma: jnp.float32):
 
 def asym_gauss(params: optax.Params, r: jnp.ndarray):
     """
-    Assymetric (piecewise) Gaussian function f(r) of the form:
+    Assymetric (piecewise) Gaussian function \Sigma(r) of the form:
 
         .. math::
 
-            \Sigma(r) = \exp\left[ \dfrac{-(r-R_{c})^{2}}{2\sigma_{\rm{in}}^{2}} \right] \mathrm{for} r < R_{c}, 
-            \Sigma(r) = \exp\left[ \dfrac{-(r-R_{c})^{2}}{2\sigma_{\rm{out}}^{2}} \right] \mathrm{for} r \geq R_{c}
+            \Sigma(r) = a_1 * \exp(-(r - Rc)^2 / (2 * \sigma_1^2) \mathrm{for} r < R_c, 
+              \Sigma(r) = a_2 * \exp(-(r - Rc)^2 / (2 * \sigma_2^2) \mathrm{for} r \geq R_c
     """      
 
     return jnp.piecewise(r, [r < params['Rc'], r >= params['Rc']], 
