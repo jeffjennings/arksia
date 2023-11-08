@@ -106,3 +106,17 @@ class ParametricFit():
         return params, loss_arr
 
 
+    def fit(self):
+        """
+        # TODO
+        """
+
+        form = self._initial_params['form']
+
+        
+        # fit the parametrized function using the Adam optimizer
+        optimizer = optax.adam(self._learn_rate)
+
+        return self._fit(self._initial_params, optimizer, self._niter)
+
+
