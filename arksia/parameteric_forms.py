@@ -4,3 +4,15 @@
 import jax.numpy as jnp
 from jax.scipy.special import erf
 import optax
+
+def gauss(r: jnp.ndarray, Rc: jnp.float32, sigma: jnp.float32):
+    """
+    Gaussian function f(r) of the form: 
+
+        ..math::
+
+            \Sigma(r) = \exp(-(r - Rc)^2 / (2 * \sigma^2)
+    """        
+
+    return jnp.exp(-(r - Rc) ** 2 / (2 * sigma ** 2))
+
