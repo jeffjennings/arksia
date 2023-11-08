@@ -144,9 +144,9 @@ def double_erf_powerlaw(params: optax.Params, r: jnp.ndarray):
                          \left( \dfrac{r}{R_{\rm{in}}} \right)^{-\alpha
     """      
 
-    inner_edge = 1 - erf((params['Rin'] - r) / 
-                         (2 ** 0.5 * params['sigma_in'] * params['Rin']))
-    outer_edge = 1 - erf((r - params['Rout']) / 
-                         (2 ** 0.5 * params['sigma_out'] * params['Rout']))
+    inner_edge = 1 - erf((params['R1'] - r) / \
+                         (2 ** 0.5 * params['sigma1'] * params['R1']))
+    outer_edge = 1 - erf((r - params['R2']) / \
+                         (2 ** 0.5 * params['sigma2'] * params['R2']))
 
-    return inner_edge * outer_edge * (r / params['Rin']) ** (-params['alpha'])
+    return inner_edge * outer_edge * (r / params['R1']) ** (-params['alpha'])
