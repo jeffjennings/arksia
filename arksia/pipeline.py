@@ -434,13 +434,16 @@ def fit_parametric_to_frank(fits, model):
     frank_profile = results[0]
 
     # run parametric fits
-    PF = parametric_fitter.ParametricFit(frank_profile, 
+    PFit = parametric_fitter.ParametricFit(frank_profile, 
                                          model, 
                                          learn_rate=1e-3, 
                                          niter=10000)
-    para_params, loss = PF.fit()
+    sol = PFit.fit()
 
-    return para_params, loss 
+    # initial parameter value guesses, best-fit values, loss per iteration
+    pi, pf, loss = sol.initial_params, sol.bestfit_params, sol.losses
+
+    return pi, pf, loss
 
 
 def main(*args):
@@ -474,7 +477,7 @@ def main(*args):
 
     if model["base"]["fit_parametric"] is True:
         fits = input_output.load_bestfit_profiles(model)
-        para_params, loss = fit_parametric_to_frank(fits, model)
+        pi, pf, loss = fit_parametric_to_frank(fits, model)
 
     if model["base"]["parametric_fig"] is True:
         fig4 = plot.parametric_fit_figure(model)
