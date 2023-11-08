@@ -82,6 +82,7 @@ def model_setup(parsed_args):
 
     model["clean"]["npix"] = disk_pars["clean"]["npix"]
     model["clean"]["pixel_scale"] = disk_pars["clean"]["pixel_scale"]
+
     # get clean image rms
     image_pars = json.load(open(os.path.join(model["base"]["root_dir"], "pars_image.json"), 'r'))
     disk_image_pars = image_pars[model["base"]["disk"]]
@@ -134,6 +135,11 @@ def model_setup(parsed_args):
         print("    'scale_heights' is not None in your parameter file -- enforcing frank 'method=Normal' and 'max_iter=2000'")
         model["frank"]["method"] = "Normal"
         model["frank"]["max_iter"] = 2000
+
+    # implemented functional forms 
+    valid_funcs = [x for x in dir(arksia.parametric_forms) if not x.startswith('__')]
+    if model["parametric"]["form"] not in valid_funcs:
+        raise ValueError(f"{model['parametric']['form']} must be one of {valid_funcs}")
 
     return model
 
