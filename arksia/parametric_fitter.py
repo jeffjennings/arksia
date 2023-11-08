@@ -103,3 +103,6 @@ class ParametricFit():
             if i % 100 == 0:
                 progress.set_description(f"{loss_arr[i]:.2f}")
 
+        return params, loss_arr
+
+
