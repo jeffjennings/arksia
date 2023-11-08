@@ -57,6 +57,17 @@ def double_powerlaw(r: jnp.ndarray, Rc: jnp.float32, alpha1: jnp.float32,
 
     return ((r / Rc) ** (-alpha1 * gamma) + (r / Rc) ** (alpha2 * gamma)) ** (-1 / gamma)
 
+    
+def double_powerlaw_limits(params: optax.Params, r: jnp.ndarray):
+
+    dpl = double_powerlaw(r, params['Rc'], params['alpha1'], params['alpha2'], params['gamma'])
+
+    if params['R1'] is not None:
+        dpl *= (1 + erf((r - params['R1']) / params['l1']))
+    if params['R2'] is not None:
+        dpl *= (1 + erf((params['R2'] - r) / params['l2']))
+
+    return dpl
 
 
 def single_erf_powerlaw(params: optax.Params, r: jnp.ndarray):
