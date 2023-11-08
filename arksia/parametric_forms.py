@@ -33,7 +33,17 @@ def asym_gauss(params: optax.Params, r: jnp.ndarray):
                          )
 
 
-def double_powerlaw(params: optax.Params, r: jnp.ndarray):
+def triple_gauss(params: optax.Params, r: jnp.ndarray):
+    """
+    Sum of three Gaussian functions \Sigma(r)
+    """      
+
+    gauss1 = gauss(r, params['a1'], params['Rc1'], params['sigma1'])
+    gauss2 = gauss(r, params['a2'], params['Rc2'], params['sigma2'])
+    gauss3 = gauss(r, params['a3'], params['Rc3'], params['sigma3'])
+
+    return gauss1 + gauss2 + gauss3
+
     """
     Double power law function f(r) of the form:
 
