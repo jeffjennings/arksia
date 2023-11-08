@@ -42,16 +42,14 @@ class ParametricFit():
         form = params['form']
 
         if form == 'asym_gauss':
-            return asym_gauss(params, x) 
+            return parametric_forms.asym_gauss(params, x) 
         
         elif form == 'double_powerlaw':
-            return double_powerlaw(params, x)
-        
+            return parametric_forms.double_powerlaw_limits(params, x)
         elif form == 'single_erf_powerlaw':
-            return single_erf_powerlaw(params, x)
-        
+            return parametric_forms.single_erf_powerlaw(params, x)
         elif form == 'double_erf_powerlaw':
-            return double_erf_powerlaw(params, x)
+            return parametric_forms.double_erf_powerlaw(params, x)
         
         else:
             raise ValueError(f"{form} invalid")
