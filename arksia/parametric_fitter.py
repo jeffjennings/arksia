@@ -18,6 +18,11 @@ class ParametricFit():
 
     def __init__(self, truth, model, learn_rate=1e-3, niter=10000):
 
+        # get frank brightness profile that we'll fit a parametric form to.
+        # 'x' is radial points of frank fit, 'y' is brightness, 'err' is lower
+        # bound on brightness uncertainty.
+        x, y, err = truth
+        self._x, self._y, self._err = jnp.array(x), jnp.array(y), jnp.array(err)
 
         self._model = model 
 
