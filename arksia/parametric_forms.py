@@ -44,25 +44,19 @@ def triple_gauss(params: optax.Params, r: jnp.ndarray):
 
     return gauss1 + gauss2 + gauss3
 
+
+def double_powerlaw(r: jnp.ndarray, Rc: jnp.float32, alpha1: jnp.float32, 
+                    alpha2: jnp.float32, gamma: jnp.float32):
     """
-    Double power law function f(r) of the form:
+    Double power law function \Sigma(r) of the form:
 
         .. math::
 
-            \Sigma(r) = \left( \left( \dfrac{r}{R_{c}} \right)^{-\alpha_{\rm{in}}\gamma} + 
-            \left( \dfrac{r}{R_{c}} \right)^{-\alpha_{\rm{out}}\gamma} \right)^{-1/\gamma}
-    """      
+            \Sigma(r) = [(r / R_c)^{\alpha_1 * \gamma} + (r / R_c)^{\alpha_2 * \gamma}]^{-1 / \gamma}
+    """
 
-    value = ((r / params['Rc']) ** (-params['alpha_in'] * params['gamma']) +
-             (r / params['Rc']) ** (-params['alpha_out'] *
-                                    params['gamma'])) ** (-1 / params['gamma'])
+    return ((r / Rc) ** (-alpha1 * gamma) + (r / Rc) ** (alpha2 * gamma)) ** (-1 / gamma)
 
-    if params['Rin'] is not None:
-        value *= (1 + erf((r - params['Rin']) / params['l_in']))
-    if params['Rout'] is not None:
-        value *= (1 + erf((params['Rout'] - r) / params['l_out']))
-
-    return value
 
 
 def single_erf_powerlaw(params: optax.Params, r: jnp.ndarray):
