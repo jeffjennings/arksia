@@ -29,3 +29,10 @@ class ParametricFit():
         self._learn_rate = learn_rate
         self._niter = niter
 
+
+        # check if jax is on a gpu or tpu
+        self._device = jax.default_backend()
+        print(f"    JAX is using the {self._device}.")
+        if self._device == 'cpu':
+            print("      Using the CPU will slow computation of parametric fits.")
+
