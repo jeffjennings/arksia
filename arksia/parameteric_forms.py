@@ -32,3 +32,24 @@ def asym_gauss(params: optax.Params, r: jnp.ndarray):
                          lambda r : gauss(r, params['Rc'], params['sigma_out'])]
                          )
 
+
+def double_powerlaw(params: optax.Params, r: jnp.ndarray):
+    """
+    Double power law function f(r) of the form:
+
+        .. math::
+
+            \Sigma(r) = \left( \left( \dfrac{r}{R_{c}} \right)^{-\alpha_{\rm{in}}\gamma} + 
+            \left( \dfrac{r}{R_{c}} \right)^{-\alpha_{\rm{out}}\gamma} \right)^{-1/\gamma}
+    """      
+
+    value = ((r / params['Rc']) ** (-params['alpha_in'] * params['gamma']) +
+             (r / params['Rc']) ** (-params['alpha_out'] *
+                                    params['gamma'])) ** (-1 / params['gamma'])
+
+    if params['Rin'] is not None:
+        value *= (1 + erf((r - params['Rin']) / params['lin']))
+    if params['Rout'] is not None:
+        value *= (1 + erf((params['Rout'] - r) / params['lout']))
+
+    return value
