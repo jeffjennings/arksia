@@ -11,7 +11,7 @@ The pipeline is run from the terminal using input parameter files. It has the fo
 - processes an existing rave fit to obtain a brightness profile and 1d, 2d residuals in consistent units
 - runs frank to obtain a brightness profile, obtain 1d residuals, image the 2d residuals (using MPoL)
 - runs frank for 1+1D vertical (disk aspect ratio) inference
-- runs parametric fits to a nonparametric radial brightness profile using a range of physically motivated parametric forms
+- runs parametric fits to a nonparametric radial brightness profile using a range of physically motivated parametric forms (uses JAX for hardware acceleration)
 - produces plots to compare clean, rave, frank brightness profiles, radial visibility profiles, images, residuals
 - produces plots to compare nonparametric and parametric brightness profiles
 - produces plots to assess frank vertical inference over grids of _h_, _alpha_, _wsmooth_
