@@ -28,8 +28,8 @@ def asym_gauss(params: optax.Params, r: jnp.ndarray):
     """      
 
     return jnp.piecewise(r, [r < params['Rc'], r >= params['Rc']], 
-                        [lambda r : gauss(r, params['Rc'], params['sigma_in']), 
-                         lambda r : gauss(r, params['Rc'], params['sigma_out'])]
+                        [lambda r : gauss(r, params['a1'], params['Rc'], params['sigma1']),
+                         lambda r : gauss(r, params['a2'], params['Rc'], params['sigma2'])]
                          )
 
 
