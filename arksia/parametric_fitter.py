@@ -59,3 +59,15 @@ class ParametricFit():
         else:
             raise ValueError(f"{form} invalid")
         
+
+    def loss(self, params: optax.Params, x: jnp.ndarray, y: jnp.ndarray, 
+             err: jnp.ndarray) -> jnp.ndarray:
+        """
+        # TODO
+        """             
+        
+        y_hat = self.parametric_model(params, x)
+
+        # return (jnp.mean((y - y_hat) ** 2)) ** 0.5 # RMSE loss
+        return ((y - y_hat) ** 2 / err ** 2).sum()
+
