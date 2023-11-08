@@ -119,12 +119,12 @@ def double_powerlaw_double_gauss(params: optax.Params, r: jnp.ndarray):
 
 def single_erf_powerlaw(params: optax.Params, r: jnp.ndarray):
     """
-    Single error function and power law function f(r) of the form:
+    Single error function and power law function \Sigma(r) of the form:
 
         ..math::
 
-            \Sigma(r) = \left( 1 - \rm{erf}\left(\dfrac{R_{c}-r}{\sqrt{2} \:\sigma_{\rm{in}} R_{c}} \right)\right) 
-            \left( \dfrac{r}{R_{c}} \right)^{-\alpha_{\rm{out}}}
+            \Sigma(r) = [1 - \erf{(R_c - r) / (\sigma * R_c * \sqrt{2})}] * 
+              (r / R_c)^{-\alpha} 
     """      
 
     inner_edge = 1 - erf((params['Rc'] - r) / \
