@@ -64,7 +64,7 @@ class ParametricFit():
              err: jnp.ndarray) -> jnp.ndarray:
         """
         # TODO
-        """             
+        """
         
         y_hat = self.parametric_model(params, x)
 
@@ -81,11 +81,9 @@ class ParametricFit():
 
         opt_state = optimizer.init(params)
 
-        # TODO: set bounds for each param 
-
         @jax.jit
         def step(params, opt_state, x, y, err):
-            loss_value, grads = jax.value_and_grad(loss)(params, x, y, err)
+            loss_value, grads = jax.value_and_grad(self.loss)(params, x, y, err)
 
             updates, opt_state = optimizer.update(grads, opt_state, params)
             params = optax.apply_updates(params, updates)
