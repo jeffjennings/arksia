@@ -28,8 +28,8 @@ def asym_gauss(params: optax.Params, r: jnp.ndarray):
     """      
 
     return jnp.piecewise(r, [r < params['Rc'], r >= params['Rc']], 
-                        [lambda r : gauss(r, params['a1'], params['Rc'], params['sigma1']),
-                         lambda r : gauss(r, params['a2'], params['Rc'], params['sigma2'])]
+                        [lambda r : gauss(r, params['a'], params['Rc'], params['sigma1']),
+                         lambda r : gauss(r, params['a'], params['Rc'], params['sigma2'])]
                          )
 
 
@@ -38,9 +38,9 @@ def triple_gauss(params: optax.Params, r: jnp.ndarray):
     Sum of three Gaussian functions \Sigma(r)
     """      
 
-    gauss1 = gauss(r, params['a1'], params['Rc1'], params['sigma1'])
-    gauss2 = gauss(r, params['a2'], params['Rc2'], params['sigma2'])
-    gauss3 = gauss(r, params['a3'], params['Rc3'], params['sigma3'])
+    gauss1 = gauss(r, params['a1'], params['R1'], params['sigma1'])
+    gauss2 = gauss(r, params['a2'], params['R2'], params['sigma2'])
+    gauss3 = gauss(r, params['a3'], params['R3'], params['sigma3'])
 
     return gauss1 + gauss2 + gauss3
 
