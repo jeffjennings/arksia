@@ -130,6 +130,16 @@ class ParametricFit():
         fwhm = (self._x[idx] - Rc) * 2
         sigma = fwhm / jnp.sqrt(8 * jnp.log(2))
 
+        if form == 'asym_gauss':
+            self._initial_params["Rc"] = Rc
+            self._initial_params["a"] = maxa
+            self._initial_params["sigma1"] = sigma
+            self._initial_params["sigma2"] = sigma
+
+
+        else:
+            raise ValueError(f"{form} invalid")
+        
         optimizer = optax.adam(self._learn_rate)
 
         return self._fit(self._initial_params, optimizer, self._niter)
