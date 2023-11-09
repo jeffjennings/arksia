@@ -117,8 +117,19 @@ class ParametricFit():
 
         form = self._initial_params['form']
 
-        
-        # fit the parametrized function using the Adam optimizer
+        # set initial guesses for parameter values by using the signal we're fitting:
+        # centroid or critical radius
+        peak_idx = jnp.argmax(self._y)
+        Rc = self._x[peak_idx]
+        # amplitude
+        maxa = max(self._y)
+        # standard deviation (obtain by guessing FWHM)
+        search_window = self._y[self._x > Rc]
+        idx = next(i for i,j in enumerate(search_window) if 
+                   i > peak_idx and j < maxa / 2)
+        fwhm = (self._x[idx] - Rc) * 2
+        sigma = fwhm / jnp.sqrt(8 * jnp.log(2))
+
         optimizer = optax.adam(self._learn_rate)
 
         return self._fit(self._initial_params, optimizer, self._niter)
