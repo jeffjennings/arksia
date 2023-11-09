@@ -1,4 +1,5 @@
-"""Routines for input/ouput - loading/saving products used in pipeline (originally written by Jeff Jennings)."""
+"""This module contains functions for loading and saving products in the pipeline 
+(written by Jeff Jennings)."""
 
 import os
 import numpy as np

@@ -1,4 +1,5 @@
-"""Routine to obtain results from fits/analysis of the full ARKS survey (originally written by Jeff Jennings)."""
+"""This module contains a function to obtain results from fits/analysis of the full ARKS survey 
+(written by Jeff Jennings)."""
 
 import json
 import numpy as np 

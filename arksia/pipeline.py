@@ -1,4 +1,5 @@
-"""Main file for radial pipeline fits/analysis (originally written by Jeff Jennings)."""
+"""This module is the main file for running radial pipeline fits and analysis 
+(written by Jeff Jennings)."""
 
 import os; os.environ.get('OMP_NUM_THREADS', '1')
 import json
