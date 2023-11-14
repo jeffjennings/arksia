@@ -3,6 +3,7 @@
     "extract_clean_profile" : false,
     "process_rave_fit"      : false,
     "run_frank"             : false,
+    "run_parametric"        : false,
     "aspect_ratio_fig"      : false,  
     "compare_models_fig"    : false,
     "root_dir"              : "."

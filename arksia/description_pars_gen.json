@@ -3,6 +3,7 @@
       "extract_clean_profile" : "Whether to run the pipeline module to obtain a profile from a clean image of the source",
       "process_rave_fit"      : "Whether to run the pipeline module to process/save a profile from an existing rave fit",
       "run_frank"             : "Whether to run the pipeline module to perform a (1D or 1+1D) frank fit",
+      "run_parametric"        : "Whether to run the pipeline module to perform a parametric fit to a nonparametric brightness profile",
       "aspect_ratio_fig"      : "Whether to generate a figure showing frank vertical inference results",
       "compare_models_fig"    : "Whether to generate figures comparing the clean, rave, frank brightness and visibility profiles, and images",
       "root_dir"              : "Root directory used to load data and save results. Should contain subdirectories of the form <disk name> that have further subdirectories 'clean', 'rave', 'frank'"
