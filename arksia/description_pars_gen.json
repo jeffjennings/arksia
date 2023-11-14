@@ -37,6 +37,10 @@
       "make_quick_fig"        : "Whether to make two figures showing basic results of the fit"
     },
   
+    "parametric" : {
+      "form"                  : "The parametric functional form to fit to a nonparametric profile. One of ['asym_gauss', 'triple_gauss', 'double_powerlaw', 'double_powerlaw_gauss', 'double_powerlaw_double_gauss', 'single_erf_powerlaw', 'double_erf_powerlaw'] (see 'parametric_forms.py')."
+    },
+
     "plot" : {
       "bin_widths"            : "Widths in which to bin the observed visibilities for plotting. List of float [\\lambda]"
     }

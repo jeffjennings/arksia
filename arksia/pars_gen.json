@@ -37,6 +37,10 @@
     "make_quick_fig"        : true
   },
 
+  "parametric" : {
+    "form"            : "asym_gauss"
+  },
+
   "plot" : {
     "bin_widths"            : [5e3, 20e3]
   }
