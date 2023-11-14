@@ -26,7 +26,9 @@ class ParametricFit():
         self._learn_rate = learn_rate
         self._niter = niter
 
-        self._initial_params = {"form": model["parametric"]["form"] }
+        self._form = model["parametric"]["form"]
+
+        self._initial_params = {}
 
         # check if jax is on a gpu or tpu
         self._device = jax.default_backend()
@@ -40,7 +42,7 @@ class ParametricFit():
         # TODO
         """
         
-        form = params['form']
+        form = self._form
 
         if form == 'asym_gauss':
             return parametric_forms.asym_gauss(params, x) 
@@ -104,10 +106,10 @@ class ParametricFit():
             if i % 100 == 0:
                 progress.set_description(f"{loss_arr[i]:.2f}")
 
-        self._loss_arr = loss_arr
-        self._params = params 
+        self._loss_history = loss_arr
+        self._params = params
 
-        return self._params, self._loss_arr
+        # return self._initial_params, self._params, self._loss_history
 
 
     def fit(self):
@@ -115,7 +117,7 @@ class ParametricFit():
         # TODO
         """
 
-        form = self._initial_params['form']
+        form = self._form
 
         # set initial guesses for parameter values by using the signal we're fitting:
         # centroid or critical radius
@@ -156,7 +158,6 @@ class ParametricFit():
         return self._params
 
     @property
-    def losses(self):
+    def loss_history(self):
         """Array of loss values over optimization loop"""
-        return self._loss_arr
-    
+        return self._loss_history
