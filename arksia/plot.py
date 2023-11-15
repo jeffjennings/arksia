@@ -561,9 +561,10 @@ def parametric_fit_figure(fit, reference, model):
     # print formatted bestfit values in fig
     st = 'Best fit values:\n'
     for i,j in fit.bestfit_params.items():
-        st += f"{i} = {j:.2f}\n"
+        if j is not None:
+            st += f"{i} = {j:.2f}\n"
     st += f"\nSource distance: {model['base']['dist']:.0f} pc"
-    fig.text(0.6, 0.3, st)
+    fig.text(0.6, 0.15, st)
 
     # reference profile radial points, brightness, 1 sigma
     rr, II, ss = reference
