@@ -424,15 +424,7 @@ def run_frank(model):
             )
 
         return sols
-
-
-def compare_models(fits, model):
-    # make model comparison figures
-    fig1 = plot.profile_comparison_figure(fits, model)
-    fig2 = plot.image_comparison_figure(fits, model)
-
-    return fig1, fig2 
-
+    
 
 def main(*args):
     """Run a pipeline to extract/fit/analyze radial profiles using 
@@ -458,7 +450,8 @@ def main(*args):
 
     if model["base"]["compare_models_fig"] is True:
         fits = input_output.load_bestfit_profiles(model)   
-        fig1, fig2 = compare_models(fits, model)
+        fig1 = plot.profile_comparison_figure(fits, model)
+        fig2 = plot.image_comparison_figure(fits, model)
 
     if model["base"]["aspect_ratio_fig"] is True:
         fig3 = plot.aspect_ratio_figure(model)
