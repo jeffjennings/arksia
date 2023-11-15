@@ -31,7 +31,7 @@ def parse_parameters(*args):
 
     Returns
     -------
-    model : dict
+    args : dict
         Dictionary containing model parameters the pipeline uses
     """
 
@@ -57,6 +57,22 @@ def parse_parameters(*args):
 
 
 def model_setup(parsed_args):
+    """
+    Initialze a set of model parameters to be used in pipeline routines.
+    Run checks to catch errors on values of some parameters. 
+
+    Parameters
+    ----------
+    parsed_args : dict
+        Dictionary containing model parameters to be used in the pipeline
+
+    Returns
+    -------
+    model : dict
+        Dictionary containing final model parameters the pipeline uses, with 
+        some processing and added parameters relative to `parsed_args`
+    """
+
     # generic parameters
     model = json.load(open(parsed_args.base_parameter_filename, 'r'))
     model["base"]["disk"] = parsed_args.disk
@@ -133,7 +149,7 @@ def model_setup(parsed_args):
         raise ValueError("Parameter ['frank']['set_fstar'] is '{}'. It should be one of 'MCMC', 'SED', 'custom'".format(model["frank"]["set_fstar"])) 
 
     # enforce a Normal fit if finding scale height (LogNormal fit not compatible with vertical inference)
-    if model["frank"]["scale_heights"] is not None:
+    if model["base"]["run_frank"] is True and model["frank"]["scale_heights"] is not None:
         print("    'scale_heights' is not None in your parameter file -- enforcing frank 'method=Normal' and 'max_iter=2000'")
         model["frank"]["method"] = "Normal"
         model["frank"]["max_iter"] = 2000
@@ -416,15 +432,7 @@ def run_frank(model):
             )
 
         return sols
-
-
-def compare_models(fits, model):
-    # make model comparison figures
-    fig1 = plot.profile_comparison_figure(fits, model)
-    fig2 = plot.image_comparison_figure(fits, model)
-
-    return fig1, fig2 
-
+    
 
 def fit_parametric(fits, model):
     """
@@ -476,7 +484,8 @@ def main(*args):
 
     if model["base"]["compare_models_fig"] is True:
         fits = input_output.load_bestfit_profiles(model)   
-        fig1, fig2 = compare_models(fits, model)
+        fig1 = plot.profile_comparison_figure(fits, model)
+        fig2 = plot.image_comparison_figure(fits, model)
 
     if model["base"]["aspect_ratio_fig"] is True:
         fig3 = plot.aspect_ratio_figure(model)
