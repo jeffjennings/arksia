@@ -39,7 +39,8 @@
   },
 
   "parametric" : {
-    "form"            : "asym_gauss"
+    "form"                  : "asym_gauss",
+    "device"                : null
   },
 
   "plot" : {

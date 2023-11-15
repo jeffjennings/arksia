@@ -29,7 +29,7 @@
       "I_scale"               : "Minimum brightness allowed for radial profile for frank fit. Should be lower than data noise floor",
       "max_iter"              : "Maximum number of fit iterations",
       "set_fstar"             : "Source for visibility amplitude to be treated as unresolved stellar emission (a constant subtracted from all real visibility amplitudes). One of ['MCMC', 'SED', 'custom'], which are set per source in the source parameters .json (by default, `default_source_pars.json`)",
-      "scale_heights"         : "List of `start`, `stop`, `num` for `np.logspace` call to define scale-height grid over which to run fits. E.g., `[-2.5, -1, 10]` corresponds to `np.logspace(-2.5, -1, 10)`. If seeking to run a standard (non-vertical) frank fit, set to `null`", 
+      "scale_heights"         : "List of `start`, `stop`, `num` for `np.logspace` call to define scale-height grid over which to run fits. E.g., `[-2.5, -1, 10]` corresponds to `np.logspace(-2.5, -1, 10)`. If seeking to run a standard (non-vertical) frank fit, set to null", 
       "nthreads"              : "Number of CPU threads on which to run multiple fits (note a single frank fit is fastest on only 1 thread)",
       "save_solution"         : "Whether to save `sol` object (see frank.radial_fitters.FrankFitter)",
       "save_profile_fit"      : "Whether to save fitted brightness profile",
@@ -39,7 +39,8 @@
     },
   
     "parametric" : {
-      "form"                  : "The parametric functional form to fit to a nonparametric profile. One of ['asym_gauss', 'triple_gauss', 'double_powerlaw', 'double_powerlaw_erf', 'double_powerlaw_gauss', 'double_powerlaw_double_gauss', 'single_erf_powerlaw', 'double_erf_powerlaw'] (see 'parametric_forms.py')."
+      "form"                  : "The parametric functional form to fit to a nonparametric profile. One of ['asym_gauss', 'triple_gauss', 'double_powerlaw', 'double_powerlaw_erf', 'double_powerlaw_gauss', 'double_powerlaw_double_gauss', 'single_erf_powerlaw', 'double_erf_powerlaw'] (see 'parametric_forms.py').",
+      "device"                : "The backend device on which to run the parametric fitter using JAX. Can be null, 'cpu', 'gpu', 'tpu', or one of `jax.devices()`. If null, JAX will use a GPU or TPU if available, else fall back to the CPU."
     },
 
     "plot" : {
