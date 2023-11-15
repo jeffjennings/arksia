@@ -551,3 +551,15 @@ def parametric_fit_figure(fit, reference, model):
     """    
 
     print('  Figures: making parametric fit comparison figure')
+    
+    fig, axes = plt.subplots(ncols=2, nrows=2, figsize=(10,7.5))
+    axes = axes.ravel()
+    fig.delaxes(axes[3])
+
+    fig.suptitle(f"{model['base']['disk']}: {model['parametric']['form']} fit to frank profile")
+
+    ff = f"{model['base']['save_dir']}/parametric_fit_{model['parametric']['form']}.png"
+    print(f"    saving figure to {ff}")
+    plt.savefig(ff, dpi=300)
+
+    return fig
