@@ -440,12 +440,16 @@ def fit_parametric(fits, model):
                                          model, 
                                          learn_rate=1e-3, 
                                          niter=10000)
+    PFit.fit()
+
     print(f"    initial params {PFit.initial_params}\n    final {PFit.bestfit_params}\n    loss {PFit.loss_history}")
 
     ff = "{}/parametric_fit.obj".format(model["base"]["save_dir"])
     print(f"    saving parametric fit results to {ff}")
     with open(ff, 'wb') as f:
         pickle.dump(PFit, f)
+
+    return PFit, frank_profile
 
 
 def main(*args):
