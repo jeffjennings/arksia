@@ -481,12 +481,11 @@ def main(*args):
     if model["base"]["aspect_ratio_fig"] is True:
         fig3 = plot.aspect_ratio_figure(model)
 
-    if model["base"]["fit_parametric"] is True:
+    if model["base"]["run_parametric"] is True:
         fits = input_output.load_bestfit_profiles(model)
-        pi, pf, loss = fit_parametric_to_frank(fits, model)
+        parametric_fit, frank_profile = fit_parametric(fits, model)
 
-    if model["base"]["parametric_fig"] is True:
-        fig4 = plot.parametric_fit_figure(model)
+        fig4 = plot.parametric_fit_figure(parametric_fit, frank_profile, model)
 
 if __name__ == "__main__":
     main()
