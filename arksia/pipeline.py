@@ -452,7 +452,7 @@ def fit_parametric(fits, model):
 
     print(f"    initial params {PFit.initial_params}\n    final {PFit.bestfit_params}\n    loss {PFit.loss_history}")
 
-    ff = "{}/parametric_fit.obj".format(model["base"]["save_dir"])
+    ff = f"{model['base']['save_dir']}/parametric_fit_{model['parametric']['form']}.obj"
     print(f"    saving parametric fit results to {ff}")
     with open(ff, 'wb') as f:
         pickle.dump(PFit, f)
