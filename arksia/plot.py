@@ -581,11 +581,11 @@ def parametric_fit_figure(fit, reference, model):
     axes[0].plot(rr, fit_final / 1e6, 'r', label="best fit")
     
     axes[2].plot(rr, resid / 1e6, '.', ms=2, c='#a4a4a4', 
-                 label = f"mean {np.mean(resid) / 1e6:.2f}"
+                 label = f"mean {np.mean(resid) / 1e6:.2f} MJy sr$^{-1}$"
                  )
     axes[2].axhline(y=0, c='c', ls='--')
 
-    axes[1].semilogy(fit.loss_history, 'b')
+    axes[1].semilogy(fit.loss_history, 'b', label=f"final loss {fit.loss_history[0]:2f}")
 
     axes[0].legend()
     axes[0].set_ylabel(r'I [MJy sr$^{-1}$]')
@@ -598,6 +598,7 @@ def parametric_fit_figure(fit, reference, model):
     axes[2].set_ylim(-bound, bound)
     axes[2].legend()
 
+    axes[1].legend()
     axes[1].set_xlabel(r'Iteration')    
     axes[1].set_ylabel(r'Loss')    
 
