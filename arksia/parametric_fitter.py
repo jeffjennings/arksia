@@ -107,12 +107,12 @@ class ParametricFit():
             loss_arr = loss_arr.at[i].set(loss_current)
 
             if i % 100 == 0:
-                progress.set_description(f"{loss_arr[i]:.2f}")
+                progress.set_description(f"    loss {loss_arr[i]:.2f}")
 
         self._loss_history = loss_arr
         self._params = params
 
-        # return self._initial_params, self._params, self._loss_history
+        return
 
 
     def fit(self):
