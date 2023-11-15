@@ -527,13 +527,20 @@ def aspect_ratio_figure(model):
     return fig
 
 
-def parametric_fit_figure(model):
+def parametric_fit_figure(fit, reference, model):
     """
     Generate a figure showing results of parametric fits to nonparametric frank
       brightness profiles.
 
     Parameters
     ----------
+    fit: dict
+        Dictionary containing initial and final fit parameters for parametric
+        model, and loss values
+
+    reference : list
+        Reference profile radial points, brightness, 1 sigma uncertainty
+
     model : dict
         Dictionary containing pipeline parameters
         
@@ -542,6 +549,5 @@ def parametric_fit_figure(model):
     fig : `plt.figure` instance
         The generated figure
     """    
-    # TODO
 
     print('  Figures: making parametric fit comparison figure')
