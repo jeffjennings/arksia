@@ -147,7 +147,7 @@ def model_setup(parsed_args):
         raise ValueError("Parameter ['frank']['set_fstar'] is '{}'. It should be one of 'MCMC', 'SED', 'custom'".format(model["frank"]["set_fstar"])) 
 
     # enforce a Normal fit if finding scale height (LogNormal fit not compatible with vertical inference)
-    if model["frank"]["scale_heights"] is not None:
+    if model["base"]["run_frank"] is True and model["frank"]["scale_heights"] is not None:
         print("    'scale_heights' is not None in your parameter file -- enforcing frank 'method=Normal' and 'max_iter=2000'")
         model["frank"]["method"] = "Normal"
         model["frank"]["max_iter"] = 2000
