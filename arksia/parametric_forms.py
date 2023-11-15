@@ -58,7 +58,7 @@ def double_powerlaw(r: jnp.ndarray, Rc: jnp.float32, alpha1: jnp.float32,
     return ((r / Rc) ** (-alpha1 * gamma) + (r / Rc) ** (alpha2 * gamma)) ** (-1 / gamma)
 
     
-def double_powerlaw_limits(params: optax.Params, r: jnp.ndarray):
+def double_powerlaw_erf(params: optax.Params, r: jnp.ndarray):
     """
     Double power law function \Sigma(r), optionally with limits R1 and R2 that
     multiply the double power law by error functions of the form:
