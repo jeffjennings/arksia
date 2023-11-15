@@ -558,6 +558,41 @@ def parametric_fit_figure(fit, reference, model):
 
     fig.suptitle(f"{model['base']['disk']}: {model['parametric']['form']} fit to frank profile")
 
+    # reference profile radial points, brightness, 1 sigma
+    rr, II, ss = reference
+
+    fit_initial = fit.parametric_model(fit.initial_params, rr)
+    fit_final = fit.parametric_model(fit.bestfit_params, rr)
+    resid = II - fit_final
+
+    axes[0].plot(rr, II / 1e6, 'k', label='frank')
+    # frank 1 sigma
+    axes[0].fill_between(rr, (II - ss) / 1e6, (II + ss) / 1e6, color='k', alpha=0.4)    
+
+    axes[0].plot(rr, fit_initial / 1e6, 'c', label="initial guess")
+    axes[0].plot(rr, fit_final / 1e6, 'r', label="best fit")
+    
+    axes[2].plot(rr, resid / 1e6, '.', ms=2, c='#a4a4a4', 
+                 label = f"mean {np.mean(resid) / 1e6:.2f}"
+                 )
+    axes[2].axhline(y=0, c='c', ls='--')
+
+    axes[1].semilogy(fit.loss_history, 'b')
+
+    axes[0].legend()
+    axes[0].set_ylabel(r'I [MJy sr$^{-1}$]')
+
+    axes[2].set_xlabel(r'r [arcsec]')
+    axes[2].set_ylabel(r'Resid. I [MJy sr$^{-1}$]')
+
+    # make y-axis symmetric about 0
+    bound = max(abs(np.asarray(axes[2].get_ylim())))
+    axes[2].set_ylim(-bound, bound)
+    axes[2].legend()
+
+    axes[1].set_xlabel(r'Iteration')    
+    axes[1].set_ylabel(r'Loss')    
+
     ff = f"{model['base']['save_dir']}/parametric_fit_{model['parametric']['form']}.png"
     print(f"    saving figure to {ff}")
     plt.savefig(ff, dpi=300)
