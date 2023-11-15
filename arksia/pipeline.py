@@ -56,6 +56,22 @@ def parse_parameters(*args):
 
 
 def model_setup(parsed_args):
+    """
+    Initialze a set of model parameters to be used in pipeline routines.
+    Run checks to catch errors on values of some parameters. 
+
+    Parameters
+    ----------
+    parsed_args : dict
+        Dictionary containing model parameters to be used in the pipeline
+
+    Returns
+    -------
+    model : dict
+        Dictionary containing final model parameters the pipeline uses, with 
+        some processing and added parameters relative to `parsed_args`
+    """
+
     # generic parameters
     model = json.load(open(parsed_args.base_parameter_filename, 'r'))
     model["base"]["disk"] = parsed_args.disk
