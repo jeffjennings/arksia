@@ -447,7 +447,7 @@ def fit_parametric(fits, model):
     PFit = parametric_fitter.ParametricFit(frank_profile, 
                                          model, 
                                          learn_rate=1e-3, 
-                                         niter=10000)
+                                         niter=100000)
     PFit.fit()
 
     print(f"    initial params {PFit.initial_params}\n    final {PFit.bestfit_params}\n    loss {PFit.loss_history}")
