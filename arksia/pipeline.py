@@ -30,7 +30,7 @@ def parse_parameters(*args):
 
     Returns
     -------
-    model : dict
+    args : dict
         Dictionary containing model parameters the pipeline uses
     """
 
