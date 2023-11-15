@@ -39,7 +39,7 @@
     },
   
     "parametric" : {
-      "form"                  : "The parametric functional form to fit to a nonparametric profile. One of ['asym_gauss', 'triple_gauss', 'double_powerlaw', 'double_powerlaw_gauss', 'double_powerlaw_double_gauss', 'single_erf_powerlaw', 'double_erf_powerlaw'] (see 'parametric_forms.py')."
+      "form"                  : "The parametric functional form to fit to a nonparametric profile. One of ['asym_gauss', 'triple_gauss', 'double_powerlaw', 'double_powerlaw_erf', 'double_powerlaw_gauss', 'double_powerlaw_double_gauss', 'single_erf_powerlaw', 'double_erf_powerlaw'] (see 'parametric_forms.py')."
     },
 
     "plot" : {

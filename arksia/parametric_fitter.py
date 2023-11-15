@@ -51,6 +51,8 @@ class ParametricFit():
         
         elif form == 'double_powerlaw':
             return parametric_forms.double_powerlaw_limits(params, x)
+        elif form == 'double_powerlaw_erf':
+            return parametric_forms.double_powerlaw_limits(params, x)        
         elif form == 'double_powerlaw_gauss':
             return parametric_forms.double_powerlaw_gauss(params, x)
         elif form == 'double_powerlaw_double_gauss':
