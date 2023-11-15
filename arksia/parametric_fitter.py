@@ -4,7 +4,7 @@
 from tqdm.auto import tqdm
 import jax.numpy as jnp
 import jax
-import optax 
+import optax
 
 from arksia import parametric_forms
 
@@ -30,11 +30,13 @@ class ParametricFit():
 
         self._initial_params = {}
 
-        # check if jax is on a gpu or tpu
-        self._device = jax.default_backend()
+        # self._device = jax.default_backend()
+        if model["parametric"]["device"] is not None:
+            self._device = model["parametric"]["device"]
+            jax.config.update('jax_platform_name', self._device)
+        else:
+            self._device = jax.default_backend()
         print(f"    JAX is using the {self._device}.")
-        if self._device == 'cpu':
-            print("      Using the CPU will slow computation of parametric fits.")
 
 
     def parametric_model(self, params: optax.Params, x: jnp.ndarray):
