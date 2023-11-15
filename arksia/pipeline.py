@@ -7,6 +7,7 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 import multiprocess
+import pickle 
 
 from frank.constants import deg_to_rad
 from frank.utilities import jy_convert
@@ -425,7 +426,7 @@ def compare_models(fits, model):
     return fig1, fig2 
 
 
-def fit_parametric_to_frank(fits, model):
+def fit_parametric(fits, model):
     """
     # TODO
     """
@@ -439,12 +440,12 @@ def fit_parametric_to_frank(fits, model):
                                          model, 
                                          learn_rate=1e-3, 
                                          niter=10000)
-    sol = PFit.fit()
+    print(f"    initial params {PFit.initial_params}\n    final {PFit.bestfit_params}\n    loss {PFit.loss_history}")
 
-    # initial parameter value guesses, best-fit values, loss per iteration
-    pi, pf, loss = sol.initial_params, sol.bestfit_params, sol.losses
-
-    return pi, pf, loss
+    ff = "{}/parametric_fit.obj".format(model["base"]["save_dir"])
+    print(f"    saving parametric fit results to {ff}")
+    with open(ff, 'wb') as f:
+        pickle.dump(PFit, f)
 
 
 def main(*args):
