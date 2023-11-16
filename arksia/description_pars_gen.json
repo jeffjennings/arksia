@@ -40,7 +40,9 @@
   
     "parametric" : {
       "form"                  : "The parametric functional form to fit to a nonparametric profile. One of ['asym_gauss', 'triple_gauss', 'double_powerlaw', 'double_powerlaw_erf', 'double_powerlaw_gauss', 'double_powerlaw_double_gauss', 'single_erf_powerlaw', 'double_erf_powerlaw'] (see 'parametric_forms.py').",
-      "device"                : "The backend device on which to run the parametric fitter using JAX. Can be null, 'cpu', 'gpu', 'tpu', or one of `jax.devices()`. If null, JAX will use a GPU or TPU if available, else fall back to the CPU."
+      "device"                : "The backend device on which to run the parametric fitter using JAX. Can be null, 'cpu', 'gpu', 'tpu', or one of `jax.devices()`. If null, JAX will use a GPU or TPU if available, else fall back to the CPU.",
+      "learn_rate"            : "Learning rate for the parametric fit optimization",
+      "niter"                 : "Number of iterations for the parametric fit optimization"
     },
 
     "plot" : {

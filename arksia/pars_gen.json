@@ -40,7 +40,9 @@
 
   "parametric" : {
     "form"                  : "asym_gauss",
-    "device"                : null
+    "device"                : null,
+    "learn_rate"            : 1e-3,
+    "niter"                 : 1e5    
   },
 
   "plot" : {
