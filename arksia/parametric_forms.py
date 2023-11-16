@@ -149,4 +149,4 @@ def double_erf_powerlaw(params: optax.Params, r: jnp.ndarray):
     outer_edge = 1 - erf((r - params['R2']) / \
                          (2 ** 0.5 * params['sigma2'] * params['R2']))
 
-    return inner_edge * outer_edge * (r / params['R1']) ** (-params['alpha'])
+    return params['a'] * inner_edge * outer_edge * (r / params['R1']) ** (-params['alpha'])
