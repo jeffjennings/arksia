@@ -39,7 +39,7 @@
   },
 
   "parametric" : {
-    "form"                  : "asym_gauss",
+    "form"                  : ["asym_gauss"],
     "device"                : null,
     "learn_rate"            : 1e-3,
     "niter"                 : 1e5    
