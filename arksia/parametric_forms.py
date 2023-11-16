@@ -122,14 +122,14 @@ def single_erf_powerlaw(params: optax.Params, r: jnp.ndarray):
 
         ..math::
 
-            \Sigma(r) = [1 - \erf{(R_c - r) / (\sigma * R_c * \sqrt{2})}] * 
+            \Sigma(r) = a * [1 - \erf{(R_c - r) / (\sigma * R_c * \sqrt{2})}] * 
               (r / R_c)^{-\alpha} 
     """      
 
     inner_edge = 1 - erf((params['Rc'] - r) / \
                          (2 ** 0.5 * params['sigma'] * params['Rc']))
 
-    return inner_edge * (r / params['Rc']) ** -params['alpha']
+    return params['a'] * inner_edge * (r / params['Rc']) ** -params['alpha']
 
 
 def double_erf_powerlaw(params: optax.Params, r: jnp.ndarray):
