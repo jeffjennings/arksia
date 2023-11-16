@@ -581,7 +581,7 @@ def parametric_fit_figure(fit, reference, model):
     axes[0].plot(rr, fit_final / 1e6, 'r', label="best fit")
     
     axes[2].plot(rr, resid / 1e6, '.', ms=2, c='#a4a4a4', 
-                 label = f"mean {np.mean(resid) / 1e6:.2f} MJy sr$^{-1}$"
+                 label = f"mean {np.mean(resid) / 1e6:.4f} MJy sr$^{-1}$"
                  )
     axes[2].axhline(y=0, c='c', ls='--')
 

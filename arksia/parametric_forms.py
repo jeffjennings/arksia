@@ -45,17 +45,17 @@ def triple_gauss(params: optax.Params, r: jnp.ndarray):
     return gauss1 + gauss2 + gauss3
 
 
-def double_powerlaw(r: jnp.ndarray, Rc: jnp.float32, alpha1: jnp.float32, 
+def double_powerlaw(r: jnp.ndarray, Rc: jnp.float32, a: jnp.ndarray, alpha1: jnp.float32, 
                     alpha2: jnp.float32, gamma: jnp.float32):
     """
     Double power law function \Sigma(r) of the form:
 
         .. math::
 
-            \Sigma(r) = [(r / R_c)^{\alpha_1 * \gamma} + (r / R_c)^{\alpha_2 * \gamma}]^{-1 / \gamma}
+            \Sigma(r) = [(r / R_c)^{-\alpha_1 * \gamma} + (r / R_c)^{-\alpha_2 * \gamma}]^{-1 / \gamma}
     """
 
-    return ((r / Rc) ** (-alpha1 * gamma) + (r / Rc) ** (alpha2 * gamma)) ** (-1 / gamma)
+    return a * ((r / Rc) ** (-alpha1 * gamma) + (r / Rc) ** (-alpha2 * gamma)) ** (-1 / gamma)
 
     
 def double_powerlaw_erf(params: optax.Params, r: jnp.ndarray):
@@ -70,7 +70,7 @@ def double_powerlaw_erf(params: optax.Params, r: jnp.ndarray):
               [1 + \erf{(R_2 - r) / l_2}]
     """      
 
-    dpl = double_powerlaw(r, params['Rc'], params['alpha1'], params['alpha2'], params['gamma'])
+    dpl = double_powerlaw(r, params['Rc'], params['a'], params['alpha1'], params['alpha2'], params['gamma'])
 
     if params['R1'] is not None:
         dpl *= (1 + erf((r - params['R1']) / params['l1']))
@@ -92,8 +92,7 @@ def double_powerlaw_gauss(params: optax.Params, r: jnp.ndarray):
 
     gaussian = gauss(r, params['a1'], params['R1'], params['sigma'])
 
-    dpl = double_powerlaw(r, params['R2'], params['alpha1'], params['alpha2'], params['gamma'])
-    dpl *= params['a2']
+    dpl = double_powerlaw(r, params['R2'], params['a2'], params['alpha1'], params['alpha2'], params['gamma'])
     
     return gaussian * dpl
 
@@ -112,7 +111,7 @@ def double_powerlaw_double_gauss(params: optax.Params, r: jnp.ndarray):
     gaussian1 = gauss(r, params['a1'], params['R1'], params['sigma1'])
     gaussian2 = gauss(r, params['a2'], params['R2'], params['sigma2'])
 
-    dpl = double_powerlaw(r, params['R3'], params['alpha1'], params['alpha2'], params['gamma'])
+    dpl = double_powerlaw(r, params['R3'], params['a3'], params['alpha1'], params['alpha2'], params['gamma'])
     
     return dpl + gaussian1 + gaussian2
 

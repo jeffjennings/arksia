@@ -30,7 +30,6 @@ class ParametricFit():
 
         self._initial_params = {}
 
-        # self._device = jax.default_backend()
         if model["parametric"]["device"] is not None:
             self._device = model["parametric"]["device"]
             jax.config.update('jax_platform_name', self._device)
@@ -132,17 +131,17 @@ class ParametricFit():
         Rc = self._x[peak_idx]
 
         # amplitude
-        maxa = max(self._y)
+        amax = max(self._y)
 
         # standard deviation (obtain by guessing FWHM)
         idx = next(i for i,j in enumerate(self._y) if
-                   i > peak_idx and j < maxa / 2)
+                   i > peak_idx and j < amax / 2)
         fwhm = (self._x[idx] - Rc) * 2
         sigma = fwhm / (8 * jnp.log(2)) ** 0.5
 
         if form == 'asym_gauss':
             self._initial_params["Rc"] = Rc
-            self._initial_params["a"] = maxa
+            self._initial_params["a"] = amax
             self._initial_params["sigma1"] = sigma
             self._initial_params["sigma2"] = sigma
 
