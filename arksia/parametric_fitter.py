@@ -198,6 +198,12 @@ class ParametricFit():
             self._initial_params["sigma2"] = 0.1 * sigma
             self._initial_params["gamma"] = 1.0               
 
+        elif form == 'single_erf_powerlaw':
+            self._initial_params["a"] = amax
+            self._initial_params["Rc"] = Rc
+            self._initial_params["alpha"] = 2.0
+            self._initial_params["sigma"] = 0.1 * sigma
+
 
         else:
             raise ValueError(f"{form} invalid")
