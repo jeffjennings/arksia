@@ -185,6 +185,19 @@ class ParametricFit():
             self._initial_params["sigma"] = sigma
             self._initial_params["gamma"] = 1.0
 
+        elif form == 'double_powerlaw_double_gauss':
+            self._initial_params["a1"] = -0.3 * amax
+            self._initial_params["a2"] = -0.3 * amax
+            self._initial_params["a3"] = amax
+            self._initial_params["R1"] = 0.7 * Rc
+            self._initial_params["R2"] = 1.3 * Rc
+            self._initial_params["R3"] = Rc
+            self._initial_params["alpha1"] = 3.0
+            self._initial_params["alpha2"] = -3.0          
+            self._initial_params["sigma1"] = 0.1 * sigma
+            self._initial_params["sigma2"] = 0.1 * sigma
+            self._initial_params["gamma"] = 1.0               
+
 
         else:
             raise ValueError(f"{form} invalid")
