@@ -525,3 +525,85 @@ def aspect_ratio_figure(model):
     plt.savefig(ff, dpi=300)
 
     return fig
+
+
+def parametric_fit_figure(fit, reference, model):
+    """
+    Generate a figure showing results of parametric fits to nonparametric frank
+      brightness profiles.
+
+    Parameters
+    ----------
+    fit: dict
+        Dictionary containing initial and final fit parameters for parametric
+        model, and loss values
+
+    reference : list
+        Reference profile radial points, brightness, 1 sigma uncertainty
+
+    model : dict
+        Dictionary containing pipeline parameters
+        
+    Returns
+    -------
+    fig : `plt.figure` instance
+        The generated figure
+    """    
+
+    print('  Figures: making parametric fit comparison figure')
+    
+    fig, axes = plt.subplots(ncols=2, nrows=2, figsize=(10,7.5))
+    axes = axes.ravel()
+    fig.delaxes(axes[3])
+
+    fig.suptitle(f"{model['base']['disk']}: {fit.functional_form} fit to frank profile")
+
+    # print formatted bestfit values in fig
+    st = 'Best fit values:\n'
+    for i,j in fit.bestfit_params.items():
+        if j is not None:
+            st += f"{i} = {j:.2f}\n"
+    st += f"\nSource distance: {model['base']['dist']:.0f} pc"
+    fig.text(0.6, 0.15, st)
+
+    # reference profile radial points, brightness, 1 sigma
+    rr, II, ss = reference
+
+    fit_initial = fit.parametric_model(fit.initial_params, rr)
+    fit_final = fit.parametric_model(fit.bestfit_params, rr)
+    resid = II - fit_final
+
+    axes[0].plot(rr, II / 1e6, 'k', label='frank')
+    # frank 1 sigma
+    axes[0].fill_between(rr, (II - ss) / 1e6, (II + ss) / 1e6, color='k', alpha=0.4)    
+
+    axes[0].plot(rr, fit_initial / 1e6, 'c', label="initial guess")
+    axes[0].plot(rr, fit_final / 1e6, 'r', label="best fit")
+    
+    axes[2].plot(rr, resid / 1e6, '.', ms=2, c='#a4a4a4', 
+                 label = f"mean {np.mean(resid) / 1e6:.4f} MJy sr$^{-1}$"
+                 )
+    axes[2].axhline(y=0, c='c', ls='--')
+
+    axes[1].semilogy(fit.loss_history, 'b', label=f"final loss {fit.loss_history[-1]:.2f}")
+
+    axes[0].legend()
+    axes[0].set_ylabel(r'I [MJy sr$^{-1}$]')
+
+    axes[2].set_xlabel(r'r [arcsec]')
+    axes[2].set_ylabel(r'Resid. I [MJy sr$^{-1}$]')
+
+    # make y-axis symmetric about 0
+    bound = max(abs(np.asarray(axes[2].get_ylim())))
+    axes[2].set_ylim(-bound, bound)
+    axes[2].legend()
+
+    axes[1].legend()
+    axes[1].set_xlabel(r'Iteration')    
+    axes[1].set_ylabel(r'Loss')    
+
+    ff = f"{model['base']['parametric_dir']}/parametric_fit_{fit.functional_form}.png"
+    print(f"    saving figure to {ff}")
+    plt.savefig(ff, dpi=300)
+
+    return fig

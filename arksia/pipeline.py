@@ -7,6 +7,7 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 import multiprocess
+import pickle 
 
 from frank.constants import deg_to_rad
 from frank.utilities import jy_convert
@@ -17,7 +18,7 @@ from frank.geometry import FixedGeometry
 from frank.utilities import get_fit_stat_uncer
 
 import arksia 
-from arksia import input_output, extract_radial_profile, plot
+from arksia import input_output, extract_radial_profile, plot, parametric_fitter
 
 def parse_parameters(*args):
     """
@@ -89,6 +90,12 @@ def model_setup(parsed_args):
     model["base"]["clean_dir"] = os.path.join(model["base"]["save_dir"], "clean")
     model["base"]["rave_dir"] = os.path.join(model["base"]["save_dir"], "rave")
     model["base"]["frank_dir"] = os.path.join(model["base"]["save_dir"], "frank")
+    model["base"]["parametric_dir"] = os.path.join(model["base"]["save_dir"], "parametric")
+    
+    subdirs = model["base"]["clean_dir"], model["base"]["rave_dir"], \
+        model["base"]["frank_dir"], model["base"]["parametric_dir"]
+    for dd in subdirs: 
+        os.makedirs(dd, exist_ok=True)
 
     if disk_pars["base"]["SMG_sub"] is True:
         model["base"]["SMG_sub"] = "SMGsub."
@@ -99,6 +106,7 @@ def model_setup(parsed_args):
 
     model["clean"]["npix"] = disk_pars["clean"]["npix"]
     model["clean"]["pixel_scale"] = disk_pars["clean"]["pixel_scale"]
+
     # get clean image rms
     image_pars = json.load(open(os.path.join(model["base"]["root_dir"], "pars_image.json"), 'r'))
     disk_image_pars = image_pars[model["base"]["disk"]]
@@ -151,6 +159,13 @@ def model_setup(parsed_args):
         print("    'scale_heights' is not None in your parameter file -- enforcing frank 'method=Normal' and 'max_iter=2000'")
         model["frank"]["method"] = "Normal"
         model["frank"]["max_iter"] = 2000
+
+    # implemented functional forms 
+    valid_funcs = [x for x in dir(arksia.parametric_forms) if not x.startswith('__')]
+    if model["base"]["run_parametric"] is True:
+        for pp in model["parametric"]["form"]:
+            if pp not in valid_funcs:
+                raise ValueError(f"{pp} is not one of {valid_funcs}")
 
     return model
 
@@ -278,6 +293,7 @@ def process_rave_fit(model):
     ff = "{}/rave_profile_robust{}.txt".format(
         model["base"]["rave_dir"], model["clean"]["robust"])
     print('    saving RAVE profile to {}'.format(ff))
+
     np.savetxt(ff, 
         np.array([r, I, I_err_lo, I_err_hi]).T, 
         header='Extracted from {}\nr [arcsec]\tI [Jy/sr]\tI_err (lower bound) [Jy/sr]\tI_err (upper bound) [Jy/sr]'.format(
@@ -375,7 +391,7 @@ def run_frank(model):
             qfig, qaxes = make_quick_fig(*uv_data, sol, bin_widths=model["plot"]["bin_widths"],
                         save_prefix=None,
                         )
-            # show 1 sigma statistical uncertainty band
+            # add 1 sigma statistical uncertainty band to plot
             sigmaI = get_fit_stat_uncer(sol)
             qaxes[0].fill_between(sol.r, (sol.I - sigmaI) / 1e10, (sol.I + sigmaI) / 1e10, color='r', alpha=0.2)
             qaxes[1].fill_between(sol.r, (sol.I - sigmaI) / 1e10, (sol.I + sigmaI) / 1e10, color='r', alpha=0.2)
@@ -426,6 +442,41 @@ def run_frank(model):
         return sols
     
 
+def fit_parametric(fits, model):
+    """
+    # TODO
+    """
+
+    # get frank best-fit profile
+    _, _, results = fits
+    frank_profile = results[0]
+
+    # run parametric fits
+    figs = []
+    PFits = []
+    for pp in model['parametric']['form']:
+        PFit = parametric_fitter.ParametricFit(frank_profile, 
+                                            model, 
+                                            func_form=pp,
+                                            learn_rate=model['parametric']['learn_rate'], 
+                                            niter=int(model['parametric']['niter']))
+        PFit.fit()
+        PFits.append(PFit)
+
+        print(f"    initial params {PFit.initial_params}\n    final {PFit.bestfit_params}\n    loss {PFit.loss_history}")
+
+        ff = f"{model['base']['parametric_dir']}/parametric_fit_{pp}.obj"
+        print(f"    saving parametric fit results to {ff}")
+        with open(ff, 'wb') as f:
+            pickle.dump(PFit, f)
+
+        # plot results
+        fig = plot.parametric_fit_figure(PFit, frank_profile, model)
+        figs.append(fig)
+
+    return PFits, frank_profile, figs
+
+
 def main(*args):
     """Run a pipeline to extract/fit/analyze radial profiles using 
     clean/rave/frank for ARKS data.
@@ -455,6 +506,10 @@ def main(*args):
 
     if model["base"]["aspect_ratio_fig"] is True:
         fig3 = plot.aspect_ratio_figure(model)
+
+    if model["base"]["run_parametric"] is True:
+        fits = input_output.load_bestfit_profiles(model)
+        parametric_fits, frank_profile, figs = fit_parametric(fits, model)
 
 if __name__ == "__main__":
     main()
