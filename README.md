@@ -52,6 +52,9 @@ By default the pipeline runs using the parameter files `./pars_gen.json` and `./
 
 - When performing frank fits to find a radial profile, I recommend setting `method` to `"LogNormal"` to perform fits in logarithmic brightness space. Not all parts of the pipeline support linear brightness space fits with enforced non-negativity; this is because the logarithmic fits are in general a better choice. The exception is that when running a frank 1+1D fit to find _h_, `method` must be `"Normal"` (it will be enforced).
 
+### Setting up parametric fits ###
+- To run a parametric fit to a nonparametric (frank) profile, set the `form` parameter in `pars_gen.json` as one of the parametric functional forms listed in `description_pars_gen.json`. If the loss function (shown with the progress bar during a fit) is still varying at the end of the optimization, increase `niter` or change `learn_rate` in `pars_gen.json`. 
+
 Running the pipeline for multiple/all sources
 ---------------------------------------------
 The pipeline can be looped over multiple sources using `bulk_pipeline_run.py` via `python bulk_pipeline_run.py` (you may want to adjust the referenced `.json` parameter files there). 
