@@ -14,6 +14,13 @@ class ParametricFit():
     """
 
     def __init__(self, truth, model, learn_rate=1e-3, niter=10000):
+        # set jax device. Must come before any jax calls.
+        if model["parametric"]["device"] is not None: # TODO
+            self._device = model["parametric"]["device"]
+            jax.config.update('jax_platform_name', self._device)
+        else:
+            self._device = jax.default_backend()
+        print(f"    JAX is using the {self._device}.")
 
         # get frank brightness profile that we'll fit a parametric form to.
         # 'x' is radial points of frank fit, 'y' is brightness, 'err' is lower
@@ -29,13 +36,6 @@ class ParametricFit():
         self._form = model["parametric"]["form"]
 
         self._initial_params = {}
-
-        if model["parametric"]["device"] is not None:
-            self._device = model["parametric"]["device"]
-            jax.config.update('jax_platform_name', self._device)
-        else:
-            self._device = jax.default_backend()
-        print(f"    JAX is using the {self._device}.")
 
 
     def parametric_model(self, params: optax.Params, x: jnp.ndarray):
@@ -124,6 +124,7 @@ class ParametricFit():
         """
 
         form = self._form
+        print(f"    fitting parametric form {form} to input profile")
 
         # set initial guesses for parameter values by using the signal we're fitting:
         # centroid or critical radius
