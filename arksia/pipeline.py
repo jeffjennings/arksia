@@ -452,20 +452,29 @@ def fit_parametric(fits, model):
     frank_profile = results[0]
 
     # run parametric fits
-    PFit = parametric_fitter.ParametricFit(frank_profile, 
-                                         model, 
-                                         learn_rate=model['parametric']['learn_rate'], 
-                                         niter=int(model['parametric']['niter']))
-    PFit.fit()
+    figs = []
+    PFits = []
+    for pp in model['parametric']['form']:
+        PFit = parametric_fitter.ParametricFit(frank_profile, 
+                                            model, 
+                                            func_form=pp,
+                                            learn_rate=model['parametric']['learn_rate'], 
+                                            niter=int(model['parametric']['niter']))
+        PFit.fit()
+        PFits.append(PFit)
 
-    print(f"    initial params {PFit.initial_params}\n    final {PFit.bestfit_params}\n    loss {PFit.loss_history}")
+        print(f"    initial params {PFit.initial_params}\n    final {PFit.bestfit_params}\n    loss {PFit.loss_history}")
 
-    ff = f"{model['base']['save_dir']}/parametric_fit_{model['parametric']['form']}.obj"
-    print(f"    saving parametric fit results to {ff}")
-    with open(ff, 'wb') as f:
-        pickle.dump(PFit, f)
+        ff = f"{model['base']['parametric_dir']}/parametric_fit_{pp}.obj"
+        print(f"    saving parametric fit results to {ff}")
+        with open(ff, 'wb') as f:
+            pickle.dump(PFit, f)
 
-    return PFit, frank_profile
+        # plot results
+        fig = plot.parametric_fit_figure(PFit, frank_profile, model)
+        figs.append(fig)
+
+    return PFits, frank_profile, figs
 
 
 def main(*args):
@@ -500,9 +509,7 @@ def main(*args):
 
     if model["base"]["run_parametric"] is True:
         fits = input_output.load_bestfit_profiles(model)
-        parametric_fit, frank_profile = fit_parametric(fits, model)
-
-        fig4 = plot.parametric_fit_figure(parametric_fit, frank_profile, model)
+        parametric_fits, frank_profile, figs = fit_parametric(fits, model)
 
 if __name__ == "__main__":
     main()
