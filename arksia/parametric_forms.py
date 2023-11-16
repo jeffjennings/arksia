@@ -23,8 +23,8 @@ def asym_gauss(params: optax.Params, r: jnp.ndarray):
 
         .. math::
 
-            \Sigma(r) = a_1 * \exp(-(r - Rc)^2 / (2 * \sigma_1^2) \mathrm{for} r < R_c, 
-              \Sigma(r) = a_2 * \exp(-(r - Rc)^2 / (2 * \sigma_2^2) \mathrm{for} r \geq R_c
+            \Sigma(r) = a * \exp(-(r - Rc)^2 / (2 * \sigma_1^2) \mathrm{for} r < R_c, 
+              \Sigma(r) = a * \exp(-(r - Rc)^2 / (2 * \sigma_2^2) \mathrm{for} r \geq R_c
     """      
 
     return jnp.piecewise(r, [r < params['Rc'], r >= params['Rc']], 
@@ -52,7 +52,7 @@ def double_powerlaw(r: jnp.ndarray, Rc: jnp.float32, a: jnp.ndarray, alpha1: jnp
 
         .. math::
 
-            \Sigma(r) = [(r / R_c)^{-\alpha_1 * \gamma} + (r / R_c)^{-\alpha_2 * \gamma}]^{-1 / \gamma}
+            \Sigma(r) = a * [(r / R_c)^{-\alpha_1 * \gamma} + (r / R_c)^{-\alpha_2 * \gamma}]^{-1 / \gamma}
     """
 
     return a * ((r / Rc) ** (-alpha1 * gamma) + (r / Rc) ** (-alpha2 * gamma)) ** (-1 / gamma)
@@ -65,7 +65,7 @@ def double_powerlaw_erf(params: optax.Params, r: jnp.ndarray):
 
         .. math::
 
-            \Sigma(r) = [(r / R_c)^{\alpha_1 * \gamma} + (r / R_c)^{\alpha_2 * \gamma}]^{-1 / \gamma} * 
+            \Sigma(r) = a * [(r / R_c)^{\alpha_1 * \gamma} + (r / R_c)^{\alpha_2 * \gamma}]^{-1 / \gamma} * 
               [1 + \erf{(r - R_1) / l_1}] * 
               [1 + \erf{(R_2 - r) / l_2}]
     """      
@@ -105,7 +105,7 @@ def double_powerlaw_double_gauss(params: optax.Params, r: jnp.ndarray):
 
             \Sigma(r) =  a_1 * \exp(-(r - R_1)^2 / (2 * \sigma_1^2) + 
               a_2 * \exp(-(r - R_2)^2 / (2 * \sigma_2^2) + 
-              [(r / R_3)^{\alpha_1 * \gamma} + (r / R_3)^{\alpha_2 * \gamma}]^{-1 / \gamma}
+              a_3 * [(r / R_3)^{\alpha_1 * \gamma} + (r / R_3)^{\alpha_2 * \gamma}]^{-1 / \gamma}
     """      
 
     gaussian1 = gauss(r, params['a1'], params['R1'], params['sigma1'])
