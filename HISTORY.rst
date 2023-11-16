@@ -11,5 +11,10 @@ rave fits.
 
 v.0.2.0
 +++++++
-Added functionality to run parametric fits (to an input brightness profile, 
-not the visibilities).
+- Added functionality to run parametric fits (to an input brightness profile, 
+not the visibilities). This includes: 
+* Added parametric fitting class in `parametric_fitter.py`
+* Added functional forms in `parametric_forms.py`
+* Added plotting routine for parametric fits, `plot.parametric_fit_figure`
+* Added parametric fit process to pipeline, `pipeline.fit_parametric`
+* Added parametric fit parameters to the `.json` parameter files
