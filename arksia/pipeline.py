@@ -162,8 +162,10 @@ def model_setup(parsed_args):
 
     # implemented functional forms 
     valid_funcs = [x for x in dir(arksia.parametric_forms) if not x.startswith('__')]
-    if model["base"]["run_parametric"] is True and model["parametric"]["form"] not in valid_funcs:
-        raise ValueError(f"{model['parametric']['form']} must be one of {valid_funcs}")
+    if model["base"]["run_parametric"] is True:
+        for pp in model["parametric"]["form"]:
+            if pp not in valid_funcs:
+                raise ValueError(f"{pp} is not one of {valid_funcs}")
 
     return model
 
