@@ -5,7 +5,7 @@ import jax.numpy as jnp
 from jax.scipy.special import erf
 import optax
 
-def gauss(r: jnp.ndarray, a: jnp.float32, Rc: jnp.float32, sigma: jnp.float32):
+def gauss(r: jnp.ndarray, Rc: jnp.float32, a: jnp.float32, sigma: jnp.float32):
     """
     Gaussian function \Sigma(r) of the form: 
 
@@ -28,8 +28,8 @@ def asym_gauss(params: optax.Params, r: jnp.ndarray):
     """      
 
     return jnp.piecewise(r, [r < params['Rc'], r >= params['Rc']], 
-                        [lambda r : gauss(r, params['a'], params['Rc'], params['sigma1']),
-                         lambda r : gauss(r, params['a'], params['Rc'], params['sigma2'])]
+                        [lambda r : gauss(r, params['Rc'], params['a'], params['sigma1']),
+                         lambda r : gauss(r, params['Rc'], params['a'], params['sigma2'])]
                          )
 
 
@@ -38,9 +38,9 @@ def triple_gauss(params: optax.Params, r: jnp.ndarray):
     Sum of three Gaussian functions \Sigma(r)
     """      
 
-    gauss1 = gauss(r, params['a1'], params['R1'], params['sigma1'])
-    gauss2 = gauss(r, params['a2'], params['R2'], params['sigma2'])
-    gauss3 = gauss(r, params['a3'], params['R3'], params['sigma3'])
+    gauss1 = gauss(r, params['R1'], params['a1'], params['sigma1'])
+    gauss2 = gauss(r, params['R2'], params['a2'], params['sigma2'])
+    gauss3 = gauss(r, params['R3'], params['a3'], params['sigma3'])
 
     return gauss1 + gauss2 + gauss3
 
@@ -90,7 +90,7 @@ def double_powerlaw_gauss(params: optax.Params, r: jnp.ndarray):
               a_2 * [(r / R_2)^{\alpha_1 * \gamma} + (r / R_2)^{\alpha_2 * \gamma}]^{-1 / \gamma}
     """      
 
-    gaussian = gauss(r, params['a1'], params['R1'], params['sigma'])
+    gaussian = gauss(r, params['R1'], params['a1'], params['sigma'])
 
     dpl = double_powerlaw(r, params['R2'], params['a2'], params['alpha1'], params['alpha2'], params['gamma'])
     
@@ -108,8 +108,8 @@ def double_powerlaw_double_gauss(params: optax.Params, r: jnp.ndarray):
               a_3 * [(r / R_3)^{\alpha_1 * \gamma} + (r / R_3)^{\alpha_2 * \gamma}]^{-1 / \gamma}
     """      
 
-    gaussian1 = gauss(r, params['a1'], params['R1'], params['sigma1'])
-    gaussian2 = gauss(r, params['a2'], params['R2'], params['sigma2'])
+    gaussian1 = gauss(r, params['R1'], params['a1'], params['sigma1'])
+    gaussian2 = gauss(r, params['R2'], params['a2'], params['sigma2'])
 
     dpl = double_powerlaw(r, params['R3'], params['a3'], params['alpha1'], params['alpha2'], params['gamma'])
     
