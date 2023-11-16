@@ -556,7 +556,7 @@ def parametric_fit_figure(fit, reference, model):
     axes = axes.ravel()
     fig.delaxes(axes[3])
 
-    fig.suptitle(f"{model['base']['disk']}: {model['parametric']['form']} fit to frank profile")
+    fig.suptitle(f"{model['base']['disk']}: {fit.functional_form} fit to frank profile")
 
     # print formatted bestfit values in fig
     st = 'Best fit values:\n'
@@ -602,7 +602,7 @@ def parametric_fit_figure(fit, reference, model):
     axes[1].set_xlabel(r'Iteration')    
     axes[1].set_ylabel(r'Loss')    
 
-    ff = f"{model['base']['save_dir']}/parametric_fit_{model['parametric']['form']}.png"
+    ff = f"{model['base']['parametric_dir']}/parametric_fit_{fit.functional_form}.png"
     print(f"    saving figure to {ff}")
     plt.savefig(ff, dpi=300)
 
