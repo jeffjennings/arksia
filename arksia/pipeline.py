@@ -90,6 +90,12 @@ def model_setup(parsed_args):
     model["base"]["clean_dir"] = os.path.join(model["base"]["save_dir"], "clean")
     model["base"]["rave_dir"] = os.path.join(model["base"]["save_dir"], "rave")
     model["base"]["frank_dir"] = os.path.join(model["base"]["save_dir"], "frank")
+    model["base"]["parametric_dir"] = os.path.join(model["base"]["save_dir"], "parametric")
+    
+    subdirs = model["base"]["clean_dir"], model["base"]["rave_dir"], \
+        model["base"]["frank_dir"], model["base"]["parametric_dir"]
+    for dd in subdirs: 
+        os.makedirs(dd, exist_ok=True)
 
     if disk_pars["base"]["SMG_sub"] is True:
         model["base"]["SMG_sub"] = "SMGsub."
