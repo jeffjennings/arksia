@@ -147,6 +147,25 @@ class ParametricFit():
             self._initial_params["sigma2"] = sigma
 
 
+        elif form in ['double_powerlaw', 'double_powerlaw_erf']:
+            self._initial_params["Rc"] = Rc
+            self._initial_params["a"] = amax
+            self._initial_params["gamma"] = 1.0
+            self._initial_params["alpha1"] = 3.0
+            self._initial_params["alpha2"] = -3.0
+
+            if form == 'double_powerlaw':
+                self._initial_params["R1"] = None
+                self._initial_params["R2"] = None
+                self._initial_params["l1"] = None
+                self._initial_params["l2"] = None
+            else:
+                self._initial_params["R1"] = 0.5 * Rc
+                self._initial_params["R2"] = 1.5 * Rc
+                self._initial_params["l1"] = Rc
+                self._initial_params["l2"] = Rc
+
+
         else:
             raise ValueError(f"{form} invalid")
         
