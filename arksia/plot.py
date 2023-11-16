@@ -585,7 +585,7 @@ def parametric_fit_figure(fit, reference, model):
                  )
     axes[2].axhline(y=0, c='c', ls='--')
 
-    axes[1].semilogy(fit.loss_history, 'b', label=f"final loss {fit.loss_history[0]:.2f}")
+    axes[1].semilogy(fit.loss_history, 'b', label=f"final loss {fit.loss_history[-1]:.2f}")
 
     axes[0].legend()
     axes[0].set_ylabel(r'I [MJy sr$^{-1}$]')
