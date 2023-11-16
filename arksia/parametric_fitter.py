@@ -13,7 +13,7 @@ class ParametricFit():
     # TODO
     """
 
-    def __init__(self, truth, model, learn_rate=1e-3, niter=10000):
+    def __init__(self, truth, model, func_form, learn_rate=1e-3, niter=100000):
         # set jax device. Must come before any jax calls.
         if model["parametric"]["device"] is not None: # TODO
             self._device = model["parametric"]["device"]
@@ -33,7 +33,7 @@ class ParametricFit():
         self._learn_rate = learn_rate
         self._niter = niter
 
-        self._form = model["parametric"]["form"]
+        self._form = func_form
 
         self._initial_params = {}
 
@@ -220,6 +220,11 @@ class ParametricFit():
         return self._fit(self._initial_params, optimizer, self._niter)
 
 
+    @property
+    def functional_form(self):
+        """String of the name of the fit functional form"""
+        return self._form
+    
     @property
     def initial_params(self):
         """Dictionary of initial guess values for model parameters"""
