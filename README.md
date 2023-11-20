@@ -56,7 +56,8 @@ By default the pipeline runs using the parameter files `./pars_gen.json` and `./
 - To install the needed dependencies for parametric fits, `pip install arksia[analysis]`
     * If when running a parametric fit you receive the warning `WARNING:jax._src.xla_bridge:CUDA backend failed to initialize`, update CUDA with `pip install -U "jax[cuda12_pip]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html`
   
-- To run a parametric fit to a nonparametric (frank) profile, set the `form` parameter in `pars_gen.json` as one of the parametric functional forms listed in `description_pars_gen.json`. If the loss function (shown with the progress bar during a fit) is still varying at the end of the optimization, increase `niter` or change `learn_rate` in `pars_gen.json`.
+- To run a parametric fit to a nonparametric (frank) profile, set the `form` parameter in `pars_gen.json` as a list of parametric functional forms listed in `description_pars_gen.json`. All functional forms in the list will be fit sequentially.
+    * If during a fit the loss function (shown to the left of the progress bar) is still varying at the end of the optimization, increase `niter` or change `learn_rate` in `pars_gen.json`.
 
 Running the pipeline for multiple/all sources
 ---------------------------------------------
