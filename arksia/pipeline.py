@@ -144,15 +144,15 @@ def model_setup(parsed_args):
     if model["frank"]["set_fstar"] == "custom":
         model["frank"]["fstar"] = disk_pars["frank"]["custom_fstar"] / 1e6
     elif model["frank"]["set_fstar"] == "SED":
-        model["frank"]["fstar"] = disk_pars["frank"]["SED_fstar"] / 1e6
+        model["frank"]["fstar"] = phys_pars["Fstar_SED"] / 1e6
     elif model["frank"]["set_fstar"] == "MCMC":
         try:
-            model["frank"]["fstar"] = mcmc["fstar"]["median"] / 1e3
-        except KeyError:
+            model["frank"]["fstar"] = phys_pars["Fstar_MCMC"] / 1e3
+        except TypeError:
+            print(f"        {parsed_args.physical_parameter_filename} has no stellar flux for {model['base']['disk']} --> setting fstar to 0")            
             model["frank"]["fstar"] = 0.0
-            print('        no stellar flux in MCMC file --> setting fstar = 0')
     else:
-        raise ValueError("Parameter ['frank']['set_fstar'] is '{}'. It should be one of 'MCMC', 'SED', 'custom'".format(model["frank"]["set_fstar"])) 
+        raise ValueError(f"Parameter ['frank']['set_fstar'] {model['frank']['set_fstar']} must be one of ['MCMC', 'SED', 'custom']") 
 
     # enforce a Normal fit if finding scale height (LogNormal fit not compatible with vertical inference)
     if model["base"]["run_frank"] is True and model["frank"]["scale_heights"] is not None:
