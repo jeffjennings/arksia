@@ -308,7 +308,7 @@ def stretching(phi, inc):
     """
     phi and inc in rad
     """
-    return np.sqrt(np.cos(phi)**2+np.sin(phi)**2/np.cos(inc)**2)
+    return np.sqrt(np.cos(phi) ** 2 + np.sin(phi) ** 2 / np.cos(inc) ** 2)
 
 def find_phic(inc, f):
     """
@@ -317,11 +317,11 @@ def find_phic(inc, f):
     f>1. 
     """
     
-    if 1./np.cos(inc)<f:
+    if 1 / np.cos(inc) < f:
         print('All phis satisfy condition, using phic=pi/2')
-        return np.pi/2. 
+        return np.pi / 2 
               
     # solve equation stretching-f=0
-    func= lambda phi: stretching(phi, inc)-f
-    phic = fsolve(func, np.pi/4.) # initial guess phic=45deg
+    func = lambda phi: stretching(phi, inc) - f
+    phic = fsolve(func, np.pi / 4) # initial guess phic=45deg
     return phic[0]
