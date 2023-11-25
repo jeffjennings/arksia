@@ -168,7 +168,7 @@ def parse_rave_filename(model, file_type='rave_fit'):
     if file_type == 'rave_fit':
         # adjust rave fit paths here if neeeded
         file_path = "{}/{}-{}_inc=90_N={}_radial_{}0arcsec.npy".format(
-            model["base"]["rave_dir"], 
+            model["base"]["input_dir"], 
             model["base"]["disk"], 
             rave_str,
             raveN,
@@ -177,7 +177,7 @@ def parse_rave_filename(model, file_type='rave_fit'):
     
     elif file_type == 'rave_residual_image':
         file_path = "{}/{}-{}_inc=90_N={}_2Dresiduals.npy".format(
-            model["base"]["rave_dir"], 
+            model["base"]["input_dir"], 
             model["base"]["disk"], 
             rave_str,
             raveN
