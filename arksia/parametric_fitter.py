@@ -55,7 +55,7 @@ class ParametricFit():
 
     def parametric_model(self, params: optax.Params, x: jnp.ndarray):
         """
-        # TODO
+        Generate a parametric function from supplied parameters `params` and radial points `x`
         """
         
         form = self._form
@@ -86,7 +86,7 @@ class ParametricFit():
     def loss(self, params: optax.Params, x: jnp.ndarray, y: jnp.ndarray, 
              err: jnp.ndarray) -> jnp.ndarray:
         """
-        # TODO
+        Calculate a loss value between a reference `y` and parametric model `y_hat`
         """
         
         y_hat = self.parametric_model(params, x)
@@ -99,7 +99,7 @@ class ParametricFit():
     def _fit(self, params: optax.Params, optimizer: optax.GradientTransformation, 
             niter: int) -> tuple[optax.Params, jnp.ndarray]:
         """
-        # TODO
+        Run an optimization loop for a parametric fit using JAX
         """
 
         opt_state = optimizer.init(params)
@@ -135,7 +135,8 @@ class ParametricFit():
 
     def fit(self):
         """
-        # TODO
+        Set initial guesses for a parametric model's parameter values and call 
+        an optimization loop to perform the fit
         """
 
         form = self._form
