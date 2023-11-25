@@ -127,11 +127,7 @@ def model_setup(parsed_args):
 
     model["clean"]["npix"] = disk_pars["clean"]["npix"]
     model["clean"]["pixel_scale"] = disk_pars["clean"]["pixel_scale"]
-
-    # get clean image rms
-    image_pars = json.load(open(os.path.join(model["base"]["root_dir"], "pars_image.json"), 'r'))
-    disk_image_pars = image_pars[model["base"]["disk"]]
-    robusts, rmss = disk_image_pars["clean"]["image_robust"], disk_image_pars["clean"]["image_rms"]
+    robusts, rmss = model["clean"]["image_robust"], model["clean"]["image_rms"]
     model["clean"]["image_rms"] = rmss[robusts.index(model["clean"]["robust"])]
 
     model["clean"]["bestfit"] = {}
