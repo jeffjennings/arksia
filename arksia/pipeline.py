@@ -443,8 +443,26 @@ def run_frank(model):
     
 
 def fit_parametric(fits, model):
-    """
-    # TODO
+    """Perform one or more parametric fits to a nonparametric brightness profile
+
+    Parameters
+    ----------
+    fits : nested list
+        Best-fit real space and Fourier radial profiles for clean, rave, frank. 
+        Ouput of `input_output.load_bestfit_profiles` (see docstring)
+    model : dict
+        Dictionary containing pipeline parameters
+
+    Returns
+    -------
+    PFits : list of `ParametricFit` objects
+        Results of the parameteric fitting optimization loop
+        (see `parametric_fitter.ParametricFit`)
+    frank_profile : list
+        The best-fit frank brigthness profile to which a parametric form is 
+        being fit (see `input_output.load_bestfit_profiles`)
+    figs : list of `plt.figure`
+        Generated figures, each showing the fit for one parametric form
     """
 
     # get frank best-fit profile

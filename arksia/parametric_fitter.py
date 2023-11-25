@@ -10,12 +10,27 @@ from arksia import parametric_forms
 
 class ParametricFit():
     """
-    # TODO
+    Result of a frank fit with a Gaussian brightness model.
+
+    Parameters
+    ----------
+    truth : nested list
+        Nonparametric brightness profile to which a functional form will be fit.
+        Radial points of fit, brightness values, 1\sigma uncertainty.
+    model : dict
+        Dictionary containing pipeline parameters
+    func_form : list of str
+        Names of the functional forms to fit (see `form` in `description_pars_gen.json`)
+    learn_rate : float, default=1e-3
+        Learning rate for the optimization loop
+    niter : int, default=100000
+        Number of iterations for the optimization loop
     """
 
     def __init__(self, truth, model, func_form, learn_rate=1e-3, niter=100000):
         # set jax device. Must come before any jax calls.
-        if model["parametric"]["device"] is not None: # TODO
+        self._device = jax.devices()[0]
+        if model["parametric"]["device"] is not None:
             self._device = model["parametric"]["device"]
             jax.config.update('jax_platform_name', self._device)
         else:
@@ -40,7 +55,7 @@ class ParametricFit():
 
     def parametric_model(self, params: optax.Params, x: jnp.ndarray):
         """
-        # TODO
+        Generate a parametric function from supplied parameters `params` and radial points `x`
         """
         
         form = self._form
@@ -71,7 +86,7 @@ class ParametricFit():
     def loss(self, params: optax.Params, x: jnp.ndarray, y: jnp.ndarray, 
              err: jnp.ndarray) -> jnp.ndarray:
         """
-        # TODO
+        Calculate a loss value between a reference `y` and parametric model `y_hat`
         """
         
         y_hat = self.parametric_model(params, x)
@@ -84,7 +99,7 @@ class ParametricFit():
     def _fit(self, params: optax.Params, optimizer: optax.GradientTransformation, 
             niter: int) -> tuple[optax.Params, jnp.ndarray]:
         """
-        # TODO
+        Run an optimization loop for a parametric fit using JAX
         """
 
         opt_state = optimizer.init(params)
@@ -120,7 +135,8 @@ class ParametricFit():
 
     def fit(self):
         """
-        # TODO
+        Set initial guesses for a parametric model's parameter values and call 
+        an optimization loop to perform the fit
         """
 
         form = self._form
