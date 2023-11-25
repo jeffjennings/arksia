@@ -15,7 +15,8 @@ class ParametricFit():
 
     def __init__(self, truth, model, func_form, learn_rate=1e-3, niter=100000):
         # set jax device. Must come before any jax calls.
-        if model["parametric"]["device"] is not None: # TODO
+        self._device = jax.devices()[0]
+        if model["parametric"]["device"] is not None:
             self._device = model["parametric"]["device"]
             jax.config.update('jax_platform_name', self._device)
         else:
