@@ -97,6 +97,18 @@ def model_setup(parsed_args):
                 phys_pars = row
                 break
 
+    model["base"]["dist"] = phys_pars["dpc"]
+    # source geom for clean profile extraction and frank fit
+    model["base"]["geom"] = {
+        "inc" : phys_pars["i"],
+        "PA" : phys_pars["PA"], 
+        "dRA" : phys_pars["deltaRA"],
+        "dDec" : phys_pars["deltaDec"]
+        }
+    print(f"    source geometry {model['base']['geom']}")
+
+    model["base"]["save_dir"] = os.path.join(model["base"]["output_dir"], model["base"]["disk"])
+    print(f"  Model setup: setting save path as {model['base']['save_dir']}")
 
     model["base"]["clean_dir"] = os.path.join(model["base"]["save_dir"], "clean")
     model["base"]["rave_dir"] = os.path.join(model["base"]["save_dir"], "rave")
@@ -112,8 +124,6 @@ def model_setup(parsed_args):
         model["base"]["SMG_sub"] = "SMGsub."
     else:
         model["base"]["SMG_sub"] = ""
-
-    model["base"]["dist"] = disk_pars["base"]["dist"]
 
     model["clean"]["npix"] = disk_pars["clean"]["npix"]
     model["clean"]["pixel_scale"] = disk_pars["clean"]["pixel_scale"]
@@ -133,23 +143,6 @@ def model_setup(parsed_args):
     model["frank"]["bestfit"]["alpha"] = disk_pars["frank"]["bestfit"]["alpha"]
     model["frank"]["bestfit"]["wsmooth"] = disk_pars["frank"]["bestfit"]["wsmooth"]
     model["frank"]["bestfit"]["method"] = disk_pars["frank"]["bestfit"]["method"]
-
-    # get source geom for clean profile extraction and frank fit
-    mcmc = json.load(open(os.path.join(model["base"]["save_dir"], "MCMC_results.json"), 'r'))
-    try: 
-        dRA = mcmc["deltaRA-12mLB.obs1"]["median"]
-        dDec = mcmc["deltaDec-12mLB.obs1"]["median"]
-    except KeyError:
-        dRA = mcmc["deltaRA-12m.obs1"]["median"]
-        dDec = mcmc["deltaDec-12m.obs1"]["median"]
-
-    geom = {"inc" : mcmc["i"]["median"],
-            "PA" : mcmc["PA"]["median"], 
-            "dRA" : dRA,
-            "dDec" : dDec
-            }
-    model["base"]["geom"] = geom 
-    print('    source geometry from MCMC {}'.format(geom))
 
     # stellar flux to remove from visibilities as point-source
     if model["frank"]["set_fstar"] == "custom":
