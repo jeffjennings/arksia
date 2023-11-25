@@ -3,6 +3,7 @@
 
 import os; os.environ.get('OMP_NUM_THREADS', '1')
 import json
+import csv
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
@@ -44,12 +45,17 @@ def parse_parameters(*args):
     parser.add_argument("-b", "--base_parameter_filename",
                         type=str,
                         default="./pars_gen.json",
-                        help="Parameter file (.json) with generic pars")
+                        help="Parameter file (.json) with generic pipeline parameterss")
     
     parser.add_argument("-s", "--source_parameter_filename",
                         type=str,
                         default="./pars_source.json",
-                        help="Parameter file (.json) with source-specific pars")
+                        help="Parameter file (.json) with source-specific pipeline parameterss")
+
+    parser.add_argument("-p", "--physical_parameter_filename",
+                        type=str,
+                        default="./summary_disc_parameters.csv",
+                        help="Summary table (.csv) with source-specific physical parameters")    
 
     args = parser.parse_args(*args)
     
