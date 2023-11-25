@@ -65,7 +65,7 @@ def get_vis(model):
         (Re(V) + Im(V) * 1j), weights
     """
 
-    combined_vis_path = "{}/vis_combined.npz".format(model["base"]["frank_dir"])
+    combined_vis_path = "{}/vis_combined.npz".format(model["base"]["input_dir"])
 
     if os.path.isfile(combined_vis_path):
         print('    loading combined visibility file {}'.format(combined_vis_path))
@@ -80,7 +80,7 @@ def get_vis(model):
         vis_paths = []
         for ii in ['ACA', '12m', '12mSB', '12mLB']:
             vis_paths.append("{}/{}.{}.continuum.fav.tav.{}corrected.txt".format(
-                model["base"]["frank_dir"], model["base"]["disk"], ii, model["base"]["SMG_sub"]
+                model["base"]["input_dir"], model["base"]["disk"], ii, model["base"]["SMG_sub"]
                 )
             )
 
