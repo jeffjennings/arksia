@@ -6,7 +6,8 @@
     "run_parametric"        : false,
     "aspect_ratio_fig"      : false,  
     "compare_models_fig"    : false,
-    "root_dir"              : "."
+    "input_dir"             : ".",
+    "output_dir"            : "."
   },
 
   "clean" : {

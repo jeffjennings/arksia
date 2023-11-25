@@ -6,7 +6,8 @@
       "run_parametric"        : "Whether to run the pipeline module to perform a parametric fit to a nonparametric brightness profile",
       "aspect_ratio_fig"      : "Whether to generate a figure showing frank vertical inference results",
       "compare_models_fig"    : "Whether to generate figures comparing the clean, rave, frank brightness and visibility profiles, and images",
-      "root_dir"              : "Root directory used to load data and save results. Should contain subdirectories of the form <disk name> that have further subdirectories 'clean', 'rave', 'frank'"
+      "input_dir"             : "Directory containing inputs for the pipeline (visibilities, rave fits, clean images)",
+      "output_dir"            : "Directory where pipeline results will be saved"    
     },
   
     "clean" : {
@@ -28,7 +29,7 @@
       "method"                : "The fit method: 'Normal' to fit in linear brighness, 'LogNormal' to fit in logarithmic brightness",
       "I_scale"               : "Minimum brightness allowed for radial profile for frank fit. Should be lower than data noise floor",
       "max_iter"              : "Maximum number of fit iterations",
-      "set_fstar"             : "Source for visibility amplitude to be treated as unresolved stellar emission (a constant subtracted from all real visibility amplitudes). One of ['MCMC', 'SED', 'custom'], which are set per source in the source parameters .json (by default, `default_source_pars.json`)",
+      "set_fstar"             : "Source for visibility amplitude to be treated as unresolved stellar emission (a constant subtracted from all real visibility amplitudes). One of ['MCMC', 'SED', 'custom'], which are set per source in the source parameters .json (by default, `pars_source.json`)",
       "scale_heights"         : "List of `start`, `stop`, `num` for `np.logspace` call to define scale-height grid over which to run fits. E.g., `[-2.5, -1, 10]` corresponds to `np.logspace(-2.5, -1, 10)`. If seeking to run a standard (non-vertical) frank fit, set to null", 
       "nthreads"              : "Number of CPU threads on which to run multiple fits (note a single frank fit is fastest on only 1 thread)",
       "save_solution"         : "Whether to save `sol` object (see frank.radial_fitters.FrankFitter)",

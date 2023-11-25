@@ -3,6 +3,7 @@
 
 import os; os.environ.get('OMP_NUM_THREADS', '1')
 import json
+import csv
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
@@ -44,12 +45,17 @@ def parse_parameters(*args):
     parser.add_argument("-b", "--base_parameter_filename",
                         type=str,
                         default="./pars_gen.json",
-                        help="Parameter file (.json) with generic pars")
+                        help="Parameter file (.json) with generic pipeline parameterss")
     
     parser.add_argument("-s", "--source_parameter_filename",
                         type=str,
                         default="./pars_source.json",
-                        help="Parameter file (.json) with source-specific pars")
+                        help="Parameter file (.json) with source-specific pipeline parameterss")
+
+    parser.add_argument("-p", "--physical_parameter_filename",
+                        type=str,
+                        default="./summary_disc_parameters.csv",
+                        help="Summary table (.csv) with source-specific physical parameters")    
 
     args = parser.parse_args(*args)
     
@@ -73,19 +79,36 @@ def model_setup(parsed_args):
         some processing and added parameters relative to `parsed_args`
     """
 
-    # generic parameters
+    # generic pipeline parameters
     model = json.load(open(parsed_args.base_parameter_filename, 'r'))
     model["base"]["disk"] = parsed_args.disk
 
     print('\nRunning radial profile pipeline for {}'.format(model["base"]["disk"]))
 
-    # disk-specific parameters
+    # source-specific pipeline parameters
     source_pars = json.load(open(parsed_args.source_parameter_filename, 'r'))
     disk_pars = source_pars[model["base"]["disk"]]
 
-    # expect input files to be in "<root_dir>/<disk name>/<clean or rave or frank>"
-    model["base"]["save_dir"] = os.path.join(model["base"]["root_dir"], "{}".format(model["base"]["disk"]))
-    print("  Model setup: setting load/save paths as {}/<clean, rave, frank>. Visibility tables should be in frank path.".format(model["base"]["save_dir"]))
+    # source-specific physical parameters
+    with open(parsed_args.physical_parameter_filename) as ff:
+        reader = csv.DictReader(ff)
+        for row in reader:
+            if row['name'].replace(' ', '') == model["base"]["disk"]:
+                phys_pars = row
+                break
+
+    model["base"]["dist"] = phys_pars["dpc"]
+    # source geom for clean profile extraction and frank fit
+    model["base"]["geom"] = {
+        "inc" : phys_pars["i"],
+        "PA" : phys_pars["PA"], 
+        "dRA" : phys_pars["deltaRA"],
+        "dDec" : phys_pars["deltaDec"]
+        }
+    print(f"    source geometry {model['base']['geom']}")
+
+    model["base"]["save_dir"] = os.path.join(model["base"]["output_dir"], model["base"]["disk"])
+    print(f"  Model setup: setting save path as {model['base']['save_dir']}")
 
     model["base"]["clean_dir"] = os.path.join(model["base"]["save_dir"], "clean")
     model["base"]["rave_dir"] = os.path.join(model["base"]["save_dir"], "rave")
@@ -102,15 +125,9 @@ def model_setup(parsed_args):
     else:
         model["base"]["SMG_sub"] = ""
 
-    model["base"]["dist"] = disk_pars["base"]["dist"]
-
     model["clean"]["npix"] = disk_pars["clean"]["npix"]
     model["clean"]["pixel_scale"] = disk_pars["clean"]["pixel_scale"]
-
-    # get clean image rms
-    image_pars = json.load(open(os.path.join(model["base"]["root_dir"], "pars_image.json"), 'r'))
-    disk_image_pars = image_pars[model["base"]["disk"]]
-    robusts, rmss = disk_image_pars["clean"]["image_robust"], disk_image_pars["clean"]["image_rms"]
+    robusts, rmss = model["clean"]["image_robust"], model["clean"]["image_rms"]
     model["clean"]["image_rms"] = rmss[robusts.index(model["clean"]["robust"])]
 
     model["clean"]["bestfit"] = {}
@@ -123,36 +140,19 @@ def model_setup(parsed_args):
     model["frank"]["bestfit"]["wsmooth"] = disk_pars["frank"]["bestfit"]["wsmooth"]
     model["frank"]["bestfit"]["method"] = disk_pars["frank"]["bestfit"]["method"]
 
-    # get source geom for clean profile extraction and frank fit
-    mcmc = json.load(open(os.path.join(model["base"]["save_dir"], "MCMC_results.json"), 'r'))
-    try: 
-        dRA = mcmc["deltaRA-12mLB.obs1"]["median"]
-        dDec = mcmc["deltaDec-12mLB.obs1"]["median"]
-    except KeyError:
-        dRA = mcmc["deltaRA-12m.obs1"]["median"]
-        dDec = mcmc["deltaDec-12m.obs1"]["median"]
-
-    geom = {"inc" : mcmc["i"]["median"],
-            "PA" : mcmc["PA"]["median"], 
-            "dRA" : dRA,
-            "dDec" : dDec
-            }
-    model["base"]["geom"] = geom 
-    print('    source geometry from MCMC {}'.format(geom))
-
     # stellar flux to remove from visibilities as point-source
     if model["frank"]["set_fstar"] == "custom":
         model["frank"]["fstar"] = disk_pars["frank"]["custom_fstar"] / 1e6
     elif model["frank"]["set_fstar"] == "SED":
-        model["frank"]["fstar"] = disk_pars["frank"]["SED_fstar"] / 1e6
+        model["frank"]["fstar"] = phys_pars["Fstar_SED"] / 1e6
     elif model["frank"]["set_fstar"] == "MCMC":
         try:
-            model["frank"]["fstar"] = mcmc["fstar"]["median"] / 1e3
-        except KeyError:
+            model["frank"]["fstar"] = phys_pars["Fstar_MCMC"] / 1e3
+        except TypeError:
+            print(f"        {parsed_args.physical_parameter_filename} has no stellar flux for {model['base']['disk']} --> setting fstar to 0")            
             model["frank"]["fstar"] = 0.0
-            print('        no stellar flux in MCMC file --> setting fstar = 0')
     else:
-        raise ValueError("Parameter ['frank']['set_fstar'] is '{}'. It should be one of 'MCMC', 'SED', 'custom'".format(model["frank"]["set_fstar"])) 
+        raise ValueError(f"Parameter ['frank']['set_fstar'] {model['frank']['set_fstar']} must be one of ['MCMC', 'SED', 'custom']") 
 
     # enforce a Normal fit if finding scale height (LogNormal fit not compatible with vertical inference)
     if model["base"]["run_frank"] is True and model["frank"]["scale_heights"] is not None:
@@ -187,7 +187,7 @@ def extract_clean_profile(model):
     """
     # image filenames 
     base_path = "{}/{}.combined.{}corrected.briggs.{}.{}.{}".format(
-        model["base"]["clean_dir"], 
+        model["base"]["input_dir"], 
         model["base"]["disk"], 
         model["base"]["SMG_sub"],
         model["clean"]["robust"], 

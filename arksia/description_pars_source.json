@@ -1,12 +1,13 @@
 {
     "<disk_name>" : {
         "base"      : {
-            "SMG_sub"     : "Whether SMG subtraction has been performed on the dataset",
-            "dist"        : "Distance to source [pc]"
+            "SMG_sub"     : "Whether SMG subtraction has been performed on the dataset"
           },
           "clean"     : {
             "npix"        : "Number of pixels in one dimension of the clean image",
             "pixel_scale" : "Clean pixel width [arcsec]",
+            "image_rms"   : "List of RMS noise levels in input CLEAN images [Jy / beam] (corresponding to `image_robust`)",
+            "image_robust": "List of robust weighting parameters for input CLEAN images (corresponding to `image_rms`)",
             "bestfit"         : {"robust"   : "Robust weighting parameter for best-fit clean (and assumed rave) image"
                                 }                
           },
@@ -14,7 +15,6 @@
             "pixel_scale" : "Rave pixel width [arcsec]"
           },
           "frank"     : {
-            "SED_fstar"   : "Visibility amplitude of unresolved emission as determined from SED [uJy]",
             "custom_fstar"    : "Custom value for this amplitude, used to drive I(r=0)~0 in frank fit",
             "bestfit"         : {"alpha"   : "Best-fit value for the order parameter for the power spectrum's inverse Gamma prior", 
                                  "wsmooth" : "Best-fit value for the strength of smoothing applied to the power spectrum",

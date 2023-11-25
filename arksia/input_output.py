@@ -65,7 +65,7 @@ def get_vis(model):
         (Re(V) + Im(V) * 1j), weights
     """
 
-    combined_vis_path = "{}/vis_combined.npz".format(model["base"]["frank_dir"])
+    combined_vis_path = "{}/vis_combined.npz".format(model["base"]["input_dir"])
 
     if os.path.isfile(combined_vis_path):
         print('    loading combined visibility file {}'.format(combined_vis_path))
@@ -80,7 +80,7 @@ def get_vis(model):
         vis_paths = []
         for ii in ['ACA', '12m', '12mSB', '12mLB']:
             vis_paths.append("{}/{}.{}.continuum.fav.tav.{}corrected.txt".format(
-                model["base"]["frank_dir"], model["base"]["disk"], ii, model["base"]["SMG_sub"]
+                model["base"]["input_dir"], model["base"]["disk"], ii, model["base"]["SMG_sub"]
                 )
             )
 
@@ -168,7 +168,7 @@ def parse_rave_filename(model, file_type='rave_fit'):
     if file_type == 'rave_fit':
         # adjust rave fit paths here if neeeded
         file_path = "{}/{}-{}_inc=90_N={}_radial_{}0arcsec.npy".format(
-            model["base"]["rave_dir"], 
+            model["base"]["input_dir"], 
             model["base"]["disk"], 
             rave_str,
             raveN,
@@ -177,7 +177,7 @@ def parse_rave_filename(model, file_type='rave_fit'):
     
     elif file_type == 'rave_residual_image':
         file_path = "{}/{}-{}_inc=90_N={}_2Dresiduals.npy".format(
-            model["base"]["rave_dir"], 
+            model["base"]["input_dir"], 
             model["base"]["disk"], 
             rave_str,
             raveN
