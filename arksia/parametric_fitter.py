@@ -10,7 +10,21 @@ from arksia import parametric_forms
 
 class ParametricFit():
     """
-    # TODO
+    Result of a frank fit with a Gaussian brightness model.
+
+    Parameters
+    ----------
+    truth : nested list
+        Nonparametric brightness profile to which a functional form will be fit.
+        Radial points of fit, brightness values, 1\sigma uncertainty.
+    model : dict
+        Dictionary containing pipeline parameters
+    func_form : list of str
+        Names of the functional forms to fit (see `form` in `description_pars_gen.json`)
+    learn_rate : float, default=1e-3
+        Learning rate for the optimization loop
+    niter : int, default=100000
+        Number of iterations for the optimization loop
     """
 
     def __init__(self, truth, model, func_form, learn_rate=1e-3, niter=100000):
