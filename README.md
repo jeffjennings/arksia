@@ -19,27 +19,17 @@ The pipeline is run from the terminal using input parameter files. It has the fo
 - the pipeline runs from general and source-specific parameter files to do any combination of the above
 - the pipeline can be run in bulk (across multiple sources) to perform analysis and summarize results
 
-Prior to running the pipeline for a new source
-----------------------------------------------
-NOTE: These steps will be unnecessary once the associated ARKS paper is published and the data public. 
-
-Before running any pipeline routines:
-1) Create the following, nested directory structure, downloading and placing the appropriate files in these directories:
-- Root directory (e.g., 'arks_prep/disks'), containing the following files:
-    * 'pars_image.json' (contains clean image RMS noise per robust value)
-    * 'pars_gen.json' (contains parameters to choose which of the above pipeline modules run, as well as sensible choices for the pipeline parameters applicable to all sources)
-    * 'pars_source.json' (contains sensible choices for source-specific, best-fit parameters)
-- Within the root directory, create a subdirectory named '[disk name]', containing the following files:
-    * mcmc_results.json (used to read assumed disk geometry and stellar flux)
+Staging input files for the pipeline
+------------------------------------
+1) Ensure you have the following parameter files:
+    * 'pars_gen.json' (contains parameters to choose which of the pipeline modules run, as well as sensible choices for the pipeline parameters applicable to all sources)
+    * 'pars_source.json' (contains sensible choices for source-specific best-fit parameters, as well as metrics of supplied clean images)
+    * 'summary_disc_parameters.csv' (used to read disk geometry and stellar flux)
+      
+- Within the root directory, create a subdirectory named '[disk name]', containing the following files: # TODO
     * subdirectory 'clean': containing primary beam-corrected CLEAN image ('<>.pbcor.fits'), primary beam image ('<>.pb.fits'), CLEAN model image ('<>.model.fits') for each robust value
     * subdirectory 'frank': containing visibility datasets ('<>.corrected.txt')
     * subdirectory 'rave': containing rave fit array files ('<>.npy') for each robust value
-
-2) Add the disk information to the source parameters (.json) file:
-- set 'base: SMG_sub', 'clean: npix' and 'clean: pixel_scale' according to the '.fits' filenames (these will be used to determine the filenames of the appropriate images to load)
-- set 'rave: pixel_scale' according to the Rave model filename
-- set 'base: dist' and 'frank: SED_fstar' according to the github wiki (see 'ARKS sample' there)
-- 'frank: custom_fstar' and 'frank: bestfit' will be determined by running frank fits
 
 Running the pipeline for a single source
 ----------------------------------------
