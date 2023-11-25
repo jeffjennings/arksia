@@ -117,8 +117,8 @@ def main(source_par_f='./pars_source.json', gen_par_f='./pars_gen.json',
         print('  Survey summary: making survey summary figure')
     fig1.suptitle(r'$1\sigma$ uncertainties do not include systematic unc., and are not comparable across models')    
 
-    ff0 = '{}/survey_profile_summary.png'.format(model["base"]["root_dir"])
-    ff1 = '{}/survey_profile_summary_unc.png'.format(model["base"]["root_dir"])
+    ff0 = '{}/survey_profile_summary.png'.format(model["base"]["save_dir"])
+    ff1 = '{}/survey_profile_summary_unc.png'.format(model["base"]["save_dir"])
     print('    saving figures to {} and {}'.format(ff0, ff1))
 
     plt.figure(fig0); plt.tight_layout(); plt.savefig(ff0, dpi=300)
