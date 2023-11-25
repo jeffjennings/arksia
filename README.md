@@ -21,15 +21,18 @@ The pipeline is run from the terminal using input parameter files. It has the fo
 
 Staging input files for the pipeline
 ------------------------------------
-1) Ensure you have the following parameter files:
+1) Ensure you have the following parameter files (you may name them differently and pass them in when running the pipeline):
     * 'pars_gen.json' (contains parameters to choose which of the pipeline modules run, as well as sensible choices for the pipeline parameters applicable to all sources)
     * 'pars_source.json' (contains sensible choices for source-specific best-fit parameters, as well as metrics of supplied clean images)
     * 'summary_disc_parameters.csv' (used to read disk geometry and stellar flux)
       
-- Within the root directory, create a subdirectory named '[disk name]', containing the following files: # TODO
-    * subdirectory 'clean': containing primary beam-corrected CLEAN image ('<>.pbcor.fits'), primary beam image ('<>.pb.fits'), CLEAN model image ('<>.model.fits') for each robust value
-    * subdirectory 'frank': containing visibility datasets ('<>.corrected.txt')
-    * subdirectory 'rave': containing rave fit array files ('<>.npy') for each robust value
+2) In a single directory, depending on which modular components of the pipeline you will run, store the following input files (and set this directory as the `input_dir` in `pars_gen.json`):
+    * if using the pipeline to extract a radial profile from a clean image and/or to compare clean results to frank and rave:
+        - primary beam-corrected CLEAN image ('<>.pbcor.fits'), primary beam image ('<>.pb.fits'), CLEAN model image ('<>.model.fits') for each robust value 
+    * if using the pipeline to run frank fits:
+        - visibility datasets ('<>.corrected.txt')
+    * if using the pipeline to compare rave results to clean and frank:
+        - rave fit array files ('<>.npy') for each robust value
 
 Running the pipeline for a single source
 ----------------------------------------
