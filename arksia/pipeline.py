@@ -187,7 +187,7 @@ def extract_clean_profile(model):
     """
     # image filenames 
     base_path = "{}/{}.combined.{}corrected.briggs.{}.{}.{}".format(
-        model["base"]["clean_dir"], 
+        model["base"]["input_dir"], 
         model["base"]["disk"], 
         model["base"]["SMG_sub"],
         model["clean"]["robust"], 
