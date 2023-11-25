@@ -242,7 +242,7 @@ def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1200):
 
     # get clean images
     base_path = "{}/{}.combined.{}corrected.briggs.{}.{}.{}".format(
-        model["base"]["clean_dir"], 
+        model["base"]["input_dir"], 
         model["base"]["disk"], 
         model["base"]["SMG_sub"],
         model["clean"]["robust"], 
