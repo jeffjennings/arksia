@@ -7,6 +7,8 @@
           "clean"     : {
             "npix"        : "Number of pixels in one dimension of the clean image",
             "pixel_scale" : "Clean pixel width [arcsec]",
+            "image_rms"   : "List of RMS noise levels in input CLEAN images [Jy / beam] (corresponding to `image_robust`)",
+            "image_robust": "List of robust weighting parameters for input CLEAN images (corresponding to `image_rms`)",
             "bestfit"         : {"robust"   : "Robust weighting parameter for best-fit clean (and assumed rave) image"
                                 }                
           },
