@@ -79,19 +79,24 @@ def model_setup(parsed_args):
         some processing and added parameters relative to `parsed_args`
     """
 
-    # generic parameters
+    # generic pipeline parameters
     model = json.load(open(parsed_args.base_parameter_filename, 'r'))
     model["base"]["disk"] = parsed_args.disk
 
     print('\nRunning radial profile pipeline for {}'.format(model["base"]["disk"]))
 
-    # disk-specific parameters
+    # source-specific pipeline parameters
     source_pars = json.load(open(parsed_args.source_parameter_filename, 'r'))
     disk_pars = source_pars[model["base"]["disk"]]
 
-    # expect input files to be in "<root_dir>/<disk name>/<clean or rave or frank>"
-    model["base"]["save_dir"] = os.path.join(model["base"]["root_dir"], "{}".format(model["base"]["disk"]))
-    print("  Model setup: setting load/save paths as {}/<clean, rave, frank>. Visibility tables should be in frank path.".format(model["base"]["save_dir"]))
+    # source-specific physical parameters
+    with open(parsed_args.physical_parameter_filename) as ff:
+        reader = csv.DictReader(ff)
+        for row in reader:
+            if row['name'].replace(' ', '') == model["base"]["disk"]:
+                phys_pars = row
+                break
+
 
     model["base"]["clean_dir"] = os.path.join(model["base"]["save_dir"], "clean")
     model["base"]["rave_dir"] = os.path.join(model["base"]["save_dir"], "rave")
