@@ -125,7 +125,7 @@ class ParametricFit():
             loss_arr = loss_arr.at[i].set(loss_current)
 
             if i % 100 == 0:
-                progress.set_description(f"    loss {loss_arr[i]:.2f}")
+                progress.set_description(f"      loss {loss_arr[i]:.2f}")
 
         self._loss_history = loss_arr
         self._params = params
@@ -140,9 +140,9 @@ class ParametricFit():
         """
 
         form = self._form
-        print(f"    fitting parametric form {form} to input profile")
 
         # set initial guesses for parameter values by using the signal we're fitting:
+
         # centroid or critical radius
         peak_idx = jnp.argmax(self._y)
         Rc = self._x[peak_idx]
