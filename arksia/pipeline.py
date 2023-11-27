@@ -116,7 +116,7 @@ def model_setup(parsed_args):
             raise ValueError(f"Disk name {model['base']['disk']} not found in {parsed_args.physical_parameter_filename}")
 
     for key, val in phys_pars.items():
-        if key != "name" and val != '':
+        if key != "name" and val not in ['', '--']:
             phys_pars[key] = float(val)
 
     model["base"]["dist"] = phys_pars["dpc"]
