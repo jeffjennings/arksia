@@ -90,12 +90,16 @@ def model_setup(parsed_args):
     disk_pars = source_pars[model["base"]["disk"]]
 
     # source-specific physical parameters
+    phys_pars = None
     with open(parsed_args.physical_parameter_filename) as ff:
         reader = csv.DictReader(ff)
         for row in reader:
             if row['name'].replace(' ', '') == model["base"]["disk"]:
                 phys_pars = row
                 break
+        if phys_pars is None: 
+            raise ValueError(f"Disk name {model['base']['disk']} not found in {parsed_args.physical_parameter_filename}")
+
 
     model["base"]["dist"] = phys_pars["dpc"]
     # source geom for clean profile extraction and frank fit
