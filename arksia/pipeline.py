@@ -474,6 +474,8 @@ def fit_parametric(fits, model):
         Generated figures, each showing the fit for one parametric form
     """
 
+    print(f"  Parametric fit: fitting {model['parametric']['form']} to frank best-fit profile")
+
     # get frank best-fit profile
     _, _, results = fits
     frank_profile = results[0]
@@ -482,6 +484,7 @@ def fit_parametric(fits, model):
     figs = []
     PFits = []
     for pp in model['parametric']['form']:
+        print(f"    fitting parametric form {pp}")
         PFit = parametric_fitter.ParametricFit(frank_profile, 
                                             model, 
                                             func_form=pp,
@@ -490,10 +493,10 @@ def fit_parametric(fits, model):
         PFit.fit()
         PFits.append(PFit)
 
-        print(f"    initial params {PFit.initial_params}\n    final {PFit.bestfit_params}\n    loss {PFit.loss_history}")
+        print(f"      initial params {PFit.initial_params}\n      final {PFit.bestfit_params}\n      loss {PFit.loss_history}")
 
         ff = f"{model['base']['parametric_dir']}/parametric_fit_{pp}.obj"
-        print(f"    saving parametric fit results to {ff}")
+        print(f"      saving fit results to {ff}")
         with open(ff, 'wb') as f:
             pickle.dump(PFit, f)
 
