@@ -7,7 +7,7 @@
       "aspect_ratio_fig"      : "Whether to generate a figure showing frank vertical inference results",
       "compare_models_fig"    : "Whether to generate figures comparing the clean, rave, frank brightness and visibility profiles, and images",
       "input_dir"             : "Directory containing inputs for the pipeline (visibilities, rave fits, clean images)",
-      "output_dir"            : "Directory where pipeline results will be saved"    
+      "output_dir"            : "Parent directory in which pipeline results will be saved (in subdirectories <disk name>/<clean, rave, frank, parametric>"
     },
   
     "clean" : {
