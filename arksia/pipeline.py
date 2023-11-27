@@ -134,6 +134,8 @@ def model_setup(parsed_args):
 
     model["clean"]["npix"] = disk_pars["clean"]["npix"]
     model["clean"]["pixel_scale"] = disk_pars["clean"]["pixel_scale"]
+    model["clean"]["image_robust"] = disk_pars["clean"]["image_robust"] 
+    model["clean"]["image_rms"] = disk_pars["clean"]["image_rms"]
     robusts, rmss = model["clean"]["image_robust"], model["clean"]["image_rms"]
     model["clean"]["image_rms"] = rmss[robusts.index(model["clean"]["robust"])]
 
