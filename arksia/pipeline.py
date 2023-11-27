@@ -100,6 +100,9 @@ def model_setup(parsed_args):
         if phys_pars is None: 
             raise ValueError(f"Disk name {model['base']['disk']} not found in {parsed_args.physical_parameter_filename}")
 
+    for key, val in phys_pars.items():
+        if key != "name" and val != '':
+            phys_pars[key] = float(val)
 
     model["base"]["dist"] = phys_pars["dpc"]
     # source geom for clean profile extraction and frank fit
