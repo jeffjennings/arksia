@@ -438,6 +438,23 @@ def frank_image_diag_figure(model, sol, frank_resid_vis, resid_im_robust=2.0,
 
 
 def frank_multifit_figure(model, sols, plot_var, single_panel=False, save_prefix=None):
+    """
+    Generate a figure showing results of vertical inference with frank 1+1D
+
+    Parameters
+    ----------
+    model : dict
+        Dictionary containing pipeline parameters
+    sols : list of frank _HankelRegressor objects
+        frank fits performed over multiple hyperparameter values        
+    plot_var : str
+        One of ["I", "V"]: Whether to plot brightness profiles "I" 
+        or visibility fits "V"
+    single_panel : bool
+        Whether to plot all fits on a single panel
+    save_prefix : str, default = None
+        Prefix for saved figure name. If None, the figure won't be saved
+    """
     print('  Figures: making multifit grid figure')
 
     nsols = len(sols)
