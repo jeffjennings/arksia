@@ -442,9 +442,16 @@ def frank_multifit_figure(model, sols, plot_var, single_panel=False, save_prefix
 
     nsols = len(sols)
 
+    if single_panel is True:
+        fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(10,8))
+        axes = [axes]
+    else:
         fig, axes = plt.subplots(nrows=4, ncols=6, figsize=(10,8))
         axes = axes.ravel()
 
+    if single_panel is True:
+        plot_kwargs = {"c":None}
+    else:
         plot_kwargs = {"c":"r"}
         
     title = model["base"]["disk"]
@@ -466,11 +473,18 @@ def frank_multifit_figure(model, sols, plot_var, single_panel=False, save_prefix
 
     xs, ys = [], []
     for ii, ss in enumerate(sols):
+        if single_panel is True:
+            ii = 0
 
         lab = f"$\\alpha$ {ss.info['alpha']}, $w$ {ss.info['wsmooth']}"
 
         if plot_var == "I":
             axes[ii].plot(ss.r * model["base"]["dist"], ss.I / 1e6, label=lab, **plot_kwargs)
+
+        else:
+            if (single_panel is True and ii == 0) or single_panel is False:
+                # plot binned observed Re(V)
+                axes[ii].plot(bin_vis.uv / 1e6, bin_vis.V.real * 1e3, 'k.', ls='None')
 
             # get frank vis fit
             Vf = ss.predict_deprojected(grid)
@@ -487,6 +501,14 @@ def frank_multifit_figure(model, sols, plot_var, single_panel=False, save_prefix
     for ii, aa in enumerate(axes):
         aa.xaxis.set_ticks_position("both")
         aa.yaxis.set_ticks_position("both")
+
+        if single_panel is False:
+            if ii == 0:
+                aa.xaxis.tick_top()
+                aa.xaxis.set_label_position("top")
+            else:
+                aa.xaxis.set_ticklabels([])    
+                aa.yaxis.set_ticklabels([])
 
         aa.set_ylim(min_y, max_y)
         # aa.set_xlim(min_x, max_x)
@@ -507,6 +529,8 @@ def frank_multifit_figure(model, sols, plot_var, single_panel=False, save_prefix
 
     if save_prefix:
         prefix = save_prefix + f"_frank_multifit_{plot_var}"
+        if single_panel is False:
+            prefix += "_grid"
         
         plt.savefig(prefix + ".png", dpi=300, bbox_inches='tight')
 
