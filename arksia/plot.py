@@ -437,6 +437,52 @@ def frank_image_diag_figure(model, sol, frank_resid_vis, resid_im_robust=2.0,
     return fig, axes
 
 
+def frank_multifit_figure(model, sols, plot_var, single_panel=False, save_prefix=None):
+    print('  Figures: making multifit grid figure')
+
+    nsols = len(sols)
+
+        fig, axes = plt.subplots(nrows=4, ncols=6, figsize=(10,8))
+        axes = axes.ravel()
+
+        plot_kwargs = {"c":"r"}
+        
+    title = model["base"]["disk"]
+
+    xs, ys = [], []
+    for ii, ss in enumerate(sols):
+
+        lab = f"$\\alpha$ {ss.info['alpha']}, $w$ {ss.info['wsmooth']}"
+
+        if plot_var == "I":
+            axes[ii].plot(ss.r * model["base"]["dist"], ss.I / 1e6, label=lab, **plot_kwargs)
+
+
+        axes[ii].legend(loc='upper right', fontsize=6)
+
+    
+    for ii, aa in enumerate(axes):
+        aa.xaxis.set_ticks_position("both")
+        aa.yaxis.set_ticks_position("both")
+
+
+    if plot_var == "I":
+        axes[0].set_ylabel(r'I [MJy sr$^{-1}$]')
+        axes[0].set_xlabel(r'r [AU]')
+
+    fig.subplots_adjust(wspace=0, hspace=0)
+    fig.suptitle(title)
+
+    if save_prefix:
+        prefix = save_prefix + f"_frank_multifit_{plot_var}"
+        
+        plt.savefig(prefix + ".png", dpi=300, bbox_inches='tight')
+
+        plt.close()
+
+    return fig, axes
+
+
 def aspect_ratio_figure(model):
     """
     Generate a figure showing results of vertical inference with frank 1+1D
