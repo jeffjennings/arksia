@@ -13,6 +13,7 @@ The pipeline is run from the terminal using input parameter files. It has the fo
 - runs frank for 1+1D vertical (disk aspect ratio) inference
 - runs parametric fits to a nonparametric radial brightness profile using a range of physically motivated parametric forms (uses JAX for hardware acceleration)
 - produces plots to compare clean, rave, frank brightness profiles, radial visibility profiles, images, residuals
+- produces plots to compare frank fits with different hyperparameter values
 - produces plots to compare nonparametric and parametric brightness profiles
 - produces plots to assess frank vertical inference over grids of _h_, _alpha_, _wsmooth_
 - adds utilites to prepare visibility files for the above and to save/load/interface with all of the above
