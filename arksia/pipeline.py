@@ -398,7 +398,7 @@ def run_frank(model):
                 )
 
         # save fit summary figures
-        if model["frank"]["make_quick_fig"]:
+        if model["frank"]["make_quick_fig"] is True:
             qfig, qaxes = make_quick_fig(*uv_data, sol, bin_widths=model["plot"]["bin_widths"],
                         save_prefix=None,
                         )
@@ -449,6 +449,25 @@ def run_frank(model):
             np.savetxt(ff,
                 np.array([g0, g1, g2, logevs]).T, header='alpha\twsmooth\th=H/r\tlog evidence'
             )
+
+        multifit_save_prefix = "{}/{}_fstar{:.0f}uJy_method{}".format(
+                    model["base"]["frank_dir"], model["base"]["disk"], 
+                    model["frank"]["fstar"] * 1e6,
+                    model["frank"]["method"]
+                    )
+
+        if model["base"]["frank_multifit_fig"] is True:
+            # plot all fits (single panel)
+            plot.frank_multifit_figure(model, sols, plot_var="I", single_panel=True,
+                                            save_prefix=multifit_save_prefix)
+            plot.frank_multifit_figure(model, sols, plot_var="V", single_panel=True,
+                                            save_prefix=multifit_save_prefix)        
+            
+            # plot all I(r) fits (panel grid)
+            plot.frank_multifit_figure(model, sols, plot_var="I", 
+                                            save_prefix=multifit_save_prefix)
+            plot.frank_multifit_figure(model, sols, plot_var="V", 
+                                            save_prefix=multifit_save_prefix)
 
         return sols
     

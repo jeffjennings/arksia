@@ -437,6 +437,125 @@ def frank_image_diag_figure(model, sol, frank_resid_vis, resid_im_robust=2.0,
     return fig, axes
 
 
+def frank_multifit_figure(model, sols, plot_var, single_panel=False, save_prefix=None):
+    """
+    Generate a figure showing results of vertical inference with frank 1+1D
+
+    Parameters
+    ----------
+    model : dict
+        Dictionary containing pipeline parameters
+    sols : list of frank _HankelRegressor objects
+        frank fits performed over multiple hyperparameter values        
+    plot_var : str
+        One of ["I", "V"]: Whether to plot brightness profiles "I" 
+        or visibility fits "V"
+    single_panel : bool
+        Whether to plot all fits on a single panel
+    save_prefix : str, default = None
+        Prefix for saved figure name. If None, the figure won't be saved
+    """
+    print('  Figures: making multifit grid figure')
+
+    nsols = len(sols)
+
+    if single_panel is True:
+        fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(10,8))
+        axes = [axes]
+    else:
+        fig, axes = plt.subplots(nrows=4, ncols=6, figsize=(10,8))
+        axes = axes.ravel()
+
+    if single_panel is True:
+        plot_kwargs = {"c":None}
+    else:
+        plot_kwargs = {"c":"r"}
+        
+    title = model["base"]["disk"]
+
+    if plot_var == "V":
+        grid = np.logspace(np.log10(1e3), np.log10(1e6), 10**3)
+        
+        [u, v, vis, weights] = get_vis(model)
+
+        # deproject observed vis
+        up, vp, Vp = sols[0].geometry.apply_correction(u, v, vis) # assuming all sols have same geometry
+        bls = np.sqrt(up**2 + vp**2)
+
+        # bin observed vis
+        bin_width = model["plot"]["bin_widths"][0] # forcing single bin width
+        bin_vis = UVDataBinner(bls, Vp, weights, bin_width)
+
+        title += f"\nData shown in {bin_width/1e3} k$\\lambda$ bins"
+
+    xs, ys = [], []
+    for ii, ss in enumerate(sols):
+        if single_panel is True:
+            ii = 0
+
+        lab = f"$\\alpha$ {ss.info['alpha']}, $w$ {ss.info['wsmooth']}"
+
+        if plot_var == "I":
+            axes[ii].plot(ss.r * model["base"]["dist"], ss.I / 1e6, label=lab, **plot_kwargs)
+
+        else:
+            if (single_panel is True and ii == 0) or single_panel is False:
+                # plot binned observed Re(V)
+                axes[ii].plot(bin_vis.uv / 1e6, bin_vis.V.real * 1e3, 'k.', ls='None')
+
+            # get frank vis fit
+            Vf = ss.predict_deprojected(grid)
+            axes[ii].plot(grid / 1e6, Vf * 1e3, label=lab, **plot_kwargs)
+
+        axes[ii].legend(loc='upper right', fontsize=6)
+
+        xs.append(axes[ii].get_xlim())
+        ys.append(axes[ii].get_ylim())
+
+    min_x, max_x = min(xx[0] for ii,xx in enumerate(xs)), max(xx[1] for ii,xx in enumerate(xs))
+    min_y, max_y = min(yy[0] for ii,yy in enumerate(ys)), max(yy[1] for ii,yy in enumerate(ys))
+    
+    for ii, aa in enumerate(axes):
+        aa.xaxis.set_ticks_position("both")
+        aa.yaxis.set_ticks_position("both")
+
+        if single_panel is False:
+            if ii == 0:
+                aa.xaxis.tick_top()
+                aa.xaxis.set_label_position("top")
+            else:
+                aa.xaxis.set_ticklabels([])    
+                aa.yaxis.set_ticklabels([])
+
+        aa.set_ylim(min_y, max_y)
+        # aa.set_xlim(min_x, max_x)
+        if plot_var == "I":
+            aa.set_xlim(0, max_x)
+        else:
+            aa.set_xlim(0, max(bls) * 1.05 / 1e6)
+
+    if plot_var == "I":
+        axes[0].set_ylabel(r'I [MJy sr$^{-1}$]')
+        axes[0].set_xlabel(r'r [AU]')
+    else:
+        axes[0].set_ylabel(r'Re(V) [mJy]')
+        axes[0].set_xlabel(r'Baseline [M$\lambda$]')
+
+    fig.subplots_adjust(wspace=0, hspace=0)
+    fig.suptitle(title)
+
+    if save_prefix:
+        prefix = save_prefix + f"_frank_multifit_{plot_var}"
+        if single_panel is False:
+            prefix += "_grid"
+        
+        plt.savefig(prefix + ".png", dpi=300, bbox_inches='tight')
+
+        plt.close()
+
+    return fig, axes
+
+
 def aspect_ratio_figure(model):
     """
     Generate a figure showing results of vertical inference with frank 1+1D
