@@ -478,11 +478,22 @@ def frank_multifit_figure(model, sols, plot_var, single_panel=False, save_prefix
 
         axes[ii].legend(loc='upper right', fontsize=6)
 
+        xs.append(axes[ii].get_xlim())
+        ys.append(axes[ii].get_ylim())
+
+    min_x, max_x = min(xx[0] for ii,xx in enumerate(xs)), max(xx[1] for ii,xx in enumerate(xs))
+    min_y, max_y = min(yy[0] for ii,yy in enumerate(ys)), max(yy[1] for ii,yy in enumerate(ys))
     
     for ii, aa in enumerate(axes):
         aa.xaxis.set_ticks_position("both")
         aa.yaxis.set_ticks_position("both")
 
+        aa.set_ylim(min_y, max_y)
+        # aa.set_xlim(min_x, max_x)
+        if plot_var == "I":
+            aa.set_xlim(0, max_x)
+        else:
+            aa.set_xlim(0, max(bls) * 1.05 / 1e6)
 
     if plot_var == "I":
         axes[0].set_ylabel(r'I [MJy sr$^{-1}$]')
