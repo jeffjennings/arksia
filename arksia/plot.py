@@ -449,6 +449,21 @@ def frank_multifit_figure(model, sols, plot_var, single_panel=False, save_prefix
         
     title = model["base"]["disk"]
 
+    if plot_var == "V":
+        grid = np.logspace(np.log10(1e3), np.log10(1e6), 10**3)
+        
+        [u, v, vis, weights] = get_vis(model)
+
+        # deproject observed vis
+        up, vp, Vp = sols[0].geometry.apply_correction(u, v, vis) # assuming all sols have same geometry
+        bls = np.sqrt(up**2 + vp**2)
+
+        # bin observed vis
+        bin_width = model["plot"]["bin_widths"][0] # forcing single bin width
+        bin_vis = UVDataBinner(bls, Vp, weights, bin_width)
+
+        title += f"\nData shown in {bin_width/1e3} k$\\lambda$ bins"
+
     xs, ys = [], []
     for ii, ss in enumerate(sols):
 
@@ -457,6 +472,9 @@ def frank_multifit_figure(model, sols, plot_var, single_panel=False, save_prefix
         if plot_var == "I":
             axes[ii].plot(ss.r * model["base"]["dist"], ss.I / 1e6, label=lab, **plot_kwargs)
 
+            # get frank vis fit
+            Vf = ss.predict_deprojected(grid)
+            axes[ii].plot(grid / 1e6, Vf * 1e3, label=lab, **plot_kwargs)
 
         axes[ii].legend(loc='upper right', fontsize=6)
 
@@ -469,6 +487,9 @@ def frank_multifit_figure(model, sols, plot_var, single_panel=False, save_prefix
     if plot_var == "I":
         axes[0].set_ylabel(r'I [MJy sr$^{-1}$]')
         axes[0].set_xlabel(r'r [AU]')
+    else:
+        axes[0].set_ylabel(r'Re(V) [mJy]')
+        axes[0].set_xlabel(r'Baseline [M$\lambda$]')
 
     fig.subplots_adjust(wspace=0, hspace=0)
     fig.suptitle(title)
