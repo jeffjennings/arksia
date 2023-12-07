@@ -88,10 +88,10 @@ def model_setup(parsed_args):
     print(f"  Model setup: expecting all input files in {model['base']['input_dir']}")
 
     if model["base"]["output_dir"] is None:
-        model["base"]["save_dir"] = os.path.join(model["base"]["input_dir"], model["base"]["disk"])
+        model["base"]["save_dir"] = model["base"]["input_dir"]
         print(f"  Model setup: 'output_dir' is None in your parameter file -- setting save path to 'input_dir'")
     else:
-        model["base"]["save_dir"] = os.path.join(model["base"]["output_dir"], model["base"]["disk"])
+        model["base"]["save_dir"] = os.path.join(model["base"]["output_dir"])
         print(f"  Model setup: setting save path as {model['base']['save_dir']}")
     print(f"    Results will be saved in save_path/<frank, clean, rave, parametric>")
 
