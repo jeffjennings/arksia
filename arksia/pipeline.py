@@ -40,6 +40,22 @@ def get_parameter_descriptions():
         params_source = json.load(f)
     return [params_gen, params_source]
 
+def helper():
+    param_descrip = get_parameter_descriptions()
+
+    print(f"""
+         Run the modular 'arksia' pipeline with `python -m arksia.pipeline -d <disk name>`,
+          where <disk name> is one of the sources in 'pars_source.json'.
+          Required inputs are one .csv file containing disk physical parameters (obtained from the
+          ARKS survey, by default named 'summary_disc_parameters.csv') and two 
+          .json files (containing generic and source-specific 
+          pipeline parameters). The default generic parameters 
+          file is 'description_pars_gen.json' and is of the form:\n 
+          {json.dumps(param_descrip[0], indent=4)}.\n\nThe default source-specific
+          parameters file is 'description_pars_source.json' and is of the form:\n
+          {json.dumps(param_descrip[1], indent=4)}""")
+    
+    
 def parse_parameters(*args):
     """
     Read in a .json parameter files to run the pipeline
