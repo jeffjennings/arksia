@@ -8,7 +8,7 @@
       "compare_models_fig"    : "Whether to generate figures comparing the clean, rave, frank brightness and visibility profiles, and images",
       "frank_multifit_fig"    : "Whether to generate figures comparing frank fits with different hyperparameter values",
       "input_dir"             : "Directory containing inputs for the pipeline (visibilities, rave fits, clean images)",
-      "output_dir"            : "Parent directory in which pipeline results will be saved (in subdirectories <disk name>/<clean, rave, frank, parametric>"
+      "output_dir"            : "Parent directory in which pipeline results will be saved (in subdirectories <disk name>/<clean, rave, frank, parametric>. If null, output_dir will be set to input_dir"
     },
   
     "clean" : {
