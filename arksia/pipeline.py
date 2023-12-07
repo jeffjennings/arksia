@@ -139,49 +139,54 @@ def model_setup(parsed_args):
     else:
         model["base"]["SMG_sub"] = ""
 
-    model["clean"]["npix"] = disk_pars["clean"]["npix"]
-    model["clean"]["pixel_scale"] = disk_pars["clean"]["pixel_scale"]
-    model["clean"]["image_robust"] = disk_pars["clean"]["image_robust"] 
-    model["clean"]["image_rms"] = disk_pars["clean"]["image_rms"]
-    robusts, rmss = model["clean"]["image_robust"], model["clean"]["image_rms"]
-    model["clean"]["image_rms"] = rmss[robusts.index(model["clean"]["robust"])]
+    if model["base"]["extract_clean_profile"] is True:
+        model["clean"]["npix"] = disk_pars["clean"]["npix"]
+        model["clean"]["pixel_scale"] = disk_pars["clean"]["pixel_scale"]
+        model["clean"]["image_robust"] = disk_pars["clean"]["image_robust"] 
+        model["clean"]["image_rms"] = disk_pars["clean"]["image_rms"]
+        robusts, rmss = model["clean"]["image_robust"], model["clean"]["image_rms"]
+        model["clean"]["image_rms"] = rmss[robusts.index(model["clean"]["robust"])]
 
-    model["clean"]["bestfit"] = {}
-    model["clean"]["bestfit"]["robust"] = disk_pars["clean"]["bestfit"]["robust"]
+    if model["base"]["compare_models_fig"] is True:
+        model["clean"]["bestfit"] = {}
+        model["clean"]["bestfit"]["robust"] = disk_pars["clean"]["bestfit"]["robust"]
 
-    model["rave"]["pixel_scale"] = disk_pars["rave"]["pixel_scale"]
+    if model["base"]["process_rave_fit"] is True:
+        model["rave"]["pixel_scale"] = disk_pars["rave"]["pixel_scale"]
     
-    model["frank"]["bestfit"] = {}
-    model["frank"]["bestfit"]["alpha"] = disk_pars["frank"]["bestfit"]["alpha"]
-    model["frank"]["bestfit"]["wsmooth"] = disk_pars["frank"]["bestfit"]["wsmooth"]
-    model["frank"]["bestfit"]["method"] = disk_pars["frank"]["bestfit"]["method"]
+    if True in [model["base"]["compare_models_fig"], model["base"]["run_parametric"]]:
+        model["frank"]["bestfit"] = {}
+        model["frank"]["bestfit"]["alpha"] = disk_pars["frank"]["bestfit"]["alpha"]
+        model["frank"]["bestfit"]["wsmooth"] = disk_pars["frank"]["bestfit"]["wsmooth"]
+        model["frank"]["bestfit"]["method"] = disk_pars["frank"]["bestfit"]["method"]
 
-    # stellar flux to remove from visibilities as point-source
-    if model["frank"]["set_fstar"] == "custom":
-        model["frank"]["fstar"] = disk_pars["frank"]["custom_fstar"] / 1e6
-    elif model["frank"]["set_fstar"] == "SED":
-        model["frank"]["fstar"] = phys_pars["Fstar_SED"] / 1e6
-    elif model["frank"]["set_fstar"] == "MCMC":
-        try:
-            model["frank"]["fstar"] = phys_pars["Fstar_MCMC"] / 1e3
-        except TypeError:
-            print(f"  Model setup: {parsed_args.physical_parameter_filename} has no stellar flux for {model['base']['disk']} --> setting fstar to 0")            
-            model["frank"]["fstar"] = 0.0
-    else:
-        raise ValueError(f"Parameter ['frank']['set_fstar'] {model['frank']['set_fstar']} must be one of ['MCMC', 'SED', 'custom']") 
+    if model["base"]["run_frank"] is True:
+        # stellar flux to remove from visibilities as point-source
+        if model["frank"]["set_fstar"] == "custom":
+            model["frank"]["fstar"] = disk_pars["frank"]["custom_fstar"] / 1e6
+        elif model["frank"]["set_fstar"] == "SED":
+            model["frank"]["fstar"] = phys_pars["Fstar_SED"] / 1e6
+        elif model["frank"]["set_fstar"] == "MCMC":
+            try:
+                model["frank"]["fstar"] = phys_pars["Fstar_MCMC"] / 1e3
+            except TypeError:
+                print(f"  Model setup: {parsed_args.physical_parameter_filename} has no stellar flux for {model['base']['disk']} --> setting fstar to 0")            
+                model["frank"]["fstar"] = 0.0
+        else:
+            raise ValueError(f"Parameter ['frank']['set_fstar'] {model['frank']['set_fstar']} must be one of ['MCMC', 'SED', 'custom']") 
 
-    # enforce a Normal fit if finding scale height (LogNormal fit not compatible with vertical inference)
-    if model["base"]["run_frank"] is True and model["frank"]["scale_heights"] is not None:
-        print("  Model setup: 'scale_heights' is not None in your parameter file -- enforcing frank 'method=Normal' and 'max_iter=2000'")
-        model["frank"]["method"] = "Normal"
-        model["frank"]["max_iter"] = 2000
+        # enforce a Normal fit if finding scale height (LogNormal fit not compatible with vertical inference)
+        if model["frank"]["scale_heights"] is not None:
+            print("  Model setup: 'scale_heights' is not None in your parameter file -- enforcing frank 'method=Normal' and 'max_iter=2000'")
+            model["frank"]["method"] = "Normal"
+            model["frank"]["max_iter"] = 2000
 
-    # implemented functional forms 
-    valid_funcs = [x for x in dir(arksia.parametric_forms) if not x.startswith('__')]
-    if model["base"]["run_parametric"] is True:
-        for pp in model["parametric"]["form"]:
-            if pp not in valid_funcs:
-                raise ValueError(f"{pp} is not one of {valid_funcs}")
+        if model["base"]["run_parametric"] is True:
+            # implemented functional forms 
+            valid_funcs = [x for x in dir(arksia.parametric_forms) if not x.startswith('__')]
+            for pp in model["parametric"]["form"]:
+                if pp not in valid_funcs:
+                    raise ValueError(f"{pp} is not one of {valid_funcs}")
 
     return model
 
