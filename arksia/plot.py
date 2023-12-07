@@ -290,14 +290,14 @@ def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, xy_boun
     xf, yf, frank_image = make_image(sol, npix, project=True)
     frank_image = frank_image.T
     frank_image = jy_convert(frank_image, 'sterad_arcsec2')
-    frank_extent = [xf[-1] / 2, xf[0] / 2, yf[-1] / 2, yf[0] / 2]
-    frank_pixel_scale = np.diff(xf).mean() / 2
+    frank_extent = [xf[-1], xf[0], yf[-1], yf[0]]
+    frank_pixel_scale = np.diff(xf).mean()
 
     frank_resid_vis = load_bestfit_frank_uvtable(model, resid_table=True)
     # generate frank residual image
     frank_resid_im = dirty_image(frank_resid_vis, robust=resid_im_robust, npix=npix, pixel_scale=frank_pixel_scale)
     frank_resid_Imax = abs(frank_resid_im).max()
-    frank_resid_extent = [xf[-1] / 2, xf[0] / 2, yf[0] / 2, yf[-1] / 2]
+    frank_resid_extent = [xf[-1], xf[0], yf[0], yf[-1]]
 
     # make figure
     fig = plt.figure(figsize=(10,6))
