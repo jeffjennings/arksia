@@ -401,8 +401,8 @@ def frank_image_diag_figure(model, sol, frank_resid_vis, resid_im_robust=2.0,
     xf, yf, frank_image = make_image(sol, npix, project=True)
     frank_image = frank_image.T
     frank_image = jy_convert(frank_image, 'sterad_arcsec2')
-    frank_extent = [xf[-1] / 2, xf[0] / 2, yf[-1] / 2, yf[0] / 2]
-    frank_pixel_scale = np.diff(xf).mean() / 2
+    frank_extent = [xf[-1], xf[0], yf[-1], yf[0]]
+    frank_pixel_scale = np.diff(xf).mean()
 
     # make frank residual image
     frank_resid_im = dirty_image(frank_resid_vis, robust=resid_im_robust, npix=npix, pixel_scale=frank_pixel_scale)
