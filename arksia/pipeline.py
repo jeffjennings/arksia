@@ -87,8 +87,9 @@ def model_setup(parsed_args):
 
     print(f"  Model setup: expecting all input files in {model['base']['input_dir']}")
 
-    model["base"]["save_dir"] = os.path.join(model["base"]["output_dir"], model["base"]["disk"])
-    print(f"  Model setup: setting save path as {model['base']['save_dir']}")
+    if model["base"]["output_dir"] is None:
+        model["base"]["save_dir"] = os.path.join(model["base"]["input_dir"], model["base"]["disk"])
+        print(f"  Model setup: 'output_dir' is None in your parameter file -- setting save path to 'input_dir'")
 
     model["base"]["clean_dir"] = os.path.join(model["base"]["save_dir"], "clean")
     model["base"]["rave_dir"] = os.path.join(model["base"]["save_dir"], "rave")
