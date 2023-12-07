@@ -367,7 +367,7 @@ def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, xy_boun
 
 
 def frank_image_diag_figure(model, sol, frank_resid_vis, resid_im_robust=2.0, 
-                            npix=1800, save_prefix=None
+                            npix=1800, xy_bounds=[-7,7], save_prefix=None
                             ):
     """
     Generate a figure showing frank brightness profile reprojected and swept 
@@ -387,6 +387,8 @@ def frank_image_diag_figure(model, sol, frank_resid_vis, resid_im_robust=2.0,
         Robust weighting parameter used for imaging frank residual visibilities.
     npix : int, default=2400
         Number of pixels along one axis used to make frank images
+    xy_bounds : list of float, default=[-7,7]
+        Plot axis bounds for (assumed square) images
     save_prefix : string, default = None
         Prefix for saved figure name. If None, the figure won't be saved
 
@@ -423,8 +425,8 @@ def frank_image_diag_figure(model, sol, frank_resid_vis, resid_im_robust=2.0,
                ) 
 
     for ax in axes:
-        ax.set_xlim(7,-7)
-        ax.set_ylim(-7,7)
+        ax.set_xlim(xy_bounds[1], xy_bounds[0])
+        ax.set_ylim(xy_bounds[0], xy_bounds[1])
 
     fig.suptitle("{} -- robust {} for imaged residuals. Pixel scale {:.1f} mas".format(model["base"]["disk"],
                                                                                    resid_im_robust,
