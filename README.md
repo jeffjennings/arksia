@@ -36,7 +36,7 @@ Staging input files for the pipeline
 
 Running the pipeline for a single source
 ----------------------------------------
-The main pipeline file is `pipeline.py`. By default the pipeline runs using the parameter files `./pars_gen.json` and `./pars_source.json`, and the CSV table `./summary_disc_parameters.csv`. For a description of the parameters, see `description_pars_gen.json` and `description_pars_source.json`, or from a terminal run `python -c 'import arksia.pipeline; arksia.pipeline.helper()'`.
+The main pipeline file is `pipeline.py`. By default the pipeline runs using the parameter files `./pars_gen.json` and `./pars_source.json`, and the table `./summary_disc_parameters.csv`. For a description of the parameters, see `description_pars_gen.json` and `description_pars_source.json`, or from a terminal run `python -c 'import arksia.pipeline; arksia.pipeline.helper()'`.
 
 The pipeline can be run from the terminal for fits/analysis of a single source with `python -m arksia.pipeline -d '<disk name>'`, where the disk name, e.g. `'HD76582'`, must match a source name in the source-specific .json parameter file (by default `./pars_source.json`).
 
@@ -58,4 +58,4 @@ The pipeline can be looped over multiple sources using `bulk_pipeline_run.py` vi
 
 Obtaining key results for multiple/all sources
 ----------------------------------------------
-Survey-wide results are a `.txt` file per source with all radial brightness profiles (clean, rave, frank) sampled at the same radii, and figures with a panel for each source showing the clean, rave, frank brightness profiles (one figure without uncertainties, one with). These are generated with `bulk_pipeline_results.py` via `python bulk_pipeline_results.py` (you may want to adjust the referenced `.json` parameter files there).
+Survey-wide summary results are a `.txt` file per source with all radial brightness profiles (clean, rave, frank) sampled at the same radii, and figures with a panel for each source showing the clean, rave, frank brightness profiles (one figure without uncertainties, one with). These are generated with `bulk_pipeline_results.py` via `python bulk_pipeline_results.py` (you may want to adjust the referenced `.json` parameter files there).
