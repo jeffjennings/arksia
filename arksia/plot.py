@@ -216,7 +216,7 @@ def profile_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000):
     return fig
 
 
-def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1200):
+def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, xy_bounds=[-7,7]):
     """
     Generate a figure comparing clean, rave, frank 2d image
 
@@ -228,8 +228,10 @@ def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1200):
         Dictionary containing pipeline parameters
     resid_im_robust : float, default=2.0
         Robust weighting parameter used for imaging frank residual visibilities.
-    npix : int, default=1200
+    npix : int
         Number of pixels along one axis used to make frank images
+    xy_bounds : list of float, default=[-7,7]
+        Plot axis bounds for (assumed square) images        
 
     Returns
     -------
@@ -353,8 +355,8 @@ def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1200):
     ax9.set_title('Pixel scale {:.1f} mas'.format(frank_pixel_scale * 1e3))
 
     for ax in [ax4, ax5, ax6, ax7, ax8, ax9]:
-        ax.set_xlim(7,-7)
-        ax.set_ylim(-7,7)
+        ax.set_xlim(xy_bounds[1], xy_bounds[0])
+        ax.set_ylim(xy_bounds[0], xy_bounds[1])
 
     ff = '{}/image_compare_robust{}.png'.format(
         model["base"]["save_dir"], model["clean"]["robust"])
