@@ -54,8 +54,8 @@ The pipeline can be run from the terminal for fits/analysis of a single source w
 
 Running the pipeline for multiple/all sources
 ---------------------------------------------
-The pipeline can be looped over multiple sources using `bulk_pipeline_run.py` via `python bulk_pipeline_run.py` (you may want to adjust the referenced `.json` parameter files there). 
+The pipeline can be looped over multiple sources via `python bulk_pipeline_run.py` (you may want to adjust the referenced `.json` parameter files in `bulk_pipeline_run.py`). 
 
 Obtaining key results for multiple/all sources
 ----------------------------------------------
-Survey-wide summary results are a `.txt` file per source with all radial brightness profiles (clean, rave, frank) sampled at the same radii, and figures with a panel for each source showing the clean, rave, frank brightness profiles (one figure without uncertainties, one with). These are generated with `bulk_pipeline_results.py` via `python bulk_pipeline_results.py` (you may want to adjust the referenced `.json` parameter files there).
+Survey-wide summary results are a `.txt` file per source with all radial brightness profiles (clean, rave, frank) sampled at the same radii, and figures with a panel for each source showing the clean, rave, frank brightness profiles (one figure without uncertainties, one with). These are generated via `python bulk_pipeline_results.py` (you may want to adjust the referenced `.json` parameter files in `bulk_pipeline_results.py`).
