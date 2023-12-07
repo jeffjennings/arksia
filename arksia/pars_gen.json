@@ -48,6 +48,8 @@
   },
 
   "plot" : {
-    "bin_widths"            : [5e3, 20e3]
+    "bin_widths"            : [5e3, 20e3],
+    "image_xy_bounds"       : [-5, 5],
+    "frank_resid_im_robust" : 2.0    
   }
 }  
