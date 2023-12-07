@@ -358,8 +358,8 @@ def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, xy_boun
         ax.set_xlim(xy_bounds[1], xy_bounds[0])
         ax.set_ylim(xy_bounds[0], xy_bounds[1])
 
-    ff = '{}/image_compare_robust{}.png'.format(
-        model["base"]["save_dir"], model["clean"]["robust"])
+    ff = '{}/image_compare_cleanRobust{}_frankResidRobust{}.png'.format(
+        model["base"]["save_dir"], model["clean"]["robust"], resid_im_robust)
     print('    saving figure to {}'.format(ff))
     plt.savefig(ff, dpi=300)
     
