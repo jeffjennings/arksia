@@ -8,7 +8,7 @@
     "compare_models_fig"    : false,
     "frank_multifit_fig"    : false,
     "input_dir"             : ".",
-    "output_dir"            : "."
+    "output_dir"            : null
   },
 
   "clean" : {
