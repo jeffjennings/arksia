@@ -16,9 +16,8 @@ The pipeline is run from the terminal using input parameter files. It has the fo
 - produces plots to compare frank fits with different hyperparameter values
 - produces plots to compare nonparametric and parametric brightness profiles
 - produces plots to assess frank vertical inference over grids of _h_, _alpha_, _wsmooth_
-- adds utilites to prepare visibility files for the above and to save/load/interface with all of the above
-- the pipeline runs from general and source-specific parameter files to do any combination of the above
-- the pipeline can be run in bulk (across multiple sources) to perform analysis and summarize results
+
+The pipeline has utilites to prepare visibility files and save/load/interface with the above. It runs from general and source-specific parameter files. It can be run in bulk (across multiple sources).
 
 Staging input files for the pipeline
 ------------------------------------
@@ -31,7 +30,7 @@ Staging input files for the pipeline
     * if using the pipeline to extract a radial profile from a clean image and/or to compare clean results to frank and rave:
         - primary beam-corrected CLEAN image ('<>.pbcor.fits'), primary beam image ('<>.pb.fits'), CLEAN model image ('<>.model.fits') for each robust value 
     * if using the pipeline to run frank fits:
-        - visibility datasets ('<>.corrected.txt')
+        - visibility datasets from the ARKS survey ('<>corrected.txt')
     * if using the pipeline to compare rave results to clean and frank:
         - rave fit array files ('<>.npy') for each robust value
 
