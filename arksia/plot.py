@@ -36,7 +36,7 @@ def plot_image(image, extent, ax, norm=None, cmap='inferno', title=None,
     ax.set_title(title)  
 
 
-def profile_comparison_figure(fits, model, resid_im_robust=2.0, npix=1200):
+def profile_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000):
     """
     Generate a figure comparing clean, rave, frank radial brightness and visibility profiles.
 
@@ -48,7 +48,7 @@ def profile_comparison_figure(fits, model, resid_im_robust=2.0, npix=1200):
         Dictionary containing pipeline parameters
     resid_im_robust : float, default=2.0
         Robust weighting parameter used for imaging frank residual visibilities.
-    npix : int, default=1200
+    npix : int
         Number of pixels along one axis used to make frank images
         
     Returns
@@ -208,8 +208,8 @@ def profile_comparison_figure(fits, model, resid_im_robust=2.0, npix=1200):
     for ax in [ax0, ax1, ax2, ax3]:
         ax.axhline(0, c='c', ls='--', zorder=10)
 
-    ff = '{}/profile_compare_robust{}.png'.format(
-        model["base"]["save_dir"], model["clean"]["robust"])
+    ff = '{}/profile_compare_cleanRobust{}_frankResidRobust{}.png'.format(
+        model["base"]["save_dir"], model["clean"]["robust"], resid_im_robust)
     print('    saving figure to {}'.format(ff))
     plt.savefig(ff, dpi=300)
     
