@@ -340,7 +340,7 @@ def run_frank(model):
 
     uv_data = input_output.get_vis(model)
 
-    print('    shifting visibilities down by fstar {} uJy according to {}'.format(model["frank"]["fstar"] * 1e6, model["frank"]["set_fstar"]))
+    print('    shifting visibilities down by {} fstar {} uJy '.format(model["frank"]["set_fstar"], model["frank"]["fstar"] * 1e6))
     uv_data[2] = uv_data[2] - model["frank"]["fstar"]
     
     frank_geom = FixedGeometry(**model["base"]["geom"]) 
@@ -422,7 +422,11 @@ def run_frank(model):
 
             # reprojected frank residual visibilities
             frank_resid_vis = [uv_data[0], uv_data[1], uv_data[2] - sol.predict(uv_data[0], uv_data[1]), uv_data[3]]
-            plot.frank_image_diag_figure(model, sol, frank_resid_vis, save_prefix=save_prefix)
+            plot.frank_image_diag_figure(model, sol, frank_resid_vis, 
+                                         xy_bounds=model["plot"]["image_xy_bounds"], 
+                                         resid_im_robust=model["plot"]["frank_resid_im_robust"],
+                                         save_prefix=save_prefix
+                                         )
 
         return sol
 
@@ -562,8 +566,13 @@ def main(*args):
 
     if model["base"]["compare_models_fig"] is True:
         fits = input_output.load_bestfit_profiles(model)   
-        fig1 = plot.profile_comparison_figure(fits, model)
-        fig2 = plot.image_comparison_figure(fits, model)
+        fig1 = plot.profile_comparison_figure(fits, model,
+                                              resid_im_robust=model["plot"]["frank_resid_im_robust"]
+                                              )
+        fig2 = plot.image_comparison_figure(fits, model, 
+                                            xy_bounds=model["plot"]["xy_bounds"],
+                                            resid_im_robust=model["plot"]["frank_resid_im_robust"]
+                                            )
 
     if model["base"]["aspect_ratio_fig"] is True:
         fig3 = plot.aspect_ratio_figure(model)
