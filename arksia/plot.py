@@ -434,7 +434,7 @@ def frank_image_diag_figure(model, sol, frank_resid_vis, resid_im_robust=2.0,
                                                                                    )
     
     if save_prefix:
-        plt.savefig(save_prefix + '_frank_images.png', dpi=300,
+        plt.savefig(save_prefix + f"_frank_images_residRobust{resid_im_robust}.png", dpi=300,
                     bbox_inches='tight')
         plt.close()
 
