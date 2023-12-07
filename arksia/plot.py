@@ -478,8 +478,6 @@ def frank_multifit_figure(model, sols, plot_var, single_panel=False, save_prefix
     title = model["base"]["disk"]
 
     if plot_var == "V":
-        grid = np.logspace(np.log10(1e3), np.log10(1e6), 10**3)
-        
         [u, v, vis, weights] = get_vis(model)
 
         # deproject observed vis
@@ -487,8 +485,10 @@ def frank_multifit_figure(model, sols, plot_var, single_panel=False, save_prefix
         bls = np.sqrt(up**2 + vp**2)
 
         # bin observed vis
-        bin_width = model["plot"]["bin_widths"][0] # forcing single bin width
+        bin_width = model["plot"]["bin_widths"][-1] # forcing single bin width
         bin_vis = UVDataBinner(bls, Vp, weights, bin_width)
+
+        grid = np.logspace(np.log10(min(bin_vis.uv)), np.log10(max(bin_vis.uv)), 10**3)
 
         title += f"\nData shown in {bin_width/1e3} k$\\lambda$ bins"
 
