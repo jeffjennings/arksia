@@ -301,7 +301,7 @@ def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, xy_boun
 
     # make figure
     fig = plt.figure(figsize=(10,6))
-    fig.suptitle("{} -- robust = {} for clean, rave; {} for frank imaged residuals.\nclean image colormap forced to minimum of 0.".format(
+    fig.suptitle("{} -- robust = {} for clean, rave; {} for frank imaged residuals".format(
         model["base"]["disk"],
         model["clean"]["bestfit"]["robust"],
         resid_im_robust)
@@ -316,7 +316,7 @@ def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, xy_boun
     ax9 = fig.add_subplot(gs[1, 1])
 
     # plot clean image
-    norm = Normalize(vmin=0, vmax=np.nanmax(clean_image) * 1e3)
+    norm = Normalize(vmin=np.nanmin(clean_image) * 1e3, vmax=np.nanmax(clean_image) * 1e3)
     plot_image(clean_image * 1e3, clean_extent, ax4, norm=norm,
                cbar_label='$I_{clean}$ [mJy arcsec$^{-2}$]'
                )
