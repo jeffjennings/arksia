@@ -505,13 +505,16 @@ def frank_multifit_figure(model, sols, plot_var, single_panel=False, save_prefix
         else:
             if (single_panel is True and ii == 0) or single_panel is False:
                 # plot binned observed Re(V)
-                axes[ii].plot(bin_vis.uv / 1e6, bin_vis.V.real * 1e3, 'k.', ls='None')
+                axes[ii].plot(bin_vis.uv / 1e6, bin_vis.V.real * 1e3, 'k.', ls='None', zorder=-50)
 
             # get frank vis fit
             Vf = ss.predict_deprojected(grid)
             axes[ii].plot(grid / 1e6, Vf * 1e3, label=lab, **plot_kwargs)
 
         axes[ii].legend(loc='upper right', fontsize=6)
+
+        if plot_var == "V":
+            axes[ii].set_ylim(-1.1 * max(Vf * 1e3), 1.1 * max(Vf * 1e3))
 
         xs.append(axes[ii].get_xlim())
         ys.append(axes[ii].get_ylim())
