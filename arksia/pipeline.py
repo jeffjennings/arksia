@@ -21,6 +21,25 @@ from frank.utilities import get_fit_stat_uncer
 import arksia 
 from arksia import input_output, extract_radial_profile, plot, parametric_fitter
 
+arksia_path = os.path.dirname(arksia.__file__)
+
+def get_default_parameter_file():
+    """Get the path to the default parameter file"""
+    return os.path.join(arksia_path, 'default_parameters.json')
+
+def load_default_parameters():
+    """Load the default parameters"""
+    return json.load(open(get_default_parameter_file(), 'r'))
+
+def get_parameter_descriptions():
+    """Get the description for parameters"""
+    with open(os.path.join(arksia_path, 'description_pars_gen.json')) as f:
+        params_gen = json.load(f)
+
+    with open(os.path.join(arksia_path, 'description_pars_source.json')) as f:
+        params_source = json.load(f)
+    return [params_gen, params_source]
+
 def parse_parameters(*args):
     """
     Read in a .json parameter files to run the pipeline
