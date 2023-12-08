@@ -17,7 +17,7 @@ The pipeline is run from the terminal using input parameter files. It has the fo
 - produces plots to compare nonparametric and parametric brightness profiles
 - produces plots to assess frank vertical inference over grids of _h_, _alpha_, _wsmooth_
 
-The pipeline has utilites to prepare visibility files and save/load/interface with the above. It runs from general and source-specific parameter files. It can be run in bulk (across multiple sources).
+The pipeline runs from general and source-specific parameter files. It can be run in bulk (across multiple sources).
 
 Staging input files for the pipeline
 ------------------------------------
@@ -41,9 +41,7 @@ The main pipeline file is `pipeline.py`. By default the pipeline runs using the 
 The pipeline can be run from the terminal for fits/analysis of a single source with `python -m arksia.pipeline -d '<disk name>'`, where the disk name, e.g. `'HD76582'`, must match a source name in the source-specific .json parameter file (by default `./pars_source.json`).
 
 ### Setting up frank fits ###
-- To run frank, you will likely want to adjust the `alpha`, `wsmooth` and `scale_heights` parameters in `pars_gen.json`. 
-
-- When performing frank fits to find a radial profile, set `method` to `"LogNormal"` to perform fits in logarithmic brightness space. This is enforced in some parts of the pipeline because the logarithmic fits are in general a better choice. The exception is that when running a frank 1+1D fit to find _h_, `method` must be `"Normal"` (it will be enforced).
+- When performing a new `frank` fit, it's recommended to set `method` to `"LogNormal"` to perform fits in logarithmic brightness space. This is enforced in some parts of the pipeline because the logarithmic fits are in general a better choice. The exception is that when running a frank 1+1D fit to find _h_, `method` must be `"Normal"` (it will be enforced).
 
 ### Setting up parametric fits ###
 - To install the needed dependencies for parametric fits, `pip install arksia[analysis]`
