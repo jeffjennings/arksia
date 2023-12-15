@@ -204,7 +204,7 @@ def model_setup(parsed_args):
             try:
                 model["frank"]["fstar"] = phys_pars["Fstar_MCMC"] / 1e3
             except TypeError:
-                print(f"  Model setup: {parsed_args.physical_parameter_filename} has no stellar flux for {model['base']['disk']} --> falling back to SED estimate of stellar flux")
+                print(f"  Model setup: {parsed_args.physical_parameter_filename} has no stellar flux for {model['base']['disk']} --> using SED estimate of stellar flux")
                 model["frank"]["fstar"] = phys_pars["Fstar_SED"] / 1e6
         else:
             raise ValueError(f"Parameter ['frank']['set_fstar'] {model['frank']['set_fstar']} must be one of ['MCMC', 'SED', 'custom']") 
