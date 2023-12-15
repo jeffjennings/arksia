@@ -425,9 +425,9 @@ def run_frank(model):
         setattr(sol, 'logevidence', logev)
 
         # save fit outputs
-        save_prefix = "{}/{}_alpha{}_w{}_h{:.3f}_fstar{:.0f}uJy_method{}".format(
+        save_prefix = "{}/{}_alpha{}_w{}_rout{}_h{:.3f}_fstar{:.0f}uJy_method{}".format(
                     model["base"]["frank_dir"], model["base"]["disk"], 
-                    alpha, wsmooth, h,
+                    alpha, wsmooth, sol.Rmax, h,
                     model["frank"]["fstar"] * 1e6,
                     model["frank"]["method"]
                     )
