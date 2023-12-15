@@ -384,9 +384,27 @@ def run_frank(model):
         hs = [0]
     else:
         hs = np.logspace(*model["frank"]["scale_heights"])
-        print("    aspect ratios to be sampled: {}".format(hs))      
+        print("    aspect ratios to be sampled: {}".format(hs))          
+    
+    # pre-process visibilities for multiple frank fits.
+    # Re-using the processed visibilities is only valid with certain parameter
+    # changes. For example N, Rmax, geometry, nu, assume_optically_thick, and
+    # scale_height cannot be changed. This will be checked before fits are 
+    # conducted.        
+    FF = FrankDebrisFitter(Rmax=model["frank"]["rout"], 
+                            N=model["frank"]["N"], 
+                            geometry=frank_geom,
+                            scale_height=None, # TODO
+                            alpha=0,
+                            weights_smooth=0,
+                            method=model["frank"]["method"],
+                            I_scale=model["frank"]["I_scale"],
+                            max_iter=model["frank"]["max_iter"],
+                            convergence_failure='warn'
+                            )
+    ppV = FF.preprocess_visibilities(*uv_data)
 
-    # perform frank fit(s)
+    # # perform frank fit(s)
     def frank_fitter(priors):
         alpha, wsmooth, h = priors 
         print('        performing fit for alpha {} wsmooth {} h {}'.format(alpha, wsmooth, h))
@@ -401,7 +419,8 @@ def run_frank(model):
         FF = FrankDebrisFitter(Rmax=model["frank"]["rout"], 
                                 N=model["frank"]["N"], 
                                 geometry=frank_geom,
-                                scale_height=scale_height, 
+                                scale_height=None, # TODO: just for pre-processed visibilities
+                                # scale_height=scale_height, # TODO
                                 alpha=alpha,
                                 weights_smooth=wsmooth,
                                 method=model["frank"]["method"],
@@ -409,8 +428,8 @@ def run_frank(model):
                                 max_iter=model["frank"]["max_iter"],
                                 convergence_failure='warn'
                                 )
-        
-        sol = FF.fit(*uv_data)
+
+        sol = FF.fit_preprocessed(ppV)
 
         # add non-negative brightness profile to sol
         if model["frank"]["method"] == "Normal":
@@ -472,19 +491,34 @@ def run_frank(model):
     
     else: 
         # use as many threads as there are fits, up to a maximum of 'model["frank"]["nthreads"]'
-        nthreads = min(nfits, model["frank"]["nthreads"])
-        pool = multiprocess.Pool(processes=nthreads)
-        print('    {} fits will be performed. Using {} threads (1 thread per fit; {} threads available on CPU).'.format(nfits, 
-                                                                                             nthreads, 
-                                                                                             multiprocess.cpu_count())
-                                                                                             )
+        # nthreads = min(nfits, model["frank"]["nthreads"])
+        # pool = multiprocess.Pool(processes=nthreads)
+        # print('    {} fits will be performed. Using {} threads (1 thread per fit; {} threads available on CPU).'.format(nfits, 
+        #                                                                                      nthreads, 
+        #                                                                                      multiprocess.cpu_count())
+        #                                                                                      )
 
-        # grids of prior values
+        # # grids of prior values
         g0, g1, g2 = np.meshgrid(model["frank"]["alpha"], model["frank"]["wsmooth"], hs)
         g0, g1, g2 = g0.flatten(), g1.flatten(), g2.flatten()
         priors = np.array([g0, g1, g2]).T
-        # run fits over grids
-        sols = pool.map(frank_fitter, priors)
+
+        # # run fits over grids
+        # sols = pool.map(frank_fitter, priors)
+
+        sols = []
+        for ii in priors[0]:
+            for jj in priors[1]:
+                sol = frank_fitter([ii, jj, hs[0]])
+
+                if hs[0] == 0:
+                    logev = None
+                else:
+                    logev = FF.log_evidence_laplace()
+                # add evidence to sol
+                setattr(sol, 'logevidence', logev)
+
+                sols.append(sol)
 
         logevs = []
         for ss in sols:
