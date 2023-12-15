@@ -213,11 +213,12 @@ def load_bestfit_frank_uvtable(model, resid_table=False):
         suffix = 'fit'
 
     # enforce the best-fit has 0 scale height
-    path = "{}/{}_alpha{}_w{}_h0.000_fstar{:.0f}uJy_method{}_frank_uv_{}.npz".format(
+    path = "{}/{}_alpha{}_w{}_rout{}_h0.000_fstar{:.0f}uJy_method{}_frank_uv_{}.npz".format(
                         model["base"]["frank_dir"], 
                         model["base"]["disk"], 
                         model["frank"]["bestfit"]["alpha"],
-                        model["frank"]["bestfit"]["wsmooth"], 
+                        model["frank"]["bestfit"]["wsmooth"],
+                        model["frank"]["bestfit"]["rout"], 
                         model["frank"]["fstar"] * 1e6,
                         model["frank"]["bestfit"]["method"],
                         suffix
@@ -261,11 +262,12 @@ def load_bestfit_profiles(model):
     rr, Ir, Ier_lo, Ier_hi = np.genfromtxt(rave_bestfit).T
 
     # enforce the best-fit has 0 scale height
-    frank_bestfit = "{}/{}_alpha{}_w{}_h0.000_fstar{:.0f}uJy_method{}_frank_sol.obj".format(
+    frank_bestfit = "{}/{}_alpha{}_w{}_rout{}_h0.000_fstar{:.0f}uJy_method{}_frank_sol.obj".format(
                         model["base"]["frank_dir"], 
                         model["base"]["disk"], 
                         model["frank"]["bestfit"]["alpha"],
                         model["frank"]["bestfit"]["wsmooth"],
+                        model["frank"]["bestfit"]["rout"],
                         model["frank"]["fstar"] * 1e6,
                         model["frank"]["bestfit"]["method"],
     )

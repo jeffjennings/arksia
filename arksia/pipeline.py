@@ -124,11 +124,10 @@ def model_setup(parsed_args):
 
     if model["base"]["output_dir"] is None:
         model["base"]["save_dir"] = model["base"]["input_dir"]
-        print(f"  Model setup: 'output_dir' is None in your parameter file -- setting save path to 'input_dir'")
+        print(f"  Model setup: 'output_dir' is None in your parameter file -- setting save path as {model['base']['save_dir']}")
     else:
-        model["base"]["save_dir"] = os.path.join(model["base"]["output_dir"])
-        print(f"  Model setup: setting save path as {model['base']['save_dir']}")
-    print(f"    Results will be saved in save_path/<frank, clean, rave, parametric>")
+        model["base"]["save_dir"] = model["base"]["output_dir"]
+    print(f"    Results will be saved in {model['base']['save_dir']}/<frank, clean, rave, parametric>")
 
     model["base"]["clean_dir"] = os.path.join(model["base"]["save_dir"], "clean")
     model["base"]["rave_dir"] = os.path.join(model["base"]["save_dir"], "rave")
@@ -205,8 +204,8 @@ def model_setup(parsed_args):
             try:
                 model["frank"]["fstar"] = phys_pars["Fstar_MCMC"] / 1e3
             except TypeError:
-                print(f"  Model setup: {parsed_args.physical_parameter_filename} has no stellar flux for {model['base']['disk']} --> setting fstar to 0")            
-                model["frank"]["fstar"] = 0.0
+                print(f"  Model setup: {parsed_args.physical_parameter_filename} has no stellar flux for {model['base']['disk']} --> falling back to SED estimate of stellar flux")
+                model["frank"]["fstar"] = phys_pars["Fstar_SED"] / 1e6
         else:
             raise ValueError(f"Parameter ['frank']['set_fstar'] {model['frank']['set_fstar']} must be one of ['MCMC', 'SED', 'custom']") 
 
@@ -425,9 +424,9 @@ def run_frank(model):
         setattr(sol, 'logevidence', logev)
 
         # save fit outputs
-        save_prefix = "{}/{}_alpha{}_w{}_h{:.3f}_fstar{:.0f}uJy_method{}".format(
+        save_prefix = "{}/{}_alpha{}_w{}_rout{}_h{:.3f}_fstar{:.0f}uJy_method{}".format(
                     model["base"]["frank_dir"], model["base"]["disk"], 
-                    alpha, wsmooth, h,
+                    alpha, wsmooth, sol.Rmax, h,
                     model["frank"]["fstar"] * 1e6,
                     model["frank"]["method"]
                     )
