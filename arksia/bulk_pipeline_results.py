@@ -104,14 +104,13 @@ def main(source_par_f='./pars_source.json', gen_par_f='./pars_gen.json',
                 
                 ax[ii].axhline(y=0, ls='--', c='k')
 
-                ax[ii].text(0.6, 0.9, jj, transform=ax[ii].transAxes)
+                fstar_ujy = model["frank"]["fstar"] * 1e6
+                ax[ii].text(0.6, 0.9, f"{jj}\n$Fstar {fstar_ujy:.0f} uJy", transform=ax[ii].transAxes)
 
                 if ii == len(disk_names) - 1:
                     ax[ii].legend(loc='center right')
                     ax[ii].set_xlabel('r [au]')
                     ax[ii].set_ylabel(r'I [$10^5$ Jy sterad$^{-1}$]')
-
-                ax[ii].set_title('$f_*=${:.0f} $\mu$Jy'.format(model["frank"]["fstar"] * 1e6))
 
     if profiles_fig:
         print('  Survey summary: making survey summary figure')
