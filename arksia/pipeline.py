@@ -506,19 +506,18 @@ def run_frank(model):
         # # run fits over grids
         # sols = pool.map(frank_fitter, priors)
 
-        sols = []
-        for ii in priors[0]:
-            for jj in priors[1]:
-                sol = frank_fitter([ii, jj, hs[0]])
+        sols = []       
+        for prior in priors:            
+            sol = frank_fitter(prior)
 
-                if hs[0] == 0:
-                    logev = None
-                else:
-                    logev = FF.log_evidence_laplace()
-                # add evidence to sol
-                setattr(sol, 'logevidence', logev)
+            if hs[0] == 0:
+                logev = None
+            else:
+                logev = FF.log_evidence_laplace()
+            # add evidence to sol
+            setattr(sol, 'logevidence', logev)
 
-                sols.append(sol)
+            sols.append(sol)
 
         logevs = []
         for ss in sols:
