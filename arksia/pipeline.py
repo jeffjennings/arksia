@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import multiprocess
 import pickle 
 
+import frank; frank.enable_logging()
 from frank.constants import deg_to_rad
 from frank.utilities import jy_convert
 from frank.debris_fitters import FrankDebrisFitter
@@ -485,7 +486,6 @@ def run_frank(model):
 
     nfits = len((model["frank"]["alpha"])) * len(model["frank"]["wsmooth"]) * len(hs)
     if nfits == 1:
-        # import frank; frank.enable_logging()
         sol = frank_fitter([model["frank"]["alpha"][0], model["frank"]["wsmooth"][0], hs[0]])
         return sol
     
