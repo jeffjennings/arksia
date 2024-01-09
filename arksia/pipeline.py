@@ -26,7 +26,7 @@ arksia_path = os.path.dirname(arksia.__file__)
 
 def get_default_parameter_file():
     """Get the path to the default parameter file"""
-    return os.path.join(arksia_path, 'default_parameters.json')
+    return os.path.join(arksia_path, 'pars_gen.json')
 
 def load_default_parameters():
     """Load the default parameters"""
