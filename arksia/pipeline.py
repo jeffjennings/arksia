@@ -482,13 +482,13 @@ def run_frank(model):
                                          save_prefix=save_prefix
                                          )
 
-        return sol
+        return sol, FF
 
     nfits = len((model["frank"]["alpha"])) * len(model["frank"]["wsmooth"]) * len(hs)
     print(f"    {nfits} frank fits will be performed")
 
     if nfits == 1:
-        sol = frank_fitter([model["frank"]["alpha"][0], model["frank"]["wsmooth"][0], hs[0]])
+        sol, _ = frank_fitter([model["frank"]["alpha"][0], model["frank"]["wsmooth"][0], hs[0]])
         return sol
     
     else: 
@@ -511,7 +511,7 @@ def run_frank(model):
 
         sols = []       
         for prior in priors:            
-            sol = frank_fitter(prior)
+            sol, FF = frank_fitter(prior)
 
             if hs[0] == 0:
                 logev = None
