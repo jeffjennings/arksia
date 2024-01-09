@@ -196,33 +196,18 @@ def model_setup(parsed_args):
         model["frank"]["bestfit"]["method"] = disk_pars["frank"]["bestfit"]["method"]
 
     if model["base"]["run_frank"] is True:
-        # stellar flux to remove from visibilities as point-source
-        if model["frank"]["set_fstar"] == "custom":
-            model["frank"]["fstar"] = disk_pars["frank"]["custom_fstar"] / 1e6
-        elif model["frank"]["set_fstar"] == "SED":
-            model["frank"]["fstar"] = phys_pars["Fstar_SED"] / 1e6
-        elif model["frank"]["set_fstar"] == "MCMC":
-            try:
-                model["frank"]["fstar"] = phys_pars["Fstar_MCMC"] / 1e3
-            except TypeError:
-                print(f"  Model setup: {parsed_args.physical_parameter_filename} has no stellar flux for {model['base']['disk']} --> using SED estimate of stellar flux")
-                model["frank"]["fstar"] = phys_pars["Fstar_SED"] / 1e6
-        else:
-            raise ValueError(f"Parameter ['frank']['set_fstar'] {model['frank']['set_fstar']} must be one of ['MCMC', 'SED', 'custom']") 
-
-        # enforce a Normal fit if finding scale height (LogNormal fit not compatible with vertical inference)
-        if model["frank"]["scale_heights"] is not None:
-            print("  Model setup: 'scale_heights' is not None in your parameter file -- enforcing frank 'method=Normal' and 'max_iter=2000'")
-            model["frank"]["method"] = "Normal"
-            model["frank"]["max_iter"] = 2000
-
-        if model["base"]["run_parametric"] is True:
-            # implemented functional forms 
-            valid_funcs = [x for x in dir(arksia.parametric_forms) if not x.startswith('__')]
-            for pp in model["parametric"]["form"]:
-                if pp not in valid_funcs:
-                    raise ValueError(f"{pp} is not one of {valid_funcs}")
-
+        # handle non-list inputs
+        if type(model["frank"]["alpha"]) in [int, float]:
+            model["frank"]["alpha"] = [model["frank"]["alpha"]]
+        if type(model["frank"]["wsmooth"]) in [int, float]:
+            model["frank"]["wsmooth"] = [model["frank"]["wsmooth"]]
+        if type(model["frank"]["scale_height"]) in [int, float]:
+            model["frank"]["scale_height"] = [model["frank"]["scale_height"]]
+        
+    if model["base"]["run_parametric"] is True:
+        # handle non-list input
+        if type(model["parametric"]["form"]) is str:
+            model["parametric"]["form"] = [model["parametric"]["form"]]
     return model
 
 
@@ -381,7 +366,7 @@ def run_frank(model):
     frank_geom = FixedGeometry(**model["base"]["geom"]) 
 
     # set scale height
-    if model["frank"]["scale_heights"] is None:
+    if model["frank"]["scale_height"] is None:
         hs = [0]
 
         # pre-process visibilities for multiple frank fits (only valid for a 
@@ -399,8 +384,11 @@ def run_frank(model):
                                 )
         ppV = FF_pre.preprocess_visibilities(*uv_data)
 
-    else:
-        hs = np.logspace(*model["frank"]["scale_heights"])
+    else: 
+        if len(model["frank"]["scale_height"]) == 1:
+            hs = model["frank"]["scale_height"] * 1
+        else:
+            hs = np.logspace(*model["frank"]["scale_height"])
         print("    aspect ratios to be sampled: {}".format(hs))
 
     # perform frank fit(s)
@@ -563,7 +551,7 @@ def fit_parametric(fits, model):
     ----------
     fits : nested list
         Best-fit real space and Fourier radial profiles for clean, rave, frank. 
-        Ouput of `input_output.load_bestfit_profiles` (see docstring)
+        Ouput of `input_output.load_bestfit_profiles`
     model : dict
         Dictionary containing pipeline parameters
 
