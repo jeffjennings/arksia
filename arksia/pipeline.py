@@ -383,29 +383,27 @@ def run_frank(model):
     # set scale height
     if model["frank"]["scale_heights"] is None:
         hs = [0]
+
+        # pre-process visibilities for multiple frank fits (only valid for a 
+        # fixed scale height
+        FF_pre = FrankDebrisFitter(Rmax=model["frank"]["rout"], 
+                                N=model["frank"]["N"], 
+                                geometry=frank_geom,
+                                scale_height=None,
+                                alpha=0,
+                                weights_smooth=0,
+                                method=model["frank"]["method"],
+                                I_scale=model["frank"]["I_scale"],
+                                max_iter=model["frank"]["max_iter"],
+                                convergence_failure='warn'
+                                )
+        ppV = FF_pre.preprocess_visibilities(*uv_data)
+
     else:
         hs = np.logspace(*model["frank"]["scale_heights"])
-        print("    aspect ratios to be sampled: {}".format(hs))          
-    
-    # pre-process visibilities for multiple frank fits.
-    # Re-using the processed visibilities is only valid with certain parameter
-    # changes. For example N, Rmax, geometry, nu, assume_optically_thick, and
-    # scale_height cannot be changed. This will be checked before fits are 
-    # conducted.        
-    FF = FrankDebrisFitter(Rmax=model["frank"]["rout"], 
-                            N=model["frank"]["N"], 
-                            geometry=frank_geom,
-                            scale_height=None, # TODO
-                            alpha=0,
-                            weights_smooth=0,
-                            method=model["frank"]["method"],
-                            I_scale=model["frank"]["I_scale"],
-                            max_iter=model["frank"]["max_iter"],
-                            convergence_failure='warn'
-                            )
-    ppV = FF.preprocess_visibilities(*uv_data)
+        print("    aspect ratios to be sampled: {}".format(hs))
 
-    # # perform frank fit(s)
+    # perform frank fit(s)
     def frank_fitter(priors):
         alpha, wsmooth, h = priors 
         print('        performing fit for alpha {} wsmooth {} h {}'.format(alpha, wsmooth, h))
