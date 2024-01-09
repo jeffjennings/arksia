@@ -459,9 +459,11 @@ def frank_multifit_figure(model, sols, plot_var, single_panel=False, save_prefix
     save_prefix : str, default = None
         Prefix for saved figure name. If None, the figure won't be saved
     """
-    print('  Figures: making multifit grid figure')
-
-    nsols = len(sols)
+    if single_panel is True:
+        fig_layout = "single_panel"
+    else:
+        fig_layout = "grid"
+    print(f"  Figures: making multifit figure: {fig_layout} of {plot_var}")
 
     if single_panel is True:
         fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(10,8))
