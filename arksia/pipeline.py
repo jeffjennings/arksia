@@ -418,8 +418,7 @@ def run_frank(model):
         FF = FrankDebrisFitter(Rmax=model["frank"]["rout"], 
                                 N=model["frank"]["N"], 
                                 geometry=frank_geom,
-                                scale_height=None, # TODO: just for pre-processed visibilities
-                                # scale_height=scale_height, # TODO
+                                scale_height=scale_height,
                                 alpha=alpha,
                                 weights_smooth=wsmooth,
                                 method=model["frank"]["method"],
@@ -428,7 +427,10 @@ def run_frank(model):
                                 convergence_failure='warn'
                                 )
 
-        sol = FF.fit_preprocessed(ppV)
+        if scale_height is None:
+            sol = FF.fit_preprocessed(ppV)
+        else:
+            sol = FF.fit(*uv_data)
 
         # add non-negative brightness profile to sol
         if model["frank"]["method"] == "Normal":
