@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import multiprocess
 import pickle 
 
-import frank; frank.enable_logging()
+# import frank; frank.enable_logging()
 from frank.constants import deg_to_rad
 from frank.utilities import jy_convert
 from frank.debris_fitters import FrankDebrisFitter
@@ -371,7 +371,7 @@ def run_frank(model):
         frank fit solutions for each set of hyperparameters 
         (see frank.radial_fitters.FrankFitter)
     """
-    print(' Frank fit: running fit')
+    print(' Frank fit: running fit(s)')
 
     uv_data = input_output.get_vis(model)
 
@@ -485,11 +485,14 @@ def run_frank(model):
         return sol
 
     nfits = len((model["frank"]["alpha"])) * len(model["frank"]["wsmooth"]) * len(hs)
+    print(f"    {nfits} frank fits will be performed")
+
     if nfits == 1:
         sol = frank_fitter([model["frank"]["alpha"][0], model["frank"]["wsmooth"][0], hs[0]])
         return sol
     
     else: 
+        # commenting in favor of approach that saves compute by pre-processing visibilities
         # use as many threads as there are fits, up to a maximum of 'model["frank"]["nthreads"]'
         # nthreads = min(nfits, model["frank"]["nthreads"])
         # pool = multiprocess.Pool(processes=nthreads)
@@ -498,12 +501,12 @@ def run_frank(model):
         #                                                                                      multiprocess.cpu_count())
         #                                                                                      )
 
-        # # grids of prior values
+        # grids of prior values
         g0, g1, g2 = np.meshgrid(model["frank"]["alpha"], model["frank"]["wsmooth"], hs)
         g0, g1, g2 = g0.flatten(), g1.flatten(), g2.flatten()
         priors = np.array([g0, g1, g2]).T
 
-        # # run fits over grids
+        # run fits over grids
         # sols = pool.map(frank_fitter, priors)
 
         sols = []       
