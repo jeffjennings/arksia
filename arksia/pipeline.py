@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import multiprocess
 import pickle 
 
+# import frank; frank.enable_logging()
 from frank.constants import deg_to_rad
 from frank.utilities import jy_convert
 from frank.debris_fitters import FrankDebrisFitter
@@ -204,7 +205,7 @@ def model_setup(parsed_args):
             try:
                 model["frank"]["fstar"] = phys_pars["Fstar_MCMC"] / 1e3
             except TypeError:
-                print(f"  Model setup: {parsed_args.physical_parameter_filename} has no stellar flux for {model['base']['disk']} --> falling back to SED estimate of stellar flux")
+                print(f"  Model setup: {parsed_args.physical_parameter_filename} has no stellar flux for {model['base']['disk']} --> using SED estimate of stellar flux")
                 model["frank"]["fstar"] = phys_pars["Fstar_SED"] / 1e6
         else:
             raise ValueError(f"Parameter ['frank']['set_fstar'] {model['frank']['set_fstar']} must be one of ['MCMC', 'SED', 'custom']") 
@@ -370,7 +371,7 @@ def run_frank(model):
         frank fit solutions for each set of hyperparameters 
         (see frank.radial_fitters.FrankFitter)
     """
-    print(' Frank fit: running fit')
+    print(' Frank fit: running fit(s)')
 
     uv_data = input_output.get_vis(model)
 
@@ -382,9 +383,25 @@ def run_frank(model):
     # set scale height
     if model["frank"]["scale_heights"] is None:
         hs = [0]
+
+        # pre-process visibilities for multiple frank fits (only valid for a 
+        # fixed scale height
+        FF_pre = FrankDebrisFitter(Rmax=model["frank"]["rout"], 
+                                N=model["frank"]["N"], 
+                                geometry=frank_geom,
+                                scale_height=None,
+                                alpha=0,
+                                weights_smooth=0,
+                                method=model["frank"]["method"],
+                                I_scale=model["frank"]["I_scale"],
+                                max_iter=model["frank"]["max_iter"],
+                                convergence_failure='warn'
+                                )
+        ppV = FF_pre.preprocess_visibilities(*uv_data)
+
     else:
         hs = np.logspace(*model["frank"]["scale_heights"])
-        print("    aspect ratios to be sampled: {}".format(hs))      
+        print("    aspect ratios to be sampled: {}".format(hs))
 
     # perform frank fit(s)
     def frank_fitter(priors):
@@ -401,7 +418,7 @@ def run_frank(model):
         FF = FrankDebrisFitter(Rmax=model["frank"]["rout"], 
                                 N=model["frank"]["N"], 
                                 geometry=frank_geom,
-                                scale_height=scale_height, 
+                                scale_height=scale_height,
                                 alpha=alpha,
                                 weights_smooth=wsmooth,
                                 method=model["frank"]["method"],
@@ -409,8 +426,11 @@ def run_frank(model):
                                 max_iter=model["frank"]["max_iter"],
                                 convergence_failure='warn'
                                 )
-        
-        sol = FF.fit(*uv_data)
+
+        if scale_height is None:
+            sol = FF.fit_preprocessed(ppV)
+        else:
+            sol = FF.fit(*uv_data)
 
         # add non-negative brightness profile to sol
         if model["frank"]["method"] == "Normal":
@@ -462,29 +482,45 @@ def run_frank(model):
                                          save_prefix=save_prefix
                                          )
 
-        return sol
+        return sol, FF
 
     nfits = len((model["frank"]["alpha"])) * len(model["frank"]["wsmooth"]) * len(hs)
+    print(f"    {nfits} frank fits will be performed")
+
     if nfits == 1:
-        # import frank; frank.enable_logging()
-        sol = frank_fitter([model["frank"]["alpha"][0], model["frank"]["wsmooth"][0], hs[0]])
+        sol, _ = frank_fitter([model["frank"]["alpha"][0], model["frank"]["wsmooth"][0], hs[0]])
         return sol
     
     else: 
+        # commenting in favor of approach that saves compute by pre-processing visibilities
         # use as many threads as there are fits, up to a maximum of 'model["frank"]["nthreads"]'
-        nthreads = min(nfits, model["frank"]["nthreads"])
-        pool = multiprocess.Pool(processes=nthreads)
-        print('    {} fits will be performed. Using {} threads (1 thread per fit; {} threads available on CPU).'.format(nfits, 
-                                                                                             nthreads, 
-                                                                                             multiprocess.cpu_count())
-                                                                                             )
+        # nthreads = min(nfits, model["frank"]["nthreads"])
+        # pool = multiprocess.Pool(processes=nthreads)
+        # print('    {} fits will be performed. Using {} threads (1 thread per fit; {} threads available on CPU).'.format(nfits, 
+        #                                                                                      nthreads, 
+        #                                                                                      multiprocess.cpu_count())
+        #                                                                                      )
 
         # grids of prior values
         g0, g1, g2 = np.meshgrid(model["frank"]["alpha"], model["frank"]["wsmooth"], hs)
         g0, g1, g2 = g0.flatten(), g1.flatten(), g2.flatten()
         priors = np.array([g0, g1, g2]).T
+
         # run fits over grids
-        sols = pool.map(frank_fitter, priors)
+        # sols = pool.map(frank_fitter, priors)
+
+        sols = []       
+        for prior in priors:            
+            sol, FF = frank_fitter(prior)
+
+            if hs[0] == 0:
+                logev = None
+            else:
+                logev = FF.log_evidence_laplace()
+            # add evidence to sol
+            setattr(sol, 'logevidence', logev)
+
+            sols.append(sol)
 
         logevs = []
         for ss in sols:
