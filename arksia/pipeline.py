@@ -174,17 +174,17 @@ def model_setup(parsed_args):
     else:
         model["base"]["SMG_sub"] = ""
 
+    model["clean"]["npix"] = disk_pars["clean"]["npix"]
+    model["clean"]["pixel_scale"] = disk_pars["clean"]["pixel_scale"]
+
     if model["base"]["extract_clean_profile"] is True:
-        model["clean"]["npix"] = disk_pars["clean"]["npix"]
-        model["clean"]["pixel_scale"] = disk_pars["clean"]["pixel_scale"]
         model["clean"]["image_robust"] = disk_pars["clean"]["image_robust"] 
         model["clean"]["image_rms"] = disk_pars["clean"]["image_rms"]
         robusts, rmss = model["clean"]["image_robust"], model["clean"]["image_rms"]
         model["clean"]["image_rms"] = rmss[robusts.index(model["clean"]["robust"])]
 
-    if model["base"]["compare_models_fig"] is True:
-        model["clean"]["bestfit"] = {}
-        model["clean"]["bestfit"]["robust"] = disk_pars["clean"]["bestfit"]["robust"]
+    if model["base"]["compare_models_fig"] is not None:
+        model["clean"]["bestfit"] = disk_pars["clean"]["bestfit"]
 
     if model["base"]["process_rave_fit"] is True:
         model["rave"]["pixel_scale"] = disk_pars["rave"]["pixel_scale"]
