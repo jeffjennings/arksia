@@ -11,6 +11,7 @@ def save_custom_gen_pars(gen_pars):
 
     tmp_dir = '/tmp/arksia/tests'
     os.makedirs(tmp_dir, exist_ok=True)
+    gen_pars['base']['input_dir'] = 'test'
     gen_pars['base']['output_dir'] = tmp_dir
 
     gen_pars_file = os.path.join(tmp_dir, 'gen_pars.json')
@@ -36,12 +37,11 @@ def update_frank_pars(gen_pars):
 def _run_pipeline(gen_pars_file):
     """Generic routine to invoke pipeline"""
 
-    arksia_path = pipeline.arksia_path
     # Dummy source-specific parameters file
-    source_pars_file = os.path.join(arksia_path, '../test/mock_pars_source.json')
+    source_pars_file = 'test/mock_pars_source.json'
 
     # Dummy physical parameters file
-    phys_pars_file = os.path.join(arksia_path, '../test/mock_pars_phys.cv')
+    phys_pars_file = 'test/mock_pars_phys.csv'
 
     # Call pipeline
     pipeline.main(['-b', gen_pars_file, '-s', source_pars_file, '-p', phys_pars_file, '-d', 'mockAS209'])

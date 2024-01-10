@@ -1,4 +1,35 @@
-_arksia_ ('ARKS Image Analysis') - a pipeline for 1D image analysis of the ALMA large program ARKS ('ALMA survey to Resolve exoKuiper belt Substructures').
+<p align="center">
+<i>arksia</i> ('ARKS Image Analysis')
+  <br/> A pipeline for image analysis of the ALMA large program ARKS ('ALMA survey to Resolve exoKuiper belt Substructures')
+</p>
+
+<p align="center">
+  <!-- current release -->
+  <a href="https://github.com/jeffjennings/arksia/releases">
+      <img src="https://img.shields.io/github/release/jeffjennings/arksia/all.svg">
+  </a>
+
+  <!-- current version on pypi -->
+  <a href="https://pypi.python.org/pypi/arksia">
+      <img src="https://img.shields.io/pypi/v/arksia.svg">
+
+  <!-- license -->
+  <a href="https://www.gnu.org/licenses/lgpl-3.0">
+      <img src="https://img.shields.io/badge/license-LGPL%20v3-blue.svg">   
+  </a>      
+
+ <br/>
+  <!-- tests -->
+  <a href="https://github.com/jeffjennings/arksia/actions/workflows/tests.yml">
+      <img src="https://github.com/jeffjennings/arksia/actions/workflows/tests.yml/badge.svg">
+  </a>    
+
+  <!-- coverage -->
+  <a href="https://github.com/jeffjennings/arksia/blob/coverage/coverage.md">
+      <img src="https://github.com/jeffjennings/arksia/blob/coverage/coverage.svg">
+  </a>
+
+</p>
 
 This package is intended for members of the ARKS collaboration to conduct image analysis on the large program data, and ultimately for anyone to reproduce results of this aspect of the collaboration's published results.
 

@@ -1,0 +1,93 @@
+name: tests
+
+# Run this workflow for every commit
+on: push
+# permissions for updating coverage report and badge on coverage branch 
+permissions:
+  contents: write
+
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Display Python version
+        run: python -c "import sys; print(sys.version)"
+
+      - name: Install test dependencies
+        run: |
+          pip install setuptools --upgrade
+          pip install .[test]
+          pip install .[analysis]
+
+      - name: Install core package
+        run: pip install .
+
+      - name: Run unit tests
+        run: |
+          mkdir -p test-reports
+          py.test -v --junitxml=test-reports/junit.xml test/tests.py
+
+  coverage:
+    name: Run coverage
+    runs-on: ubuntu-latest
+    # only run on push to main
+    if: github.ref == 'refs/heads/main'
+
+    strategy:
+      matrix:
+        python-version: ['3.9']    
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Display Python version
+        run: python -c "import sys; print(sys.version)"
+  
+      - name: Install test dependencies
+        run: |
+          pip install setuptools --upgrade
+          pip install .[test]
+          pip install .[analysis]        
+
+      - name: Install core package
+        run: pip install .
+
+      # run coverage; redirect coverage report to markdown file
+      - name: Check coverage, generate report
+        run: |
+          coverage run --source=arksia -m pytest test/tests.py
+          mkdir -p test/coverage
+          coverage report --format='markdown' > test/coverage/coverage.md
+
+      # make coverage badge
+      - name: Generate coverage badge
+        uses: tj-actions/coverage-badge-py@v2
+        with:
+          output: test/coverage/coverage.svg
+
+      # publish coverage report and badge to 'coverage' branch
+      - name: Publish coverage report to coverage branch
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: coverage
+          folder: test/coverage
