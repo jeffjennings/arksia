@@ -39,10 +39,11 @@ jobs:
           py.test -v --junitxml=test-reports/junit.xml test/tests.py
 
   coverage:
-    name: Run code coverage
+    name: Run coverage
     runs-on: ubuntu-latest
     # needs: test
-  
+    # if: github.ref == 'refs/heads/main'
+
     strategy:
       matrix:
         python-version: ['3.9']    
@@ -62,12 +63,15 @@ jobs:
       - name: Install test dependencies
         run: |
           pip install setuptools --upgrade
-          pip install .[test]        
+          pip install .[test]
+          pip install .[analysis]        
 
-      # check code coverage, store results and generate badge.
+      - name: Install core package
+        run: pip install .
+
       # coverage.py creates a .gitignore with '*' where it's run; remove it
       # to keep the coverage report and badge
-      - name: Check coverage
+      - name: Check coverage; generate report and badge
         run: |
           coverage run --source=arksia -m pytest test/tests.py
           coverage report
