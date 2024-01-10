@@ -112,7 +112,9 @@ def main(source_par_f='./pars_source.json', gen_par_f='./pars_gen.json',
 
                 # flatten axes
                 ax = [bb for aa in ax for bb in aa]
-                cols, labs = ['C1', 'C3', 'C2'], ['clean', 'rave', 'frank']
+                cols, labs = ['C1', 'C2'], ['clean', 'frank']
+                if include_rave: 
+                    cols, labs = cols.append('C3'), labs.append('rave')                    
 
                 for kk, ll in enumerate(Is_interp):     
                     # plot profile
