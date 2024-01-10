@@ -47,3 +47,16 @@ def _run_pipeline(gen_pars_file):
     pipeline.main(['-b', gen_pars_file, '-s', source_pars_file, '-p', phys_pars_file, '-d', 'mockAS209'])
 
 
+def test_pipeline_frank_fit():
+    """Run the pipeline to perform a frank fit (and save fit diagnostics)"""
+
+    # Default generic parameters file
+    gen_pars = pipeline.load_default_parameters()
+
+    gen_pars = update_frank_pars(gen_pars)
+
+    gen_pars_file = save_custom_gen_pars(gen_pars)
+
+    _run_pipeline(gen_pars_file)
+
+
