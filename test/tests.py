@@ -63,7 +63,6 @@ def test_pipeline_frank_fit():
 def test_pipeline_frank_logfit():
     """Run the pipeline to perform a frank fit in log(brightness)"""
 
-    # Default generic parameters file
     gen_pars = pipeline.load_default_parameters()
 
     gen_pars = update_frank_pars(gen_pars)
@@ -167,3 +166,14 @@ def test_bulk_pipeline_run():
     bulk_pipeline_run.main(source_par_f=source_pars_file, gen_par_f=gen_pars_file)
 
 
+def test_bulk_pipeline_results():
+    """Run the pipeline to produce figures comparing clean and frank bestfit models"""
+    gen_pars = pipeline.load_default_parameters()
+    gen_pars_file = save_custom_gen_pars(gen_pars)
+    source_pars_file = 'test/mock_pars_source.json'
+    phys_pars_file = 'test/mock_pars_phys.csv'
+
+    bulk_pipeline_results.main(source_par_f=source_pars_file, 
+                               gen_par_f=gen_pars_file,
+                               phys_par_f=phys_pars_file,
+                               include_rave=False)
