@@ -9,13 +9,13 @@ import astropy.io.fits as pyfits
 from frank.utilities import generic_dht, get_fit_stat_uncer
 from frank.io import load_sol, load_uvtable
 
-def concatenate_vis(in_paths, out_path):
+def concatenate_vis(in_path, out_path):
     """
     Concatenate the visibilities from multiple files; save as one output .npz file.
 
     Parameters
     ----------
-    in_paths : list of string
+    in_path : list of string
         Filenames of the input visibility tables
     out_path : string
         Filename of the output table
@@ -27,7 +27,7 @@ def concatenate_vis(in_paths, out_path):
         (Re(V) + Im(V) * 1j), weights
     """
     u, v, re, im, weights = [], [], [], [], []
-    for ii in in_paths:
+    for ii in in_path:
         try: 
             ut, vt, ret, imt, weightst, _ = np.genfromtxt(ii).T
             u.extend(ut)
