@@ -1,4 +1,4 @@
-"""This module contains a function to run `pipeline` in a loop over multiple sources 
+"""This module contains a function to run the arksia pipeline over multiple sources 
 (written by Jeff Jennings)."""
 
 import os
