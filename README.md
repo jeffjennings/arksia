@@ -1,6 +1,9 @@
 <p align="center">
-<i>arksia</i> ('ARKS Image Analysis')
-  <br/> A pipeline for image analysis of the ALMA large program ARKS ('ALMA survey to Resolve exoKuiper belt Substructures')
+   <img width = "800" src="https://github.com/jeffjennings/arksia/blob/main/logo.png?raw=true"/>
+ </p>
+
+<p align="center">
+  A pipeline for image analysis of the ALMA large program ARKS ('ALMA survey to Resolve exoKuiper belt Substructures') datasets
 </p>
 
 <p align="center">
@@ -31,7 +34,7 @@
 
 </p>
 
-This package is intended for members of the ARKS collaboration to conduct image analysis on the large program data, and ultimately for anyone to reproduce results of this aspect of the collaboration's published results.
+This package is intended for members of the ARKS collaboration to conduct imaging and analysis on the large program data, and ultimately for anyone to reproduce results of this aspect of the collaboration's published results. It is designed as a pipeline to be run from the command line for rapid reproducibility or simple variations on the published analysis. 
 
 Install
 -------
