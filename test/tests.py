@@ -4,7 +4,7 @@ import os
 import json
 import numpy as np 
 
-from arksia import pipeline
+from arksia import pipeline, bulk_pipeline_run, bulk_pipeline_results
 
 def save_custom_gen_pars(gen_pars):
     """Save an altered generic parameters file"""
@@ -154,3 +154,16 @@ def test_pipeline_model_comparison_figs():
     gen_pars_file = save_custom_gen_pars(gen_pars)
 
     _run_pipeline(gen_pars_file)
+
+
+def test_bulk_pipeline_run():
+    """Run the pipeline to produce figures comparing clean and frank bestfit models"""
+    gen_pars = pipeline.load_default_parameters()
+
+    gen_pars_file = save_custom_gen_pars(gen_pars)
+
+    source_pars_file = 'test/mock_pars_source.json'
+
+    bulk_pipeline_run.main(source_par_f=source_pars_file, gen_par_f=gen_pars_file)
+
+
