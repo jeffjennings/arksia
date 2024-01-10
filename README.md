@@ -1,5 +1,6 @@
 <p align="center">
-_arksia_ ('ARKS Image Analysis') - a pipeline for image analysis of the ALMA large program ARKS ('ALMA survey to Resolve exoKuiper belt Substructures')
+<i>arksia</i> ('ARKS Image Analysis')
+  <br/> A pipeline for image analysis of the ALMA large program ARKS ('ALMA survey to Resolve exoKuiper belt Substructures')
 </p>
 
 <p align="center">
