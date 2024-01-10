@@ -70,14 +70,11 @@ jobs:
       - name: Install core package
         run: pip install .
 
-      # coverage.py creates a .gitignore with '*' where it's run; remove it
-      # to keep the coverage report and badge
       - name: Check coverage, generate report
         run: |
           coverage run --source=arksia -m pytest test/tests.py
           mkdir -p test/coverage
           coverage report --format='markdown' > test/coverage/coverage.md
-          rm test/coverage/.gitignore
 
       - name: Generate coverage badge
         uses: tj-actions/coverage-badge-py@v2
