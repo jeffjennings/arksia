@@ -2,6 +2,7 @@ name: tests
 
 # Run this workflow for every commit
 on: push
+# permissions for updating coverage report and badge on coverage branch 
 permissions:
   contents: write
 
@@ -44,7 +45,7 @@ jobs:
     name: Run coverage
     runs-on: ubuntu-latest
     # only run on push to main
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/readme_coverage'
 
     strategy:
       matrix:
