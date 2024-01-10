@@ -75,3 +75,18 @@ def test_pipeline_frank_logfit():
     _run_pipeline(gen_pars_file)
 
 
+def test_pipeline_frank_multifit():
+    """Run the pipeline to perform multiple frank fits and produce the multi-fit figures"""
+
+    gen_pars = pipeline.load_default_parameters()
+
+    gen_pars = update_frank_pars(gen_pars)
+
+    gen_pars['base']['frank_multifit_fig'] = True
+    gen_pars['frank']['alpha'] = [1.5, 1.3]
+
+    gen_pars_file = save_custom_gen_pars(gen_pars)
+
+    _run_pipeline(gen_pars_file)
+
+
