@@ -643,21 +643,35 @@ def main(*args):
     if model["base"]["run_frank"] is True:
         frank_sols = run_frank(model)
 
-    if model["base"]["compare_models_fig"] is True:
-        fits = input_output.load_bestfit_profiles(model)   
-        fig1 = plot.profile_comparison_figure(fits, model,
-                                              resid_im_robust=model["plot"]["frank_resid_im_robust"]
+    if model["base"]["compare_models_fig"] is not None:
+        if model["base"]["compare_models_fig"] == "all":
+            fits = input_output.load_bestfit_profiles(model)
+        else:
+            fits = input_output.load_bestfit_profiles(model, include_rave=False)
+
+        include_rave = False
+        # if there are rave fits, include them in figures
+        if fits[1] is not None:
+            include_rave = True
+
+        fig1 = plot.profile_comparison_figure(fits, 
+                                              model,
+                                              resid_im_robust=model["plot"]["frank_resid_im_robust"],
+                                              include_rave=include_rave,
                                               )
-        fig2 = plot.image_comparison_figure(fits, model, 
-                                            xy_bounds=model["plot"]["xy_bounds"],
-                                            resid_im_robust=model["plot"]["frank_resid_im_robust"]
+        
+        fig2 = plot.image_comparison_figure(fits, 
+                                            model, 
+                                            xy_bounds=model["plot"]["image_xy_bounds"],
+                                            resid_im_robust=model["plot"]["frank_resid_im_robust"],
+                                            include_rave=include_rave,
                                             )
 
-    if model["base"]["aspect_ratio_fig"] is True:
+    if model["frank"]["scale_height"] is not None and model["base"]["aspect_ratio_fig"] is True:
         fig3 = plot.aspect_ratio_figure(model)
 
     if model["base"]["run_parametric"] is True:
-        fits = input_output.load_bestfit_profiles(model)
+        fits = input_output.load_bestfit_profiles(model, include_clean=False, include_rave=False)
         parametric_fits, frank_profile, figs = fit_parametric(fits, model)
 
 if __name__ == "__main__":
