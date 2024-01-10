@@ -1,5 +1,7 @@
 _arksia_ ('ARKS Image Analysis') - a pipeline for 1D image analysis of the ALMA large program ARKS ('ALMA survey to Resolve exoKuiper belt Substructures').
 
+This package is intended for members of the ARKS collaboration to conduct image analysis on the large program data, and ultimately for others to reproduce results of this aspect of the collaboration's published results.
+
 Install
 -------
 ```pip install arksia```
