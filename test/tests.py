@@ -131,3 +131,15 @@ def test_pipeline_extract_clean_profile():
     _run_pipeline(gen_pars_file)
     
 
+def test_pipeline_parametric_fit():
+    """Run the pipeline to perform a parametric fit of a frank brightness profile"""
+    gen_pars = pipeline.load_default_parameters()
+
+    gen_pars['base']['run_parametric'] = True
+    gen_pars['parametric']['form'] = 'asym_gauss'
+    gen_pars['parametric']['niter'] = 50
+
+    gen_pars_file = save_custom_gen_pars(gen_pars)
+
+    _run_pipeline(gen_pars_file)
+
