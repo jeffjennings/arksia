@@ -143,3 +143,13 @@ def test_pipeline_parametric_fit():
 
     _run_pipeline(gen_pars_file)
 
+
+def test_pipeline_model_comparison_figs():
+    """Run the pipeline to produce figures comparing clean and frank bestfit models"""
+    gen_pars = pipeline.load_default_parameters()
+
+    gen_pars['base']['compare_models_fig'] = "clean, frank"
+
+    gen_pars_file = save_custom_gen_pars(gen_pars)
+
+    _run_pipeline(gen_pars_file)
