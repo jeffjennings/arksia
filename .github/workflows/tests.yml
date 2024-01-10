@@ -28,7 +28,7 @@ jobs:
         run: |
           pip install setuptools --upgrade
           pip install .[test]
-          pip instal .[analysis]
+          pip install .[analysis]
 
       - name: Install core package
         run: pip install .
@@ -41,7 +41,7 @@ jobs:
   coverage:
     name: Run code coverage
     runs-on: ubuntu-latest
-    needs: test
+    # needs: test
   
     strategy:
       matrix:
