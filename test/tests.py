@@ -118,3 +118,16 @@ def test_pipeline_frank_vertical_multifit():
 
     _run_pipeline(gen_pars_file)
 
+
+def test_pipeline_extract_clean_profile():
+    """Run the pipeline to extract a radial brightness profile from a clean image"""
+    gen_pars = pipeline.load_default_parameters()
+
+    gen_pars['base']['extract_clean_profile'] = True
+    gen_pars['clean']['rmax'] = 2.0
+
+    gen_pars_file = save_custom_gen_pars(gen_pars)
+
+    _run_pipeline(gen_pars_file)
+    
+
