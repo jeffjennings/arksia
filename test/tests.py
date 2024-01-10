@@ -20,3 +20,16 @@ def save_custom_gen_pars(gen_pars):
     return gen_pars_file
 
 
+def update_frank_pars(gen_pars):
+    """Update default generic parameters for tests using frank"""
+    gen_pars['base']['run_frank'] = True
+    gen_pars['frank']['rout'] = 1.5
+    gen_pars['frank']['N'] = 50
+    gen_pars['frank']['alpha'] = [1.5]
+    gen_pars['frank']['wsmooth'] = [1e-1]
+    gen_pars['frank']['scale_height'] = None    
+    gen_pars['frank']['method'] = 'Normal'
+
+    return gen_pars
+
+
