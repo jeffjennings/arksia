@@ -1,4 +1,4 @@
-"""This module contains a function to obtain results from fits/analysis of the full ARKS survey 
+"""This module contains a function to obtain results from fits/analysis of multiple sources
 (written by Jeff Jennings)."""
 
 import json
@@ -8,18 +8,22 @@ import matplotlib.pyplot as plt
 from arksia.pipeline import model_setup
 from arksia.input_output import load_bestfit_profiles
 
-def main(source_par_f='./pars_source.json', gen_par_f='./pars_gen.json', 
-         profiles_txt=True, profiles_fig=True, robust=2.0
+def main(source_par_f='./pars_source.json', gen_par_f='./pars_gen.json',
+         phys_par_f='./summary_disc_parameters.csv',
+         profiles_txt=True, profiles_fig=True, robust=2.0,
+         include_rave=True
                    ):
     """
-    Generate radial profile results across all survey sources.
+    Generate summary radial profile results across all survey sources.
 
     Parameters
     ----------
     source_par_f : string, default='pars_source.json'
         Path to the parameter file with custom values for each source        
     gen_par_f : string, default='pars_gen.json'
-        Path to the general parameter file    
+        Path to the general parameters file  
+    phys_par_f : string, default='pars_gen.json'
+        Path to the physical parameters file
     profiles_txt : bool, default=True
         Whether to produce a .txt file per source containting the 
         clean, rave, frank brightness profiles (sampled at same radii)
@@ -28,7 +32,9 @@ def main(source_par_f='./pars_source.json', gen_par_f='./pars_gen.json',
         all sources
     robust : float, default=2.0
         Robust weighting value to use for retrieving clean, rave results
-    
+    include_rave : bool, default=True
+        Whether to include rave results in summary
+
     Returns
     -------
     figs : `plt.figure` instance
@@ -50,21 +56,30 @@ def main(source_par_f='./pars_source.json', gen_par_f='./pars_gen.json',
         class parsed_args():
             base_parameter_filename = gen_par_f
             source_parameter_filename = source_par_f
-            disk = jj                        
+            physical_parameter_filename = phys_par_f
+            disk = jj
         model = model_setup(parsed_args)
 
         # best-fit clean, rave, frank profile for each source
-        [[rc, Ic, Iec], [grid, Vc]], [[rr, Ir, Ier_lo, Ier_hi], [grid, Vr]], [[rf, If, Ief], [grid, Vf], sol] = load_bestfit_profiles(model, robust)
+        fits = load_bestfit_profiles(model, robust, include_rave=include_rave)
+        [[rc, Ic, Iec], [grid, Vc]] = fits[0]
+        [[rf, If, Ief], [grid, Vf], sol] = fits[2]
+        if include_rave:
+            [[rr, Ir, Ier_lo, Ier_hi], [grid, Vr]] = fits[1]        
 
         # interpolate clean and rave profiles onto frank radial points 
         Ic_interp = np.interp(rf, rc, Ic)
         Iec_interp = np.interp(rf, rc, Iec)
-        Ir_interp = np.interp(rf, rr, Ir)
-        Ier_lo_interp = np.interp(rf, rr, Ier_lo)
-        Ier_hi_interp = np.interp(rf, rr, Ier_hi)
+        if include_rave:
+            Ir_interp = np.interp(rf, rr, Ir)
+            Ier_lo_interp = np.interp(rf, rr, Ier_lo)
+            Ier_hi_interp = np.interp(rf, rr, Ier_hi)
 
-        Is_interp = [Ic_interp, Ir_interp, If]
-        Ies_interp = [[Iec_interp, Iec_interp], [Ier_lo_interp, Ier_hi_interp], [Ief, Ief]]
+            Is_interp = [Ic_interp, Ir_interp, If]
+            Ies_interp = [[Iec_interp, Iec_interp], [Ier_lo_interp, Ier_hi_interp], [Ief, Ief]]
+        else:
+            Is_interp = [Ic_interp, If]
+            Ies_interp = [[Iec_interp, Iec_interp], [Ief, Ief]]
 
 
         if profiles_txt:
@@ -72,14 +87,21 @@ def main(source_par_f='./pars_source.json', gen_par_f='./pars_gen.json',
             print('  Survey summary: saving radial profiles to {}'.format(ff))
 
             # save .txt file per source with clean,rave,frank profiles
-            np.savetxt(ff, 
-                    np.array([rf * model["base"]["dist"], Ic_interp, Iec_interp, 
+            header=f"dist={model['base']['dist']} [au].\nAll brightnesses in [Jy/steradian].\nUncertainties not comparable across models. "
+
+            if include_rave:
+                profiles = np.array([rf * model["base"]["dist"], Ic_interp, Iec_interp, 
                               If, Ief, Ir_interp, Ier_lo_interp, Ier_hi_interp
-                              ]).T,
-                    header="dist={} [au].\nAll brightnesses in [Jy/steradian].\nUncertainties not comparable across models. " + \
-                    "Rave uncertainties have unique lower and upper bounds.\nColumns: " + \
-                    "r [au]\t\tI_clean\t\tsigma_clean\t\tI_frank\t\tsigma_frank\t\tI_rave\t\tsigma_lower_rave\t\tsigma_upper_rave".format(model["base"]["dist"])
-                    )
+                              ])
+                header += "Rave uncertainties have unique lower and upper bounds.\nColumns: "
+                header += "r [au]\t\tI_clean\t\tsigma_clean\t\tI_frank\t\tsigma_frank\t\tI_rave\t\tsigma_lower_rave\t\tsigma_upper_rave"
+            else:
+                profiles = np.array([rf * model["base"]["dist"], Ic_interp, Iec_interp,
+                              If, Ief
+                              ])
+                header += "\nColumns: r [au]\t\tI_clean\t\tsigma_clean\t\tI_frank\t\tsigma_frank"               
+            
+            np.savetxt(ff, profiles.T, header=header)
 
 
         if profiles_fig:
@@ -90,7 +112,9 @@ def main(source_par_f='./pars_source.json', gen_par_f='./pars_gen.json',
 
                 # flatten axes
                 ax = [bb for aa in ax for bb in aa]
-                cols, labs = ['C1', 'C3', 'C2'], ['clean', 'rave', 'frank']
+                cols, labs = ['C1', 'C2'], ['clean', 'frank']
+                if include_rave: 
+                    cols, labs = cols.append('C3'), labs.append('rave')                    
 
                 for kk, ll in enumerate(Is_interp):     
                     # plot profile
