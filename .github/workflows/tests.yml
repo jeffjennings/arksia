@@ -35,4 +35,4 @@ jobs:
       - name: Run unit tests
         run: |
           mkdir -p test-reports
-          py.test -v --junitxml=test-reports/junit.xml arksia/test/tests.py
+          py.test -v --junitxml=test-reports/junit.xml arksia/../test/tests.py
