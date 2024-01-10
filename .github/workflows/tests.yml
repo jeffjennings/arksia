@@ -27,7 +27,8 @@ jobs:
       - name: Install test dependencies
         run: |
           pip install setuptools --upgrade
-          pip install .[test, analysis]
+          pip install .[test]
+          pip instal .[analysis]
 
       - name: Install core package
         run: pip install .
