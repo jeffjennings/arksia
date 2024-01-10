@@ -25,7 +25,7 @@
   </a>    
 
   <!-- coverage -->
-  <a href="https://github.com/jeffjennings/arksia/blob/coverage/index.md">
+  <a href="https://github.com/jeffjennings/arksia/blob/coverage/coverage.md">
       <img src="https://github.com/jeffjennings/arksia/blob/coverage/coverage.svg">
   </a>
 

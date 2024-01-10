@@ -75,9 +75,8 @@ jobs:
       - name: Check coverage, generate report
         run: |
           coverage run --source=arksia -m pytest test/tests.py
-          coverage report
           mkdir -p test/coverage
-          coverage --format='markdown' -d test/coverage
+          coverage report --format='markdown' > test/coverage/coverage.md
           rm test/coverage/.gitignore
 
       - name: Generate coverage badge
