@@ -4,13 +4,14 @@ import os
 import json
 import numpy as np 
 
-from arksia import pipeline, bulk_pipeline_run, bulk_pipeline_results
+from arksia import input_output, pipeline, bulk_pipeline_run, bulk_pipeline_results
+
+tmp_dir = '/tmp/arksia/tests'
+os.makedirs(tmp_dir, exist_ok=True)
 
 def save_custom_gen_pars(gen_pars):
     """Save an altered generic parameters file"""
 
-    tmp_dir = '/tmp/arksia/tests'
-    os.makedirs(tmp_dir, exist_ok=True)
     gen_pars['base']['input_dir'] = 'test'
     gen_pars['base']['output_dir'] = tmp_dir
 
@@ -45,6 +46,18 @@ def _run_pipeline(gen_pars_file):
 
     # Call pipeline
     pipeline.main(['-b', gen_pars_file, '-s', source_pars_file, '-p', phys_pars_file, '-d', 'mockAS209'])
+
+
+def test_concat_vis():
+    """Join text files to create a .npz visibility table with expected number of parameters"""
+    
+    fake_vis0 = np.empty((6, 10))
+    fake_vis1 = np.empty((6, 10))
+    f0, f1 = tmp_dir + '/fake_vis0.txt', tmp_dir + '/fake_vis1.txt'
+    np.savetxt(f0, fake_vis0.T)
+    np.savetxt(f1, fake_vis1.T)
+
+    input_output.concatenate_vis(in_path=[f0, f1], out_path=tmp_dir + '/concat_vis_test.npz')
 
 
 def test_pipeline_frank_fit():

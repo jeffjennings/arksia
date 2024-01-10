@@ -75,7 +75,7 @@ jobs:
       # run coverage; redirect coverage report to markdown file
       - name: Check coverage, generate report
         run: |
-          coverage run --source=arksia -m pytest test/tests.py
+          coverage run --source=arksia --omit='arksia/parametric_forms.py' -m pytest test/tests.py
           mkdir -p test/coverage
           coverage report --format='markdown' > test/coverage/coverage.md
 
