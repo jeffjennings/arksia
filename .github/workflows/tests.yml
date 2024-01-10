@@ -77,7 +77,7 @@ jobs:
           coverage run --source=arksia -m pytest test/tests.py
           coverage report
           mkdir -p test/coverage
-          coverage html -d test/coverage
+          coverage --format='markdown' -d test/coverage
           rm test/coverage/.gitignore
 
       - name: Generate coverage badge
