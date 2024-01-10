@@ -1,4 +1,4 @@
-"""This module contains a function to obtain results from fits/analysis of the full ARKS survey 
+"""This module contains a function to obtain results from fits/analysis of multiple sources
 (written by Jeff Jennings)."""
 
 import json
@@ -8,8 +8,9 @@ import matplotlib.pyplot as plt
 from arksia.pipeline import model_setup
 from arksia.input_output import load_bestfit_profiles
 
-def main(source_par_f='./pars_source.json', gen_par_f='./pars_gen.json', 
-         profiles_txt=True, profiles_fig=True, robust=2.0
+def main(source_par_f='./pars_source.json', gen_par_f='./pars_gen.json',
+         phys_par_f='./summary_disc_parameters.csv',
+         profiles_txt=True, profiles_fig=True, robust=2.0,
                    ):
     """
     Generate radial profile results across all survey sources.
@@ -19,7 +20,9 @@ def main(source_par_f='./pars_source.json', gen_par_f='./pars_gen.json',
     source_par_f : string, default='pars_source.json'
         Path to the parameter file with custom values for each source        
     gen_par_f : string, default='pars_gen.json'
-        Path to the general parameter file    
+        Path to the general parameters file  
+    phys_par_f : string, default='pars_gen.json'
+        Path to the physical parameters file
     profiles_txt : bool, default=True
         Whether to produce a .txt file per source containting the 
         clean, rave, frank brightness profiles (sampled at same radii)
@@ -50,7 +53,8 @@ def main(source_par_f='./pars_source.json', gen_par_f='./pars_gen.json',
         class parsed_args():
             base_parameter_filename = gen_par_f
             source_parameter_filename = source_par_f
-            disk = jj                        
+            physical_parameter_filename = phys_par_f
+            disk = jj
         model = model_setup(parsed_args)
 
         # best-fit clean, rave, frank profile for each source
