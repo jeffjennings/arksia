@@ -5,7 +5,7 @@
       "run_frank"             : "Whether to run the pipeline module to perform a (1D or 1+1D) frank fit",
       "run_parametric"        : "Whether to run the pipeline module to perform a parametric fit to a nonparametric brightness profile",
       "aspect_ratio_fig"      : "Whether to generate a figure showing frank vertical inference results",
-      "compare_models_fig"    : "Whether to generate figures comparing the clean, rave, frank brightness and visibility profiles, and images",
+      "compare_models_fig"    : "Which models to compare in generated figures showing brightness and visibility profiles and images. Either 'null' to not generate figures, 'all' to compare clean/frank/rave in figures, or 'clean, frank' to compare only clean and frank in figures",
       "frank_multifit_fig"    : "Whether to generate figures comparing frank fits with different hyperparameter values",
       "input_dir"             : "Directory containing inputs for the pipeline (visibilities, rave fits, clean images)",
       "output_dir"            : "Parent directory in which pipeline results will be saved (in subdirectories <disk name>/<clean, rave, frank, parametric>. If null, output_dir will be set to input_dir"
