@@ -37,7 +37,6 @@ def update_frank_pars(gen_pars):
 def _run_pipeline(gen_pars_file):
     """Generic routine to invoke pipeline"""
 
-    arksia_path = pipeline.arksia_path
     # Dummy source-specific parameters file
     source_pars_file = 'test/mock_pars_source.json'
 

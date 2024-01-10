@@ -30,7 +30,7 @@ jobs:
           pip install .[test]
           pip install .[analysis]
 
-      - name: Install
+      - name: Install core package
         run: pip install .
 
       - name: Run unit tests
