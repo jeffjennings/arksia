@@ -45,7 +45,7 @@ jobs:
     name: Run coverage
     runs-on: ubuntu-latest
     # only run on push to main
-    if: github.ref == 'refs/heads/readme_coverage'
+    if: github.ref == 'refs/heads/main'
 
     strategy:
       matrix:
