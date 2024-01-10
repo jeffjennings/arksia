@@ -183,9 +183,6 @@ def model_setup(parsed_args):
         robusts, rmss = model["clean"]["image_robust"], model["clean"]["image_rms"]
         model["clean"]["image_rms"] = rmss[robusts.index(model["clean"]["robust"])]
 
-    if model["base"]["compare_models_fig"] is not None:
-        model["clean"]["bestfit"] = disk_pars["clean"]["bestfit"]
-
     if model["base"]["process_rave_fit"] is True:
         model["rave"]["pixel_scale"] = disk_pars["rave"]["pixel_scale"]
     
@@ -215,9 +212,6 @@ def model_setup(parsed_args):
             if pp not in valid_funcs:
                 raise ValueError(f"{pp} is not one of {valid_funcs}")
 
-    if model["base"]["run_parametric"] is True or model["base"]["compare_models_fig"] is not None:
-        model["frank"]["bestfit"] = disk_pars["frank"]["bestfit"]
-
     # frank: stellar flux to remove from visibilities as point-source
     if model["frank"]["set_fstar"] == "custom":
         model["frank"]["fstar"] = disk_pars["frank"]["custom_fstar"] / 1e6
@@ -231,7 +225,10 @@ def model_setup(parsed_args):
             model["frank"]["fstar"] = phys_pars["Fstar_SED"] / 1e6
     else:
         raise ValueError(f"Parameter ['frank']['set_fstar'] {model['frank']['set_fstar']} must be one of ['MCMC', 'SED', 'custom']") 
-                
+
+    model["clean"]["bestfit"] = disk_pars["clean"]["bestfit"]
+    model["frank"]["bestfit"] = disk_pars["frank"]["bestfit"]
+
     return model
 
 
