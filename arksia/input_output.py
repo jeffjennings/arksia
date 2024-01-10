@@ -229,7 +229,7 @@ def load_bestfit_frank_uvtable(model, resid_table=False):
     return [u, v, V, weights]
 
 
-def load_bestfit_profiles(model):
+def load_bestfit_profiles(model, include_clean=True, include_rave=True):
     """
     Load the clean, rave and frank best-fit radial brightness profiles and 
     radial visibility profiles
@@ -238,6 +238,8 @@ def load_bestfit_profiles(model):
     ----------
     model : dict
         Dictionary containing pipeline parameters
+    include_clean, include_rave : bool, default=True
+        Whether to load bestfit clean/rave results
 
     Returns
     -------
@@ -252,14 +254,7 @@ def load_bestfit_profiles(model):
         uncertainties; baselines and visibility amplitudes of the visibility
         fit; the fit solution object.      
     """
-
-    clean_bestfit = "{}/clean_profile_robust{}.txt".format(
-        model["base"]["clean_dir"], model["clean"]["bestfit"]["robust"])
-    rc, Ic, Iec = np.genfromtxt(clean_bestfit).T
-
-    rave_bestfit = "{}/rave_profile_robust{}.txt".format(
-        model["base"]["rave_dir"], model["clean"]["bestfit"]["robust"])
-    rr, Ir, Ier_lo, Ier_hi = np.genfromtxt(rave_bestfit).T
+    clean_results = rave_results = None 
 
     # enforce the best-fit has 0 scale height
     frank_bestfit = "{}/{}_alpha{}_w{}_rout{}_h0.000_fstar{:.0f}uJy_method{}_frank_sol.obj".format(
@@ -274,18 +269,33 @@ def load_bestfit_profiles(model):
     sol = load_sol(frank_bestfit)
     rf, If, Ief = sol.r, sol.I, get_fit_stat_uncer(sol)
 
-    # dense grid for visibility profiles
+    # dense grid for visibility profile
     grid = np.logspace(np.log10(1e3), np.log10(1e6), 10**3)
-
-    # clean visibility profile
-    _, Vc = generic_dht(rc, Ic, Rmax=sol.Rmax, N=sol._info["N"], grid=grid,
-                            inc=0) # 'inc=0' passed to enforce optically thin assumption
-    # rave visibility profile
-    _, Vr = generic_dht(rr, Ir, Rmax=sol.Rmax, N=sol._info["N"], grid=grid,
-                            inc=0)
     # frank visibility profile
     Vf = sol.predict_deprojected(grid)
+    
+    frank_results = [[rf, If, Ief], [grid, Vf], sol]
 
-    return [[rc, Ic, Iec], [grid, Vc]], \
-        [[rr, Ir, Ier_lo, Ier_hi], [grid, Vr]], \
-        [[rf, If, Ief], [grid, Vf], sol]
+    if include_clean:
+        clean_bestfit = "{}/clean_profile_robust{}.txt".format(
+            model["base"]["clean_dir"], model["clean"]["bestfit"]["robust"])
+        rc, Ic, Iec = np.genfromtxt(clean_bestfit).T
+    
+        # clean visibility profile
+        _, Vc = generic_dht(rc, Ic, Rmax=sol.Rmax, N=sol._info["N"], grid=grid,
+                                inc=0) # 'inc=0' passed to enforce optically thin assumption
+        
+        clean_results = [[rc, Ic, Iec], [grid, Vc]]
+
+    if include_rave:
+        rave_bestfit = "{}/rave_profile_robust{}.txt".format(
+            model["base"]["rave_dir"], model["clean"]["bestfit"]["robust"])
+        rr, Ir, Ier_lo, Ier_hi = np.genfromtxt(rave_bestfit).T
+
+        # rave visibility profile
+        _, Vr = generic_dht(rr, Ir, Rmax=sol.Rmax, N=sol._info["N"], grid=grid,
+                                inc=0)
+
+        rave_results = [[rr, Ir, Ier_lo, Ier_hi], [grid, Vr]]
+    
+    return clean_results, rave_results, frank_results

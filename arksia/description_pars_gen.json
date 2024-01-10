@@ -5,7 +5,7 @@
       "run_frank"             : "Whether to run the pipeline module to perform a (1D or 1+1D) frank fit",
       "run_parametric"        : "Whether to run the pipeline module to perform a parametric fit to a nonparametric brightness profile",
       "aspect_ratio_fig"      : "Whether to generate a figure showing frank vertical inference results",
-      "compare_models_fig"    : "Whether to generate figures comparing the clean, rave, frank brightness and visibility profiles, and images",
+      "compare_models_fig"    : "Which models to compare in generated figures showing brightness and visibility profiles and images. Either 'null' to not generate figures, 'all' to compare clean/frank/rave in figures, or 'clean, frank' to compare only clean and frank in figures",
       "frank_multifit_fig"    : "Whether to generate figures comparing frank fits with different hyperparameter values",
       "input_dir"             : "Directory containing inputs for the pipeline (visibilities, rave fits, clean images)",
       "output_dir"            : "Parent directory in which pipeline results will be saved (in subdirectories <disk name>/<clean, rave, frank, parametric>. If null, output_dir will be set to input_dir"
@@ -25,14 +25,13 @@
     "frank" : {
       "rout"                  : "Maximum disc radius in the fit (best to overestimate size of source) [arcsec]",
       "N"                     : "Number of collocation points used in the fit (suggested range 100 - 300)",
-      "alpha"                 : "Order parameter for the power spectrum's inverse Gamma prior (suggested range 1.00 - 1.50). If a list, multiple fits will be performed",
-      "wsmooth"               : "Strength of smoothing applied to the power spectrum (suggested range 10^-4 - 10^-1). If a list, multiple fits will be performed",
+      "alpha"                 : "Order parameter for the power spectrum's inverse Gamma prior (suggested range 1.00 - 1.50). Float or list (if a list, multiple fits will be performed)",
+      "wsmooth"               : "Strength of smoothing applied to the power spectrum (suggested range 10^-4 - 10^-1). Float or list (if a list, multiple fits will be performed)",
       "method"                : "The fit method: 'Normal' to fit in linear brighness, 'LogNormal' to fit in logarithmic brightness",
       "I_scale"               : "Minimum brightness allowed for radial profile for frank fit. Should be lower than data noise floor",
       "max_iter"              : "Maximum number of fit iterations",
       "set_fstar"             : "Source for visibility amplitude to be treated as unresolved stellar emission (a constant subtracted from all real visibility amplitudes). One of ['MCMC', 'SED', 'custom'], which are set per source in the source parameters .json (by default, `pars_source.json`)",
-      "scale_heights"         : "List of `start`, `stop`, `num` for `np.logspace` call to define scale-height grid over which to run fits. E.g., `[-2.5, -1, 10]` corresponds to `np.logspace(-2.5, -1, 10)`. If seeking to run a standard (non-vertical) frank fit, set to null", 
-      "nthreads"              : "Number of CPU threads on which to run multiple fits (note a single frank fit is fastest on only 1 thread)",
+      "scale_height"         : "Scale-height(s) over which to run fits. Float, or list of `start`, `stop`, `num` for `np.logspace` call e.g. `[-2.5, -1, 10]` corresponds to `np.logspace(-2.5, -1, 10)`. If seeking to run a standard (non-vertical) frank fit, set to null", 
       "save_solution"         : "Whether to save `sol` object (see frank.radial_fitters.FrankFitter)",
       "save_profile_fit"      : "Whether to save fitted brightness profile",
       "save_vis_fit"          : "Whether to save fitted visibility distribution",
@@ -41,7 +40,7 @@
     },
   
     "parametric" : {
-      "form"                  : "A list of parametric functional forms to fit to a nonparametric profile. One or more of ['asym_gauss', 'triple_gauss', 'double_powerlaw', 'double_powerlaw_erf', 'double_powerlaw_gauss', 'double_powerlaw_double_gauss', 'single_erf_powerlaw', 'double_erf_powerlaw'] (see 'parametric_forms.py').",
+      "form"                  : "A string, or list of parametric functional forms to fit to a nonparametric profile. One or more of ['asym_gauss', 'triple_gauss', 'double_powerlaw', 'double_powerlaw_erf', 'double_powerlaw_gauss', 'double_powerlaw_double_gauss', 'single_erf_powerlaw', 'double_erf_powerlaw'] (see 'parametric_forms.py').",
       "device"                : "The backend device on which to run the parametric fitter using JAX. Can be null, 'cpu', 'gpu', 'tpu', or one of `jax.devices()`. If null, JAX will use a GPU or TPU if available, else fall back to the CPU.",
       "learn_rate"            : "Learning rate for the parametric fit optimization",
       "niter"                 : "Number of iterations for the parametric fit optimization"

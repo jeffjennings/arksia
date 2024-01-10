@@ -26,7 +26,7 @@ arksia_path = os.path.dirname(arksia.__file__)
 
 def get_default_parameter_file():
     """Get the path to the default parameter file"""
-    return os.path.join(arksia_path, 'default_parameters.json')
+    return os.path.join(arksia_path, 'pars_gen.json')
 
 def load_default_parameters():
     """Load the default parameters"""
@@ -174,55 +174,64 @@ def model_setup(parsed_args):
     else:
         model["base"]["SMG_sub"] = ""
 
+    model["clean"]["npix"] = disk_pars["clean"]["npix"]
+    model["clean"]["pixel_scale"] = disk_pars["clean"]["pixel_scale"]
+
     if model["base"]["extract_clean_profile"] is True:
-        model["clean"]["npix"] = disk_pars["clean"]["npix"]
-        model["clean"]["pixel_scale"] = disk_pars["clean"]["pixel_scale"]
         model["clean"]["image_robust"] = disk_pars["clean"]["image_robust"] 
         model["clean"]["image_rms"] = disk_pars["clean"]["image_rms"]
         robusts, rmss = model["clean"]["image_robust"], model["clean"]["image_rms"]
         model["clean"]["image_rms"] = rmss[robusts.index(model["clean"]["robust"])]
 
-    if model["base"]["compare_models_fig"] is True:
-        model["clean"]["bestfit"] = {}
-        model["clean"]["bestfit"]["robust"] = disk_pars["clean"]["bestfit"]["robust"]
+    if model["base"]["compare_models_fig"] is not None:
+        model["clean"]["bestfit"] = disk_pars["clean"]["bestfit"]
 
     if model["base"]["process_rave_fit"] is True:
         model["rave"]["pixel_scale"] = disk_pars["rave"]["pixel_scale"]
     
-    if True in [model["base"]["compare_models_fig"], model["base"]["run_parametric"]]:
-        model["frank"]["bestfit"] = {}
-        model["frank"]["bestfit"]["alpha"] = disk_pars["frank"]["bestfit"]["alpha"]
-        model["frank"]["bestfit"]["wsmooth"] = disk_pars["frank"]["bestfit"]["wsmooth"]
-        model["frank"]["bestfit"]["method"] = disk_pars["frank"]["bestfit"]["method"]
-
     if model["base"]["run_frank"] is True:
-        # stellar flux to remove from visibilities as point-source
-        if model["frank"]["set_fstar"] == "custom":
-            model["frank"]["fstar"] = disk_pars["frank"]["custom_fstar"] / 1e6
-        elif model["frank"]["set_fstar"] == "SED":
-            model["frank"]["fstar"] = phys_pars["Fstar_SED"] / 1e6
-        elif model["frank"]["set_fstar"] == "MCMC":
-            try:
-                model["frank"]["fstar"] = phys_pars["Fstar_MCMC"] / 1e3
-            except TypeError:
-                print(f"  Model setup: {parsed_args.physical_parameter_filename} has no stellar flux for {model['base']['disk']} --> using SED estimate of stellar flux")
-                model["frank"]["fstar"] = phys_pars["Fstar_SED"] / 1e6
-        else:
-            raise ValueError(f"Parameter ['frank']['set_fstar'] {model['frank']['set_fstar']} must be one of ['MCMC', 'SED', 'custom']") 
-
+        # handle non-list inputs
+        if type(model["frank"]["alpha"]) in [int, float]:
+            model["frank"]["alpha"] = [model["frank"]["alpha"]]
+        if type(model["frank"]["wsmooth"]) in [int, float]:
+            model["frank"]["wsmooth"] = [model["frank"]["wsmooth"]]
+        if type(model["frank"]["scale_height"]) in [int, float]:
+            model["frank"]["scale_height"] = [model["frank"]["scale_height"]]
+        
         # enforce a Normal fit if finding scale height (LogNormal fit not compatible with vertical inference)
-        if model["frank"]["scale_heights"] is not None:
-            print("  Model setup: 'scale_heights' is not None in your parameter file -- enforcing frank 'method=Normal' and 'max_iter=2000'")
+        if model["frank"]["scale_height"] is not None:
+            print("  Model setup: 'scale_height' is not None in your parameter file -- enforcing frank 'method=Normal' and 'max_iter=2000'")
             model["frank"]["method"] = "Normal"
             model["frank"]["max_iter"] = 2000
+        
+    if model["base"]["run_parametric"] is True:
+        # handle non-list input
+        if type(model["parametric"]["form"]) is str:
+            model["parametric"]["form"] = [model["parametric"]["form"]]
 
-        if model["base"]["run_parametric"] is True:
-            # implemented functional forms 
-            valid_funcs = [x for x in dir(arksia.parametric_forms) if not x.startswith('__')]
-            for pp in model["parametric"]["form"]:
-                if pp not in valid_funcs:
-                    raise ValueError(f"{pp} is not one of {valid_funcs}")
+        # implemented functional forms 
+        valid_funcs = [x for x in dir(arksia.parametric_forms) if not x.startswith('__')]
+        for pp in model["parametric"]["form"]:
+            if pp not in valid_funcs:
+                raise ValueError(f"{pp} is not one of {valid_funcs}")
 
+    if model["base"]["run_parametric"] is True or model["base"]["compare_models_fig"] is not None:
+        model["frank"]["bestfit"] = disk_pars["frank"]["bestfit"]
+
+    # frank: stellar flux to remove from visibilities as point-source
+    if model["frank"]["set_fstar"] == "custom":
+        model["frank"]["fstar"] = disk_pars["frank"]["custom_fstar"] / 1e6
+    elif model["frank"]["set_fstar"] == "SED":
+        model["frank"]["fstar"] = phys_pars["Fstar_SED"] / 1e6
+    elif model["frank"]["set_fstar"] == "MCMC":
+        try:
+            model["frank"]["fstar"] = phys_pars["Fstar_MCMC"] / 1e3
+        except TypeError:
+            print(f"  Model setup: {parsed_args.physical_parameter_filename} has no stellar flux for {model['base']['disk']} --> using SED estimate of stellar flux")
+            model["frank"]["fstar"] = phys_pars["Fstar_SED"] / 1e6
+    else:
+        raise ValueError(f"Parameter ['frank']['set_fstar'] {model['frank']['set_fstar']} must be one of ['MCMC', 'SED', 'custom']") 
+                
     return model
 
 
@@ -258,8 +267,14 @@ def extract_clean_profile(model):
 
     clean_image, clean_beam = input_output.load_fits_image(clean_fits)
     bmaj, bmin = clean_beam
-    pb_image = input_output.load_fits_image(pb_fits, aux_image=True)
-    model_image = input_output.load_fits_image(model_fits, aux_image=True)
+    try:
+        pb_image = input_output.load_fits_image(pb_fits, aux_image=True)
+    except FileNotFoundError:
+        pb_image = None
+    try: 
+        model_image = input_output.load_fits_image(model_fits, aux_image=True)
+    except FileNotFoundError:
+        model_image = None
 
     # profile of clean image.
     # for radial profile on east side of disk,
@@ -289,35 +304,38 @@ def extract_clean_profile(model):
     # average of E and W
     r, I, I_err = r_W, np.mean((I_E, I_W), axis=0), np.hypot(I_err_E, I_err_W) / 2
 
-
-    # profile of CLEAN .model image.
-    # average across all azimuths (no need to take separate E and W profiles)
-    phis_mod = np.linspace(model["base"]["geom"]["PA"] - 180, 
-                                  model["base"]["geom"]["PA"] + 180,
-                                  model["clean"]["Nphi"] 
-                                  )
-    
-    r_mod, I_mod = extract_radial_profile.radial_profile_from_image(
-        model_image, geom=model["base"]["geom"], phis=phis_mod, bmaj=0, 
-        bmin=0, model_image=True, **model["clean"])
-
-    # radial profile save paths
+    # save radial profile
     ciff = "{}/clean_profile_robust{}.txt".format(
         model["base"]["clean_dir"], model["clean"]["robust"])
-    cmff = "{}/clean_model_profile_robust{}.txt".format(
-        model["base"]["clean_dir"], model["clean"]["robust"])    
     
-    print('    saving CLEAN image profile to {} and model profile to {}'.format(ciff, cmff))
+    print(f"    saving CLEAN image profile to {ciff}")
     np.savetxt(ciff, 
         np.array([r, I, I_err]).T, 
         header='Extracted from {}\nr [arcsec]\tI [Jy/sr]\tI_err [Jy/sr]'.format(
             clean_fits.split('/')[-1])
-        )
-    np.savetxt(cmff,
-        np.array([r_mod, I_mod]).T,        
-        header='Extracted from {}\nr [arcsec]\tI [Jy/sr]'.format(
-            model_fits.split('/')[-1])
-        )
+        )    
+
+    if model_image is not None:
+        # profile of CLEAN .model image.
+        # average across all azimuths (no need to take separate E and W profiles)
+        phis_mod = np.linspace(model["base"]["geom"]["PA"] - 180, 
+                                    model["base"]["geom"]["PA"] + 180,
+                                    model["clean"]["Nphi"] 
+                                    )
+        
+        r_mod, I_mod = extract_radial_profile.radial_profile_from_image(
+            model_image, geom=model["base"]["geom"], phis=phis_mod, bmaj=0, 
+            bmin=0, model_image=True, **model["clean"])
+
+        cmff = "{}/clean_model_profile_robust{}.txt".format(
+            model["base"]["clean_dir"], model["clean"]["robust"])    
+    
+        print(f"    saving CLEAN model profile to {cmff}")
+        np.savetxt(cmff,
+            np.array([r_mod, I_mod]).T,        
+            header='Extracted from {}\nr [arcsec]\tI [Jy/sr]'.format(
+                model_fits.split('/')[-1])
+            )
  
 
 def process_rave_fit(model):
@@ -381,7 +399,7 @@ def run_frank(model):
     frank_geom = FixedGeometry(**model["base"]["geom"]) 
 
     # set scale height
-    if model["frank"]["scale_heights"] is None:
+    if model["frank"]["scale_height"] is None:
         hs = [0]
 
         # pre-process visibilities for multiple frank fits (only valid for a 
@@ -399,8 +417,11 @@ def run_frank(model):
                                 )
         ppV = FF_pre.preprocess_visibilities(*uv_data)
 
-    else:
-        hs = np.logspace(*model["frank"]["scale_heights"])
+    else: 
+        if len(model["frank"]["scale_height"]) == 1:
+            hs = model["frank"]["scale_height"] * 1
+        else:
+            hs = np.logspace(*model["frank"]["scale_height"])
         print("    aspect ratios to be sampled: {}".format(hs))
 
     # perform frank fit(s)
@@ -563,7 +584,7 @@ def fit_parametric(fits, model):
     ----------
     fits : nested list
         Best-fit real space and Fourier radial profiles for clean, rave, frank. 
-        Ouput of `input_output.load_bestfit_profiles` (see docstring)
+        Ouput of `input_output.load_bestfit_profiles`
     model : dict
         Dictionary containing pipeline parameters
 
@@ -634,21 +655,35 @@ def main(*args):
     if model["base"]["run_frank"] is True:
         frank_sols = run_frank(model)
 
-    if model["base"]["compare_models_fig"] is True:
-        fits = input_output.load_bestfit_profiles(model)   
-        fig1 = plot.profile_comparison_figure(fits, model,
-                                              resid_im_robust=model["plot"]["frank_resid_im_robust"]
+    if model["base"]["compare_models_fig"] is not None:
+        if model["base"]["compare_models_fig"] == "all":
+            fits = input_output.load_bestfit_profiles(model)
+        else:
+            fits = input_output.load_bestfit_profiles(model, include_rave=False)
+
+        include_rave = False
+        # if there are rave fits, include them in figures
+        if fits[1] is not None:
+            include_rave = True
+
+        fig1 = plot.profile_comparison_figure(fits, 
+                                              model,
+                                              resid_im_robust=model["plot"]["frank_resid_im_robust"],
+                                              include_rave=include_rave,
                                               )
-        fig2 = plot.image_comparison_figure(fits, model, 
-                                            xy_bounds=model["plot"]["xy_bounds"],
-                                            resid_im_robust=model["plot"]["frank_resid_im_robust"]
+        
+        fig2 = plot.image_comparison_figure(fits, 
+                                            model, 
+                                            xy_bounds=model["plot"]["image_xy_bounds"],
+                                            resid_im_robust=model["plot"]["frank_resid_im_robust"],
+                                            include_rave=include_rave,
                                             )
 
-    if model["base"]["aspect_ratio_fig"] is True:
+    if model["frank"]["scale_height"] is not None and model["base"]["aspect_ratio_fig"] is True:
         fig3 = plot.aspect_ratio_figure(model)
 
     if model["base"]["run_parametric"] is True:
-        fits = input_output.load_bestfit_profiles(model)
+        fits = input_output.load_bestfit_profiles(model, include_clean=False, include_rave=False)
         parametric_fits, frank_profile, figs = fit_parametric(fits, model)
 
 if __name__ == "__main__":
