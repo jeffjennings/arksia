@@ -236,14 +236,14 @@ def profile_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, inclu
     return fig
 
 
-def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, xy_bounds=[-7,7]):
+def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, xy_bounds=[-7,7], include_rave=True):
     """
-    Generate a figure comparing clean, rave, frank 2d image
+    Generate a figure comparing clean, frank, and optionally rave 2d images
 
     Parameters
     ----------
     fits : nested list
-        Clean, rave, frank profiles to be plotted. Output of `input_output.load_bestfit_profiles`
+        Clean, frank, rave profiles to be plotted. Output of `input_output.load_bestfit_profiles`
     model : dict
         Dictionary containing pipeline parameters
     resid_im_robust : float, default=2.0
@@ -252,6 +252,8 @@ def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, xy_boun
         Number of pixels along one axis used to make frank images
     xy_bounds : list of float, default=[-7,7]
         Plot axis bounds for (assumed square) images        
+    include_rave : bool, default=True
+        Whether to include rave results in figure 
 
     Returns
     -------
@@ -260,7 +262,12 @@ def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, xy_boun
     """
 
     print('  Figures: making image comparison figure')
-    [[rc, Ic, Iec], [grid, Vc]], [[rr, Ir, Ier_lo, Ier_hi], [grid, Vr]], [[rf, If, Ief], [grid, Vf], sol] = fits
+
+    # load best-fit profiles
+    if include_rave is True:
+        [[rc, Ic, Iec], [grid, Vc]], [[rr, Ir, Ier_lo, Ier_hi], [grid, Vr]], [[rf, If, Ief], [grid, Vf], sol] = fits
+    else:
+        [[rc, Ic, Iec], [grid, Vc]], _, [[rf, If, Ief], [grid, Vf], sol] = fits
 
     # get clean images
     base_path = "{}/{}.combined.{}corrected.briggs.{}.{}.{}".format(
@@ -289,22 +296,23 @@ def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, xy_boun
     clean_im_xmax = model["clean"]["pixel_scale"] * model["clean"]["npix"] / 2
     clean_extent = [clean_im_xmax, -clean_im_xmax, -clean_im_xmax, clean_im_xmax]
 
-    # make rave pseudo-2d image
-    rave_im_xmax = model["rave"]["pixel_scale"] * len(rr) / 2 
-    rave_extent = [rave_im_xmax, -rave_im_xmax, -rave_im_xmax, rave_im_xmax]    
-    rave_image, _, _ = sweep_profile(rr, Ir, project=True,
-        xmax=rave_im_xmax, ymax=rave_im_xmax, dr=model["rave"]["pixel_scale"], 
-        phase_shift=True, geom=sol.geometry
-        )
-    rave_image = jy_convert(rave_image, 'sterad_arcsec2')
+    if include_rave is True:
+        # make rave pseudo-2d image
+        rave_im_xmax = model["rave"]["pixel_scale"] * len(rr) / 2 
+        rave_extent = [rave_im_xmax, -rave_im_xmax, -rave_im_xmax, rave_im_xmax]    
+        rave_image, _, _ = sweep_profile(rr, Ir, project=True,
+            xmax=rave_im_xmax, ymax=rave_im_xmax, dr=model["rave"]["pixel_scale"], 
+            phase_shift=True, geom=sol.geometry
+            )
+        rave_image = jy_convert(rave_image, 'sterad_arcsec2')
 
-    # make rave residual image (again assuming square images)
-    rave_resid_im_path = parse_rave_filename(model, file_type='rave_residual_image')
-    rave_resid_im = np.load(rave_resid_im_path)
+        # make rave residual image (again assuming square images)
+        rave_resid_im_path = parse_rave_filename(model, file_type='rave_residual_image')
+        rave_resid_im = np.load(rave_resid_im_path)
 
-    # convert Jy / pixel to Jy / arcsec
-    rave_resid_im /= model["rave"]["pixel_scale"] ** 2 
-    rave_resid_Imax = abs(rave_resid_im).max()
+        # convert Jy / pixel to Jy / arcsec
+        rave_resid_im /= model["rave"]["pixel_scale"] ** 2 
+        rave_resid_Imax = np.nanmax(abs(rave_resid_im))
 
     # make frank pseudo-2d image
     xf, yf, frank_image = make_image(sol, npix, project=True)
@@ -316,12 +324,12 @@ def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, xy_boun
     frank_resid_vis = load_bestfit_frank_uvtable(model, resid_table=True)
     # generate frank residual image
     frank_resid_im = dirty_image(frank_resid_vis, robust=resid_im_robust, npix=npix, pixel_scale=frank_pixel_scale)
-    frank_resid_Imax = abs(frank_resid_im).max()
+    frank_resid_Imax = np.nanmax(abs(frank_resid_im))
     frank_resid_extent = [xf[-1], xf[0], yf[0], yf[-1]]
 
     # make figure
     fig = plt.figure(figsize=(10,6))
-    fig.suptitle("{} -- robust = {} for clean, rave; {} for frank imaged residuals".format(
+    fig.suptitle("{} -- robust = {} for clean (and rave if included); {} for frank imaged residuals".format(
         model["base"]["disk"],
         model["clean"]["bestfit"]["robust"],
         resid_im_robust)
@@ -347,18 +355,19 @@ def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, xy_boun
                cbar_label='$I_{clean\ model}$ [mJy arcsec$^{-2}$]'
                )            
 
-    # plot rave pseudo-image
-    plot_image(rave_image * 1e3, rave_extent, ax6, 
-               cbar_label='$I_{rave}$ [mJy arcsec$^{-2}$]'
-               )
+    if include_rave is True:
+        # plot rave pseudo-image
+        plot_image(rave_image * 1e3, rave_extent, ax6, 
+                cbar_label='$I_{rave}$ [mJy arcsec$^{-2}$]'
+                )
 
-    # plot (clean - rave) image using symmetric colormap
-    rave_resid_norm = Normalize(vmin=-rave_resid_Imax * 1e3, 
-                                 vmax=rave_resid_Imax * 1e3)
-    plot_image(rave_resid_im * 1e3, rave_extent, ax7, cmap="RdBu_r",
-               norm=rave_resid_norm, 
-               cbar_label='$I_{clean - rave}$ [mJy arcsec$^{-2}$]'
-               )
+        # plot (clean - rave) image using symmetric colormap
+        rave_resid_norm = Normalize(vmin=-rave_resid_Imax * 1e3, 
+                                    vmax=rave_resid_Imax * 1e3)
+        plot_image(rave_resid_im * 1e3, rave_extent, ax7, cmap="RdBu_r",
+                norm=rave_resid_norm, 
+                cbar_label='$I_{clean - rave}$ [mJy arcsec$^{-2}$]'
+                )
 
     # plot frank pseudo-image 
     plot_image(frank_image * 1e3, frank_extent, ax8,
@@ -428,7 +437,7 @@ def frank_image_diag_figure(model, sol, frank_resid_vis, resid_im_robust=2.0,
 
     # make frank residual image
     frank_resid_im = dirty_image(frank_resid_vis, robust=resid_im_robust, npix=npix, pixel_scale=frank_pixel_scale)
-    frank_resid_Imax = abs(frank_resid_im).max()    
+    frank_resid_Imax = np.nanmax(abs(frank_resid_im))    
     frank_resid_extent = [xf[-1], xf[0], yf[0], yf[-1]]
 
     # plot frank pseudo-image 
