@@ -189,12 +189,6 @@ def model_setup(parsed_args):
     if model["base"]["process_rave_fit"] is True:
         model["rave"]["pixel_scale"] = disk_pars["rave"]["pixel_scale"]
     
-    if True in [model["base"]["compare_models_fig"], model["base"]["run_parametric"]]:
-        model["frank"]["bestfit"] = {}
-        model["frank"]["bestfit"]["alpha"] = disk_pars["frank"]["bestfit"]["alpha"]
-        model["frank"]["bestfit"]["wsmooth"] = disk_pars["frank"]["bestfit"]["wsmooth"]
-        model["frank"]["bestfit"]["method"] = disk_pars["frank"]["bestfit"]["method"]
-
     if model["base"]["run_frank"] is True:
         # handle non-list inputs
         if type(model["frank"]["alpha"]) in [int, float]:
@@ -204,10 +198,40 @@ def model_setup(parsed_args):
         if type(model["frank"]["scale_height"]) in [int, float]:
             model["frank"]["scale_height"] = [model["frank"]["scale_height"]]
         
+        # enforce a Normal fit if finding scale height (LogNormal fit not compatible with vertical inference)
+        if model["frank"]["scale_height"] is not None:
+            print("  Model setup: 'scale_height' is not None in your parameter file -- enforcing frank 'method=Normal' and 'max_iter=2000'")
+            model["frank"]["method"] = "Normal"
+            model["frank"]["max_iter"] = 2000
+        
     if model["base"]["run_parametric"] is True:
         # handle non-list input
         if type(model["parametric"]["form"]) is str:
             model["parametric"]["form"] = [model["parametric"]["form"]]
+
+        # implemented functional forms 
+        valid_funcs = [x for x in dir(arksia.parametric_forms) if not x.startswith('__')]
+        for pp in model["parametric"]["form"]:
+            if pp not in valid_funcs:
+                raise ValueError(f"{pp} is not one of {valid_funcs}")
+
+    if model["base"]["run_parametric"] is True or model["base"]["compare_models_fig"] is not None:
+        model["frank"]["bestfit"] = disk_pars["frank"]["bestfit"]
+
+    # frank: stellar flux to remove from visibilities as point-source
+    if model["frank"]["set_fstar"] == "custom":
+        model["frank"]["fstar"] = disk_pars["frank"]["custom_fstar"] / 1e6
+    elif model["frank"]["set_fstar"] == "SED":
+        model["frank"]["fstar"] = phys_pars["Fstar_SED"] / 1e6
+    elif model["frank"]["set_fstar"] == "MCMC":
+        try:
+            model["frank"]["fstar"] = phys_pars["Fstar_MCMC"] / 1e3
+        except TypeError:
+            print(f"  Model setup: {parsed_args.physical_parameter_filename} has no stellar flux for {model['base']['disk']} --> using SED estimate of stellar flux")
+            model["frank"]["fstar"] = phys_pars["Fstar_SED"] / 1e6
+    else:
+        raise ValueError(f"Parameter ['frank']['set_fstar'] {model['frank']['set_fstar']} must be one of ['MCMC', 'SED', 'custom']") 
+                
     return model
 
 
