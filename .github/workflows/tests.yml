@@ -43,7 +43,8 @@ jobs:
   coverage:
     name: Run coverage
     runs-on: ubuntu-latest
-    # if: github.ref == 'refs/heads/main'
+    # only run on push to main
+    if: github.ref == 'refs/heads/main'
 
     strategy:
       matrix:
@@ -70,17 +71,20 @@ jobs:
       - name: Install core package
         run: pip install .
 
+      # run coverage; redirect coverage report to markdown file
       - name: Check coverage, generate report
         run: |
           coverage run --source=arksia -m pytest test/tests.py
           mkdir -p test/coverage
           coverage report --format='markdown' > test/coverage/coverage.md
 
+      # make coverage badge
       - name: Generate coverage badge
         uses: tj-actions/coverage-badge-py@v2
         with:
           output: test/coverage/coverage.svg
 
+      # publish coverage report and badge to 'coverage' branch
       - name: Publish coverage report to coverage branch
         uses: JamesIves/github-pages-deploy-action@v4
         with:
