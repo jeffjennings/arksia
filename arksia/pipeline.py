@@ -267,8 +267,14 @@ def extract_clean_profile(model):
 
     clean_image, clean_beam = input_output.load_fits_image(clean_fits)
     bmaj, bmin = clean_beam
-    pb_image = input_output.load_fits_image(pb_fits, aux_image=True)
-    model_image = input_output.load_fits_image(model_fits, aux_image=True)
+    try:
+        pb_image = input_output.load_fits_image(pb_fits, aux_image=True)
+    except FileNotFoundError:
+        pb_image = None
+    try: 
+        model_image = input_output.load_fits_image(model_fits, aux_image=True)
+    except FileNotFoundError:
+        model_image = None
 
     # profile of clean image.
     # for radial profile on east side of disk,
@@ -298,35 +304,38 @@ def extract_clean_profile(model):
     # average of E and W
     r, I, I_err = r_W, np.mean((I_E, I_W), axis=0), np.hypot(I_err_E, I_err_W) / 2
 
-
-    # profile of CLEAN .model image.
-    # average across all azimuths (no need to take separate E and W profiles)
-    phis_mod = np.linspace(model["base"]["geom"]["PA"] - 180, 
-                                  model["base"]["geom"]["PA"] + 180,
-                                  model["clean"]["Nphi"] 
-                                  )
-    
-    r_mod, I_mod = extract_radial_profile.radial_profile_from_image(
-        model_image, geom=model["base"]["geom"], phis=phis_mod, bmaj=0, 
-        bmin=0, model_image=True, **model["clean"])
-
-    # radial profile save paths
+    # save radial profile
     ciff = "{}/clean_profile_robust{}.txt".format(
         model["base"]["clean_dir"], model["clean"]["robust"])
-    cmff = "{}/clean_model_profile_robust{}.txt".format(
-        model["base"]["clean_dir"], model["clean"]["robust"])    
     
-    print('    saving CLEAN image profile to {} and model profile to {}'.format(ciff, cmff))
+    print(f"    saving CLEAN image profile to {ciff}")
     np.savetxt(ciff, 
         np.array([r, I, I_err]).T, 
         header='Extracted from {}\nr [arcsec]\tI [Jy/sr]\tI_err [Jy/sr]'.format(
             clean_fits.split('/')[-1])
-        )
-    np.savetxt(cmff,
-        np.array([r_mod, I_mod]).T,        
-        header='Extracted from {}\nr [arcsec]\tI [Jy/sr]'.format(
-            model_fits.split('/')[-1])
-        )
+        )    
+
+    if model_image is not None:
+        # profile of CLEAN .model image.
+        # average across all azimuths (no need to take separate E and W profiles)
+        phis_mod = np.linspace(model["base"]["geom"]["PA"] - 180, 
+                                    model["base"]["geom"]["PA"] + 180,
+                                    model["clean"]["Nphi"] 
+                                    )
+        
+        r_mod, I_mod = extract_radial_profile.radial_profile_from_image(
+            model_image, geom=model["base"]["geom"], phis=phis_mod, bmaj=0, 
+            bmin=0, model_image=True, **model["clean"])
+
+        cmff = "{}/clean_model_profile_robust{}.txt".format(
+            model["base"]["clean_dir"], model["clean"]["robust"])    
+    
+        print(f"    saving CLEAN model profile to {cmff}")
+        np.savetxt(cmff,
+            np.array([r_mod, I_mod]).T,        
+            header='Extracted from {}\nr [arcsec]\tI [Jy/sr]'.format(
+                model_fits.split('/')[-1])
+            )
  
 
 def process_rave_fit(model):
@@ -646,21 +655,35 @@ def main(*args):
     if model["base"]["run_frank"] is True:
         frank_sols = run_frank(model)
 
-    if model["base"]["compare_models_fig"] is True:
-        fits = input_output.load_bestfit_profiles(model)   
-        fig1 = plot.profile_comparison_figure(fits, model,
-                                              resid_im_robust=model["plot"]["frank_resid_im_robust"]
+    if model["base"]["compare_models_fig"] is not None:
+        if model["base"]["compare_models_fig"] == "all":
+            fits = input_output.load_bestfit_profiles(model)
+        else:
+            fits = input_output.load_bestfit_profiles(model, include_rave=False)
+
+        include_rave = False
+        # if there are rave fits, include them in figures
+        if fits[1] is not None:
+            include_rave = True
+
+        fig1 = plot.profile_comparison_figure(fits, 
+                                              model,
+                                              resid_im_robust=model["plot"]["frank_resid_im_robust"],
+                                              include_rave=include_rave,
                                               )
-        fig2 = plot.image_comparison_figure(fits, model, 
-                                            xy_bounds=model["plot"]["xy_bounds"],
-                                            resid_im_robust=model["plot"]["frank_resid_im_robust"]
+        
+        fig2 = plot.image_comparison_figure(fits, 
+                                            model, 
+                                            xy_bounds=model["plot"]["image_xy_bounds"],
+                                            resid_im_robust=model["plot"]["frank_resid_im_robust"],
+                                            include_rave=include_rave,
                                             )
 
-    if model["base"]["aspect_ratio_fig"] is True:
+    if model["frank"]["scale_height"] is not None and model["base"]["aspect_ratio_fig"] is True:
         fig3 = plot.aspect_ratio_figure(model)
 
     if model["base"]["run_parametric"] is True:
-        fits = input_output.load_bestfit_profiles(model)
+        fits = input_output.load_bestfit_profiles(model, include_clean=False, include_rave=False)
         parametric_fits, frank_profile, figs = fit_parametric(fits, model)
 
 if __name__ == "__main__":
