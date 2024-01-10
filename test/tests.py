@@ -41,7 +41,7 @@ def _run_pipeline(gen_pars_file):
     source_pars_file = 'test/mock_pars_source.json'
 
     # Dummy physical parameters file
-    phys_pars_file = 'test/mock_pars_phys.cv'
+    phys_pars_file = 'test/mock_pars_phys.csv'
 
     # Call pipeline
     pipeline.main(['-b', gen_pars_file, '-s', source_pars_file, '-p', phys_pars_file, '-d', 'mockAS209'])
