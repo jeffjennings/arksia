@@ -112,7 +112,8 @@ def test_pipeline_frank_vertical_multifit():
     gen_pars = update_frank_pars(gen_pars)
 
     gen_pars['base']['aspect_ratio_fig'] = True
-    gen_pars['frank']['scale_height'] = [1e-1, 1.1e-1]
+    # multiple values for scale_height will call np.logspace internally
+    gen_pars['frank']['scale_height'] = [-2, 0, 3]
 
     gen_pars_file = save_custom_gen_pars(gen_pars)
 
