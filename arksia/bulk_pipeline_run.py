@@ -4,6 +4,10 @@
 import os
 import json
 
+def main(gen_par_f='./pars_gen.json', 
+         source_par_f='./pars_source.json',
+         phys_par_f='./summary_disc_parameters.csv',
+         ):
     """
     Run the arksia pipeline across multiple survey sources.
 
@@ -21,13 +25,20 @@ import json
     source_pars = json.load(open(source_par_f, 'r'))
     for ii in source_pars:
         disk_names.append(ii)
-
+    
+    gen_pars = json.load(open(gen_par_f, 'r'))
     # run the radial pipeline over each source in `disk_names`
     for ii, jj in enumerate(disk_names):
-        print("\nPipeline call {} of {} - disk {}".format(ii, len(disk_names) - 1, jj))
+        print(f"\nPipeline call {ii + 1} of {len(disk_names)} - disk {jj}")
 
-        os.system('python -m arksia.pipeline -d {} -b {} -s {}'.format(
-            jj, gen_par_f, source_par_f))
+        gen_pars['base']['input_dir'] = f"./{jj}"
+        gen_pars_current = os.path.join(os.path.dirname(gen_par_f), 'pars_gen_temp.json')
+        with open(gen_pars_current, 'w') as f:
+            json.dump(gen_pars, f)
+
+        os.system(f"python -m arksia.pipeline -d {jj} -b {gen_pars_current} -s {source_par_f} -p {phys_par_f}")
+
+    os.remove(gen_pars_current)
 
 if __name__ == "__main__":
     main()
