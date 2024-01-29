@@ -134,11 +134,6 @@ def model_setup(parsed_args):
     model["base"]["rave_dir"] = os.path.join(model["base"]["save_dir"], "rave")
     model["base"]["frank_dir"] = os.path.join(model["base"]["save_dir"], "frank")
     model["base"]["parametric_dir"] = os.path.join(model["base"]["save_dir"], "parametric")
-    
-    subdirs = model["base"]["clean_dir"], model["base"]["rave_dir"], \
-        model["base"]["frank_dir"], model["base"]["parametric_dir"]
-    for dd in subdirs: 
-        os.makedirs(dd, exist_ok=True)
 
     # source-specific pipeline parameters
     source_pars = json.load(open(parsed_args.source_parameter_filename, 'r'))
@@ -178,15 +173,18 @@ def model_setup(parsed_args):
     model["clean"]["pixel_scale"] = disk_pars["clean"]["pixel_scale"]
 
     if model["base"]["extract_clean_profile"] is True:
+        os.makedirs(model["base"]["clean_dir"], exist_ok=True)
         model["clean"]["image_robust"] = disk_pars["clean"]["image_robust"] 
         model["clean"]["image_rms"] = disk_pars["clean"]["image_rms"]
         robusts, rmss = model["clean"]["image_robust"], model["clean"]["image_rms"]
         model["clean"]["image_rms"] = rmss[robusts.index(model["clean"]["robust"])]
 
     if model["base"]["process_rave_fit"] is True:
+        os.makedirs(model["base"]["rave_dir"], exist_ok=True)
         model["rave"]["pixel_scale"] = disk_pars["rave"]["pixel_scale"]
     
     if model["base"]["run_frank"] is True:
+        os.makedirs(model["base"]["frank_dir"], exist_ok=True)
         # handle non-list inputs
         if type(model["frank"]["alpha"]) in [int, float]:
             model["frank"]["alpha"] = [model["frank"]["alpha"]]
@@ -202,6 +200,7 @@ def model_setup(parsed_args):
             model["frank"]["max_iter"] = 2000
         
     if model["base"]["run_parametric"] is True:
+        os.makedirs(model["base"]["parametric_dir"], exist_ok=True)
         # handle non-list input
         if type(model["parametric"]["form"]) is str:
             model["parametric"]["form"] = [model["parametric"]["form"]]
