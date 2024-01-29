@@ -8,20 +8,21 @@ import matplotlib.pyplot as plt
 from arksia.pipeline import model_setup
 from arksia.input_output import load_bestfit_profiles
 
-def main(source_par_f='./pars_source.json', gen_par_f='./pars_gen.json',
+def main(gen_par_f='./pars_gen.json',
+         source_par_f='./pars_source.json', 
          phys_par_f='./summary_disc_parameters.csv',
          profiles_txt=True, profiles_fig=True, robust=2.0,
          include_rave=True
                    ):
     """
-    Generate summary radial profile results across all survey sources.
+    Generate summary radial profile results across multiple survey sources.
 
     Parameters
-    ----------
-    source_par_f : string, default='pars_source.json'
-        Path to the parameter file with custom values for each source        
+    ----------       
     gen_par_f : string, default='pars_gen.json'
         Path to the general parameters file  
+    source_par_f : string, default='pars_source.json'
+        Path to the parameter file with custom values for each source         
     phys_par_f : string, default='pars_gen.json'
         Path to the physical parameters file
     profiles_txt : bool, default=True
