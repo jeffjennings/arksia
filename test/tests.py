@@ -171,12 +171,14 @@ def test_pipeline_model_comparison_figs():
 def test_bulk_pipeline_run():
     """Run the pipeline to produce figures comparing clean and frank bestfit models"""
     gen_pars = pipeline.load_default_parameters()
-
     gen_pars_file = save_custom_gen_pars(gen_pars)
-
     source_pars_file = 'test/mock_pars_source.json'
+    phys_pars_file = 'test/mock_pars_phys.csv'
 
-    bulk_pipeline_run.main(source_par_f=source_pars_file, gen_par_f=gen_pars_file)
+    bulk_pipeline_run.main(gen_par_f=gen_pars_file,
+                           source_par_f=source_pars_file,
+                           phys_par_f=phys_pars_file,
+                           )
 
 
 def test_bulk_pipeline_results():
