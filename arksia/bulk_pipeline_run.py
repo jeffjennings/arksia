@@ -4,7 +4,19 @@
 import os
 import json
 
-def main(source_par_f='./pars_source.json', gen_par_f='./pars_gen.json'):
+    """
+    Run the arksia pipeline across multiple survey sources.
+
+    Parameters
+    ----------       
+    gen_par_f : string, default='pars_gen.json'
+        Path to the general parameters file  
+    source_par_f : string, default='pars_source.json'
+        Path to the parameter file with custom values for each source         
+    phys_par_f : string, default='pars_gen.json'
+        Path to the physical parameters file    
+    """    
+    
     disk_names = []
     source_pars = json.load(open(source_par_f, 'r'))
     for ii in source_pars:
