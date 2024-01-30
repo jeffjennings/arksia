@@ -183,7 +183,7 @@ def model_setup(parsed_args):
         os.makedirs(model["base"]["rave_dir"], exist_ok=True)
         model["rave"]["pixel_scale"] = disk_pars["rave"]["pixel_scale"]
     
-    if model["base"]["run_frank"] is True:
+    if True in [model["base"]["run_frank"], model["base"]["reproduce_best_frank"]]:
         if model["base"]["reproduce_best_frank"] is True:
             print("\n  Model setup: Overriding 'frank' choices in your parameter file to reproduce best-fit model (without scale-height inference)\n")
       
@@ -217,9 +217,7 @@ def model_setup(parsed_args):
             # enforce a Normal fit if finding scale height 
             # (LogNormal fit is not supported for vertical inference)
             if model["frank"]["scale_height"] is not None:
-                print("""  Model setup: 'scale_height' is not None in your parameter file 
-                      -- enforcing frank 'method=Normal' and 'max_iter=2000'
-                      """)
+                print("Model setup: 'scale_height' is not None in your parameter file -- enforcing frank 'method=Normal' and 'max_iter=2000'")
                 model["frank"]["method"] = "Normal"
                 model["frank"]["max_iter"] = 2000
 
@@ -244,9 +242,7 @@ def model_setup(parsed_args):
         try:
             model["frank"]["fstar"] = phys_pars["Fstar_MCMC"] / 1e3
         except TypeError:
-            print(f"""Model setup: {parsed_args.physical_parameter_filename} 
-                  has no stellar flux for {model['base']['disk']} --> using SED estimate of stellar flux
-                  """)
+            print(f"Model setup: {parsed_args.physical_parameter_filename} has no stellar flux for {model['base']['disk']} --> using SED estimate of stellar flux")
             model["frank"]["fstar"] = phys_pars["Fstar_SED"] / 1e6
     else:
         raise ValueError(f"Parameter ['frank']['set_fstar'] {model['frank']['set_fstar']} must be one of ['MCMC', 'SED', 'custom']") 

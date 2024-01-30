@@ -3,7 +3,7 @@
       "extract_clean_profile" : "Whether to run the pipeline module to obtain a profile from a clean image of the source",
       "process_rave_fit"      : "Whether to run the pipeline module to process/save a profile from an existing rave fit",
       "run_frank"             : "Whether to run the pipeline module to perform a (1D or 1+1D) frank fit",
-      "reproduce_best_frank"  : "Whether to run frank using the 'bestfit' parameters in the source parameters .json (to reproduce the published fit). If True, all 'frank' parameters in this file will be overridden.",            
+      "reproduce_best_frank"  : "Whether to run a 1D frank fit using the 'bestfit' parameters in the source parameters .json (to reproduce the published fit). If True, all 'frank' parameters in this file will be overridden.",            
       "run_parametric"        : "Whether to run the pipeline module to perform a parametric fit to a nonparametric brightness profile",
       "aspect_ratio_fig"      : "Whether to generate a figure showing frank vertical inference results",
       "compare_models_fig"    : "Which models to compare in generated figures showing brightness and visibility profiles and images. Either 'null' to not generate figures, 'all' to compare clean/frank/rave in figures, or 'clean, frank' to compare only clean and frank in figures",
