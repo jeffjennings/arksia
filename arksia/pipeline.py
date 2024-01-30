@@ -333,6 +333,16 @@ def extract_clean_profile(model):
                 model_fits.split('/')[-1])
             )
  
+    plt.figure()
+    plt.title(f"{model['base']['disk']}, robust {model['clean']['robust']}")
+    plt.plot(r_mod, I_mod, '#a4a4a4', label='clean model')
+    plt.plot(r, I, 'r', label='clean image')
+    plt.fill_between(r, I - I_err, I + I_err, color='r', alpha=0.4)
+    plt.xlabel('r ["]')
+    plt.ylabel('I [Jy / sr]')
+    plt.legend()
+    plt.savefig(f"{model['base']['clean_dir']}/clean_profiles.png", dpi=300)
+    
 
 def process_rave_fit(model):
     """Unpack a fitted RAVE radial profile, convert units, save
@@ -385,7 +395,7 @@ def run_frank(model):
         frank fit solutions for each set of hyperparameters 
         (see frank.radial_fitters.FrankFitter)
     """
-    print(' Frank fit: running fit(s)')
+    print(" Frank fit: running fits")
 
     uv_data = input_output.get_vis(model)
 
@@ -423,7 +433,7 @@ def run_frank(model):
     # perform frank fit(s)
     def frank_fitter(priors):
         alpha, wsmooth, h = priors 
-        print('        performing fit for alpha {} wsmooth {} h {}'.format(alpha, wsmooth, h))
+        print(f"        performing {model['frank']['method']} fit for alpha {alpha} wsmooth {wsmooth} h {h}")
 
         if h == 0:
             scale_height = None  
@@ -527,7 +537,8 @@ def run_frank(model):
         # sols = pool.map(frank_fitter, priors)
 
         sols = []       
-        for prior in priors:            
+        for nn, prior in enumerate(priors): 
+            print(f"      Fit {nn + 1} of {nfits}") 
             sol, FF = frank_fitter(prior)
 
             if hs[0] == 0:
