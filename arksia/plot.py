@@ -36,7 +36,7 @@ def plot_image(image, extent, ax, norm=None, cmap='inferno', title=None,
     ax.set_title(title)  
 
 
-def clean_diagnostic_figure(model, clean_image, clean_profile, 
+def clean_diag_figure(model, clean_image, clean_profile, 
                             model_image=None, model_profile=None):
     """Generate a figure showing a clean .model, .image, and their radial profiles
     
@@ -110,365 +110,6 @@ def clean_diagnostic_figure(model, clean_image, clean_profile,
     return fig 
 
 
-def profile_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, include_rave=True):
-    """
-    Generate a figure comparing clean, frank, and optionally rave radial brightness and visibility profiles.
-
-    Parameters
-    ----------
-    fits : nested list
-        Clean, frank, rave profiles to be plotted. Output of `input_output.load_bestfit_profiles`
-    model : dict
-        Dictionary containing pipeline parameters
-    resid_im_robust : float, default=2.0
-        Robust weighting parameter used for imaging frank residual visibilities.
-    npix : int
-        Number of pixels along one axis used to make frank images
-    include_rave : bool, default=True
-        Whether to include rave results in figure 
-
-    Returns
-    -------
-    fig : `plt.figure` instance
-        The generated figure
-    """
-        
-    print('  Figures: making profile comparison figure')
-    
-    # load best-fit profiles
-    if include_rave is True:
-        [[rc, Ic, Iec], [grid, Vc]], [[rr, Ir, Ier_lo, Ier_hi], [grid, Vr]], [[rf, If, Ief], [grid, Vf], sol] = fits
-    else:
-        [[rc, Ic, Iec], [grid, Vc]], _, [[rf, If, Ief], [grid, Vf], sol] = fits
-
-    fig = plt.figure(figsize=(10,6))
-    fig.suptitle("{} -- robust = {} for clean and rave".format(
-        model["base"]["disk"],
-        model["clean"]["bestfit"]["robust"])
-        )
-
-    gs = GridSpec(4, 2, figure=fig, hspace=0, left=0.09, right=0.97, top=0.94, bottom=0.09)
-
-    ax0 = fig.add_subplot(gs[:3, 0])
-    ax3 = fig.add_subplot(gs[3, 0])
-
-    ax1 = fig.add_subplot(gs[:3, 1])
-    ax2 = fig.add_subplot(gs[3, 1])
-
-    cols, marks, labs = ['C1', 'C2'], ['.', '+'], ['clean', 'frank']
-    if include_rave is True:
-        cols, marks, labs = cols.append('C3'), marks.append('x'), labs.append('rave')
-
-    # brightness profiles (clean, frank, rave)
-    rs = [rc, rf]
-    if include_rave is True:
-        rs.append(rr)
-
-    Is_jy_sr = [Ic, If]
-    if include_rave is True:
-        Is_jy_sr.append(Ir)
-    
-    # brightness uncertainties
-    Ies_jy_sr = [[Iec, Iec], [Ief, Ief]]
-    if include_rave is True:
-        # rave fits have dfft lower and upper uncertainties
-        Ies_jy_sr.append([Ier_lo, Ier_hi])
-
-    for ii, jj in enumerate(Is_jy_sr):     
-        # convert Jy / sterad to mJy / arcsec^2
-        I_mjy_as2 = jy_convert(jj, 'sterad_arcsec2') * 1e3
-        ax0.plot(rs[ii], I_mjy_as2, c=cols[ii], label=labs[ii])
-    
-        Ie_lo_mjy_as2 = jy_convert(Ies_jy_sr[ii][0], 'sterad_arcsec2') * 1e3
-        Ie_hi_mjy_as2 = jy_convert(Ies_jy_sr[ii][1], 'sterad_arcsec2') * 1e3
-        ax0.fill_between(rs[ii], I_mjy_as2 - Ie_lo_mjy_as2, I_mjy_as2 + Ie_hi_mjy_as2, 
-                         color=cols[ii], alpha=0.4)
-
-    # plot clean, rave, frank Re(V), binned vis.
-    [u, v, vis, weights] = get_vis(model)
-
-    # deproject vis
-    up, vp, Vp = sol.geometry.apply_correction(u, v, vis)
-    bls = np.sqrt(up**2 + vp**2)
-
-    phis_mod = np.linspace(model["base"]["geom"]["PA"] - 180, 
-                                  model["base"]["geom"]["PA"] + 180,
-                                  model["clean"]["Nphi"] 
-                                  )
-    
-    if include_rave is True:
-        # plot 1d rave residual brightness   
-        rave_resid_im_path = parse_rave_filename(model, file_type='rave_residual_image')
-        rave_resid_im = np.load(rave_resid_im_path)
-        
-        # convert Jy / pixel to Jy / arcsec
-        rave_resid_im /= model["rave"]["pixel_scale"] ** 2 
-        
-        rave_resid_r, rave_resid_I = radial_profile_from_image( 
-            rave_resid_im, geom=model["base"]["geom"], 
-            rmax=max(rr), Nr=len(rr), phis=phis_mod, 
-            npix=rave_resid_im.shape[0], pixel_scale=model["rave"]["pixel_scale"],
-            bmaj=0, bmin=0, image_rms=0, model_image=True, arcsec2=False
-            )
-
-        ax3.plot(rave_resid_r, rave_resid_I * 1e3, c='C3') 
-
-    # load frank residual visibilities (at projected data u,v)
-    frank_resid_vis = load_bestfit_frank_uvtable(model, resid_table=True)
-    # get pixel scale
-    xf, _, _ = make_image(sol, npix, project=True)
-    frank_pixel_scale = np.diff(xf).mean() / 2
-    # plot 1d frank residual brightness
-    frank_resid_im = dirty_image(frank_resid_vis, robust=resid_im_robust, npix=npix, pixel_scale=frank_pixel_scale)
-    
-    frank_resid_r, frank_resid_I = radial_profile_from_image(
-        frank_resid_im, geom=model["base"]["geom"], 
-        rmax=model["frank"]["rout"], Nr=model["frank"]["N"], phis=phis_mod, 
-        npix=model["clean"]["npix"], pixel_scale=model["clean"]["pixel_scale"],
-        bmaj=0, bmin=0, image_rms=0, model_image=True, arcsec2=False
-        )
-           
-    ax3.plot(frank_resid_r, frank_resid_I * 1e3, c='C2')
-
-    # bin observed visibilities
-    bin_cols, bin_marks = ['k', "#a4a4a4"], ["+", "x"]
-    for ii, jj in enumerate(model["plot"]["bin_widths"]):
-        bin_vis = UVDataBinner(bls, Vp, weights, jj)
-        
-        # plot binned Re(V)
-        ax1.plot(bin_vis.uv / 1e6, bin_vis.V.real * 1e3, c=bin_cols[ii],
-                    marker=bin_marks[ii], ls='None',
-                    label=r'Obs., {:.0f} k$\lambda$ bins'.format(jj / 1e3)
-                    )
-        
-    # plot vis fits
-    vis_profiles = [Vc, Vf]
-    if include_rave is True:
-        vis_profiles.append(Vr)
-
-    for ii, jj in enumerate(vis_profiles):
-        ax1.plot(grid / 1e6, jj * 1e3, c=cols[ii], label=labs[ii])
-
-    # plot binned visibility residuals
-    bin_vis = UVDataBinner(bls, Vp, weights, model["plot"]["bin_widths"][-1])    
-    _, bin_Vc = generic_dht(rc, Ic, Rmax=sol.Rmax, N=sol._info["N"], 
-        grid=bin_vis.uv, inc=0)
-    bin_Vf = sol.predict_deprojected(bin_vis.uv, I=If)
-    if include_rave is True:
-        _, bin_Vr = generic_dht(rr, Ir, Rmax=sol.Rmax, N=sol._info["N"], 
-            grid=bin_vis.uv, inc=0)
-
-    resid_yscale_guess = []
-    binned_vis_profiles = [bin_Vc, bin_Vf]
-    if include_rave is True:
-        binned_vis_profiles.append(bin_Vr)
-        
-    for ii, jj in enumerate(binned_vis_profiles):
-        # bin vis fit residuals
-        resid = bin_vis.V.real - jj
-        rmse = np.sqrt(np.mean(resid ** 2))
-
-        resid_yscale_guess.append(resid.mean() + resid.std())
-
-        # plot fit residuals
-        ax2.plot(bin_vis.uv / 1e6, resid * 1e3, c=cols[ii], 
-                          marker=marks[ii], ls='None',
-                        label=r'RMSE {:.3f} mJy'.format(rmse * 1e3))
-
-    # symmetric y-bounds for residuals
-    resid_yscale = np.array([resid_yscale_guess]) * 1e3
-    ax2.set_ylim(-np.nanmax(resid_yscale), np.nanmax(resid_yscale))
-
-    resid_yscale_I = np.nanmax(abs(frank_resid_I)) * 1e3
-    ax3.set_ylim(-resid_yscale_I * 1.1, resid_yscale_I * 1.1)
-
-    ax3.set_xlim(ax0.get_xbound())
-    ax3.set_ylim()
-    ax0.legend()
-    ax3.set_xlabel(r'r [arcsec]')
-    ax0.set_ylabel(r'I [mJy arcsec$^{-2}$]')
-    ax3.set_ylabel(r'Resid. I [mJy arcsec$^{-2}$]')
-
-    ax1.legend(loc=1)
-    ax2.legend(fontsize=6, loc=1)
-    ax2.set_xlabel(r'Baseline [M$\lambda$]')
-    ax1.set_ylabel('Re(V) [mJy]')
-    ax2.set_ylabel('Resid. [mJy]')
-    
-    for ax in [ax1, ax2]:
-        ax.set_xlim(0, max(bls) * 1.05 / 1e6)
-    ax1.tick_params(labelbottom=False)   
-
-    for ax in [ax0, ax1, ax2, ax3]:
-        ax.axhline(0, c='c', ls='--', zorder=10)
-
-    ff = '{}/profile_compare_cleanRobust{}_frankResidRobust{}.png'.format(
-        model["base"]["save_dir"], model["clean"]["robust"], resid_im_robust)
-    print('    saving figure to {}'.format(ff))
-    plt.savefig(ff, dpi=300)
-    
-    return fig
-
-
-def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, xy_bounds=[-7,7], include_rave=True):
-    """
-    Generate a figure comparing clean, frank, and optionally rave 2d images
-
-    Parameters
-    ----------
-    fits : nested list
-        Clean, frank, rave profiles to be plotted. Output of `input_output.load_bestfit_profiles`
-    model : dict
-        Dictionary containing pipeline parameters
-    resid_im_robust : float, default=2.0
-        Robust weighting parameter used for imaging frank residual visibilities.
-    npix : int
-        Number of pixels along one axis used to make frank images
-    xy_bounds : list of float, default=[-7,7]
-        Plot axis bounds for (assumed square) images        
-    include_rave : bool, default=True
-        Whether to include rave results in figure 
-
-    Returns
-    -------
-    fig : `plt.figure` instance
-        The generated figure
-    """
-
-    print('  Figures: making image comparison figure')
-
-    # load best-fit profiles
-    if include_rave is True:
-        [[rc, Ic, Iec], [grid, Vc]], [[rr, Ir, Ier_lo, Ier_hi], [grid, Vr]], [[rf, If, Ief], [grid, Vf], sol] = fits
-    else:
-        [[rc, Ic, Iec], [grid, Vc]], _, [[rf, If, Ief], [grid, Vf], sol] = fits
-
-    # get clean images
-    base_path = "{}/{}.combined.{}corrected.briggs.{}.{}.{}".format(
-        model["base"]["input_dir"], 
-        model["base"]["disk"], 
-        model["base"]["SMG_sub"],
-        model["clean"]["robust"], 
-        model["clean"]["npix"], 
-        model["clean"]["pixel_scale"]
-        )
-    clean_fits = base_path + ".pbcor.fits" 
-    model_fits = base_path + ".model.fits"
-
-    clean_image, clean_beam = load_fits_image(clean_fits)
-    # convert clean image from Jy / beam to Jy / arcsec^2
-    bmaj, bmin = clean_beam * 3600
-    print('    clean beam: bmaj {} x bmin {} arcsec'.format(bmaj, bmin))
-    beam_area = np.pi * bmaj * bmin / (4 * np.log(2))
-    clean_image = clean_image / beam_area 
-
-    # convert clean model image from Jy / pixel to Jy / arcsec^2
-    model_image = load_fits_image(model_fits, aux_image=True)    
-    model_image = model_image / model["clean"]["pixel_scale"] ** 2
-
-    # set clean image pixel size (assuming square image)
-    clean_im_xmax = model["clean"]["pixel_scale"] * model["clean"]["npix"] / 2
-    clean_extent = [clean_im_xmax, -clean_im_xmax, -clean_im_xmax, clean_im_xmax]
-
-    if include_rave is True:
-        # make rave pseudo-2d image
-        rave_im_xmax = model["rave"]["pixel_scale"] * len(rr) / 2 
-        rave_extent = [rave_im_xmax, -rave_im_xmax, -rave_im_xmax, rave_im_xmax]    
-        rave_image, _, _ = sweep_profile(rr, Ir, project=True,
-            xmax=rave_im_xmax, ymax=rave_im_xmax, dr=model["rave"]["pixel_scale"], 
-            phase_shift=True, geom=sol.geometry
-            )
-        rave_image = jy_convert(rave_image, 'sterad_arcsec2')
-
-        # make rave residual image (again assuming square images)
-        rave_resid_im_path = parse_rave_filename(model, file_type='rave_residual_image')
-        rave_resid_im = np.load(rave_resid_im_path)
-
-        # convert Jy / pixel to Jy / arcsec
-        rave_resid_im /= model["rave"]["pixel_scale"] ** 2 
-        rave_resid_Imax = np.nanmax(abs(rave_resid_im))
-
-    # make frank pseudo-2d image
-    xf, yf, frank_image = make_image(sol, npix, project=True)
-    frank_image = frank_image.T
-    frank_image = jy_convert(frank_image, 'sterad_arcsec2')
-    frank_extent = [xf[-1], xf[0], yf[-1], yf[0]]
-    frank_pixel_scale = np.diff(xf).mean()
-
-    frank_resid_vis = load_bestfit_frank_uvtable(model, resid_table=True)
-    # generate frank residual image
-    frank_resid_im = dirty_image(frank_resid_vis, robust=resid_im_robust, npix=npix, pixel_scale=frank_pixel_scale)
-    frank_resid_Imax = np.nanmax(abs(frank_resid_im))
-    frank_resid_extent = [xf[-1], xf[0], yf[0], yf[-1]]
-
-    # make figure
-    fig = plt.figure(figsize=(10,6))
-    fig.suptitle("{} -- robust = {} for clean (and rave if included); {} for frank imaged residuals".format(
-        model["base"]["disk"],
-        model["clean"]["bestfit"]["robust"],
-        resid_im_robust)
-        )
-    gs = GridSpec(2, 3, figure=fig, hspace=0.01, wspace=0.2, left=0.04, right=0.97, top=0.98, bottom=0.01)
-
-    ax4 = fig.add_subplot(gs[0, 0])
-    ax5 = fig.add_subplot(gs[1, 0])
-    ax6 = fig.add_subplot(gs[0, 2]) 
-    ax7 = fig.add_subplot(gs[1, 2])
-    ax8 = fig.add_subplot(gs[0, 1])
-    ax9 = fig.add_subplot(gs[1, 1])
-
-    # plot clean image
-    norm = Normalize(vmin=np.nanmin(clean_image) * 1e3, vmax=np.nanmax(clean_image) * 1e3)
-    plot_image(clean_image * 1e3, clean_extent, ax4, norm=norm,
-               cbar_label='$I_{clean}$ [mJy arcsec$^{-2}$]'
-               )
-
-    # plot clean model image
-    plot_image(model_image * 1e3, clean_extent, ax5, cmap="Reds",
-               norm=get_image_cmap_norm(model_image * 1e3, stretch='asinh'), 
-               cbar_label='$I_{clean\ model}$ [mJy arcsec$^{-2}$]'
-               )            
-
-    if include_rave is True:
-        # plot rave pseudo-image
-        plot_image(rave_image * 1e3, rave_extent, ax6, 
-                cbar_label='$I_{rave}$ [mJy arcsec$^{-2}$]'
-                )
-
-        # plot (clean - rave) image using symmetric colormap
-        rave_resid_norm = Normalize(vmin=-rave_resid_Imax * 1e3, 
-                                    vmax=rave_resid_Imax * 1e3)
-        plot_image(rave_resid_im * 1e3, rave_extent, ax7, cmap="RdBu_r",
-                norm=rave_resid_norm, 
-                cbar_label='$I_{clean - rave}$ [mJy arcsec$^{-2}$]'
-                )
-
-    # plot frank pseudo-image 
-    plot_image(frank_image * 1e3, frank_extent, ax8,
-               cbar_label='$I_{frank}$ [mJy arcsec$^{-2}$]'
-               )   
-
-    # plot frank imaged residuals using symmetric colormap
-    frank_resid_norm = Normalize(vmin=-frank_resid_Imax * 1e3, 
-                                 vmax=frank_resid_Imax * 1e3)
-    plot_image(frank_resid_im * 1e3, frank_resid_extent, ax9, cmap="RdBu_r", 
-               norm=frank_resid_norm, 
-               cbar_label='$\mathcal{F}(V_{frank\ resid.}$) [mJy arcsec$^{-2}$]'
-               ) 
-    ax9.set_title('Pixel scale {:.1f} mas'.format(frank_pixel_scale * 1e3))
-
-    for ax in [ax4, ax5, ax6, ax7, ax8, ax9]:
-        ax.set_xlim(xy_bounds[1], xy_bounds[0])
-        ax.set_ylim(xy_bounds[0], xy_bounds[1])
-
-    ff = '{}/image_compare_cleanRobust{}_frankResidRobust{}.png'.format(
-        model["base"]["save_dir"], model["clean"]["robust"], resid_im_robust)
-    print('    saving figure to {}'.format(ff))
-    plt.savefig(ff, dpi=300)
-    
-    return fig
-
-
 def frank_image_diag_figure(model, sol, frank_resid_vis, resid_im_robust=2.0, 
                             npix=1800, xy_bounds=[-7,7], save_prefix=None
                             ):
@@ -500,7 +141,7 @@ def frank_image_diag_figure(model, sol, frank_resid_vis, resid_im_robust=2.0,
     fig : `plt.figure` instance
         The generated figure
     """
-    fig, axes = plt.subplots(1, 2, figsize=(10,5))
+    fig, axes = plt.subplots(1, 2, figsize=(10,4))
     
     # make frank pseudo-2d image
     xf, yf, frank_image = make_image(sol, npix, project=True)
@@ -546,7 +187,7 @@ def frank_image_diag_figure(model, sol, frank_resid_vis, resid_im_robust=2.0,
 
 def frank_multifit_figure(model, sols, plot_var, single_panel=False, save_prefix=None):
     """
-    Generate a figure showing results of vertical inference with frank 1+1D
+    Generate a figure overplotting multiple frank fits for comparison
 
     Parameters
     ----------
@@ -837,4 +478,363 @@ def parametric_fit_figure(fit, reference, model):
     print(f"    saving figure to {ff}")
     plt.savefig(ff, dpi=300)
 
+    return fig
+
+
+def profile_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, include_rave=True):
+    """
+    Generate a figure comparing clean, frank, and optionally rave radial brightness and visibility profiles.
+
+    Parameters
+    ----------
+    fits : nested list
+        Clean, frank, rave profiles to be plotted. Output of `input_output.load_bestfit_profiles`
+    model : dict
+        Dictionary containing pipeline parameters
+    resid_im_robust : float, default=2.0
+        Robust weighting parameter used for imaging frank residual visibilities.
+    npix : int
+        Number of pixels along one axis used to make frank images
+    include_rave : bool, default=True
+        Whether to include rave results in figure 
+
+    Returns
+    -------
+    fig : `plt.figure` instance
+        The generated figure
+    """
+        
+    print('  Figures: making profile comparison figure')
+    
+    # load best-fit profiles
+    if include_rave is True:
+        [[rc, Ic, Iec], [grid, Vc]], [[rr, Ir, Ier_lo, Ier_hi], [grid, Vr]], [[rf, If, Ief], [grid, Vf], sol] = fits
+    else:
+        [[rc, Ic, Iec], [grid, Vc]], _, [[rf, If, Ief], [grid, Vf], sol] = fits
+
+    fig = plt.figure(figsize=(10,6))
+    fig.suptitle("{} -- robust = {} for clean and rave".format(
+        model["base"]["disk"],
+        model["clean"]["bestfit"]["robust"])
+        )
+
+    gs = GridSpec(4, 2, figure=fig, hspace=0, left=0.09, right=0.97, top=0.94, bottom=0.09)
+
+    ax0 = fig.add_subplot(gs[:3, 0])
+    ax3 = fig.add_subplot(gs[3, 0])
+
+    ax1 = fig.add_subplot(gs[:3, 1])
+    ax2 = fig.add_subplot(gs[3, 1])
+
+    cols, marks, labs = ['C1', 'C2'], ['.', '+'], ['clean', 'frank']
+    if include_rave is True:
+        cols, marks, labs = cols.append('C3'), marks.append('x'), labs.append('rave')
+
+    # brightness profiles (clean, frank, rave)
+    rs = [rc, rf]
+    if include_rave is True:
+        rs.append(rr)
+
+    Is_jy_sr = [Ic, If]
+    if include_rave is True:
+        Is_jy_sr.append(Ir)
+    
+    # brightness uncertainties
+    Ies_jy_sr = [[Iec, Iec], [Ief, Ief]]
+    if include_rave is True:
+        # rave fits have dfft lower and upper uncertainties
+        Ies_jy_sr.append([Ier_lo, Ier_hi])
+
+    for ii, jj in enumerate(Is_jy_sr):     
+        # convert Jy / sterad to mJy / arcsec^2
+        I_mjy_as2 = jy_convert(jj, 'sterad_arcsec2') * 1e3
+        ax0.plot(rs[ii], I_mjy_as2, c=cols[ii], label=labs[ii])
+    
+        Ie_lo_mjy_as2 = jy_convert(Ies_jy_sr[ii][0], 'sterad_arcsec2') * 1e3
+        Ie_hi_mjy_as2 = jy_convert(Ies_jy_sr[ii][1], 'sterad_arcsec2') * 1e3
+        ax0.fill_between(rs[ii], I_mjy_as2 - Ie_lo_mjy_as2, I_mjy_as2 + Ie_hi_mjy_as2, 
+                         color=cols[ii], alpha=0.4)
+
+    # plot clean, rave, frank Re(V), binned vis.
+    [u, v, vis, weights] = get_vis(model)
+
+    # deproject vis
+    up, vp, Vp = sol.geometry.apply_correction(u, v, vis)
+    bls = np.sqrt(up**2 + vp**2)
+
+    phis_mod = np.linspace(model["base"]["geom"]["PA"] - 180, 
+                                  model["base"]["geom"]["PA"] + 180,
+                                  model["clean"]["Nphi"] 
+                                  )
+    
+    if include_rave is True:
+        # plot 1d rave residual brightness   
+        rave_resid_im_path = parse_rave_filename(model, file_type='rave_residual_image')
+        rave_resid_im = np.load(rave_resid_im_path)
+        
+        # convert Jy / pixel to Jy / arcsec
+        rave_resid_im /= model["rave"]["pixel_scale"] ** 2 
+        
+        rave_resid_r, rave_resid_I = radial_profile_from_image( 
+            rave_resid_im, geom=model["base"]["geom"], 
+            rmax=max(rr), Nr=len(rr), phis=phis_mod, 
+            npix=rave_resid_im.shape[0], pixel_scale=model["rave"]["pixel_scale"],
+            bmaj=0, bmin=0, image_rms=0, model_image=True, arcsec2=False
+            )
+
+        ax3.plot(rave_resid_r, rave_resid_I * 1e3, c='C3') 
+
+    # load frank residual visibilities (at projected data u,v)
+    frank_resid_vis = load_bestfit_frank_uvtable(model, resid_table=True)
+    # get pixel scale
+    xf, _, _ = make_image(sol, npix, project=True)
+    frank_pixel_scale = np.diff(xf).mean() / 2
+    # plot 1d frank residual brightness
+    frank_resid_im = dirty_image(frank_resid_vis, robust=resid_im_robust, npix=npix, pixel_scale=frank_pixel_scale)
+    
+    frank_resid_r, frank_resid_I = radial_profile_from_image(
+        frank_resid_im, geom=model["base"]["geom"], 
+        rmax=model["frank"]["rout"], Nr=model["frank"]["N"], phis=phis_mod, 
+        npix=model["clean"]["npix"], pixel_scale=model["clean"]["pixel_scale"],
+        bmaj=0, bmin=0, image_rms=0, model_image=True, arcsec2=False
+        )
+           
+    ax3.plot(frank_resid_r, frank_resid_I * 1e3, c='C2')
+
+    # bin observed visibilities
+    bin_cols, bin_marks = ["#a4a4a4", "k"], ["x", "+"]
+    for ii, jj in enumerate(model["plot"]["bin_widths"]):
+        bin_vis = UVDataBinner(bls, Vp, weights, jj)
+        
+        # plot binned Re(V)
+        ax1.plot(bin_vis.uv / 1e6, bin_vis.V.real * 1e3, c=bin_cols[ii],
+                    marker=bin_marks[ii], ls='None',
+                    label=r'Obs., {:.0f} k$\lambda$ bins'.format(jj / 1e3)
+                    )
+        
+    # plot vis fits
+    vis_profiles = [Vc, Vf]
+    if include_rave is True:
+        vis_profiles.append(Vr)
+
+    for ii, jj in enumerate(vis_profiles):
+        ax1.plot(grid / 1e6, jj * 1e3, c=cols[ii], label=labs[ii])
+
+    # plot binned visibility residuals
+    bin_vis = UVDataBinner(bls, Vp, weights, model["plot"]["bin_widths"][-1])    
+    _, bin_Vc = generic_dht(rc, Ic, Rmax=sol.Rmax, N=sol._info["N"], 
+        grid=bin_vis.uv, inc=0)
+    bin_Vf = sol.predict_deprojected(bin_vis.uv, I=If)
+    if include_rave is True:
+        _, bin_Vr = generic_dht(rr, Ir, Rmax=sol.Rmax, N=sol._info["N"], 
+            grid=bin_vis.uv, inc=0)
+
+    resid_yscale_guess = []
+    binned_vis_profiles = [bin_Vc, bin_Vf]
+    if include_rave is True:
+        binned_vis_profiles.append(bin_Vr)
+        
+    for ii, jj in enumerate(binned_vis_profiles):
+        # bin vis fit residuals
+        resid = bin_vis.V.real - jj
+        rmse = np.sqrt(np.mean(resid ** 2))
+
+        resid_yscale_guess.append(resid.mean() + resid.std())
+
+        # plot fit residuals
+        ax2.plot(bin_vis.uv / 1e6, resid * 1e3, c=cols[ii], 
+                          marker=marks[ii], ls='None',
+                        label=r'RMSE {:.3f} mJy'.format(rmse * 1e3))
+
+    # symmetric y-bounds for residuals
+    resid_yscale = np.array([resid_yscale_guess]) * 1e3
+    ax2.set_ylim(-np.nanmax(resid_yscale), np.nanmax(resid_yscale))
+
+    resid_yscale_I = np.nanmax(abs(frank_resid_I)) * 1e3
+    ax3.set_ylim(-resid_yscale_I * 1.1, resid_yscale_I * 1.1)
+
+    ax3.set_xlim(ax0.get_xbound())
+    ax3.set_ylim()
+    ax0.legend()
+    ax3.set_xlabel(r'r [arcsec]')
+    ax0.set_ylabel(r'I [mJy arcsec$^{-2}$]')
+    ax3.set_ylabel(r'Resid. I [mJy arcsec$^{-2}$]')
+
+    ax1.legend(loc=1)
+    ax2.legend(fontsize=6, loc=1)
+    ax2.set_xlabel(r'Baseline [M$\lambda$]')
+    ax1.set_ylabel('Re(V) [mJy]')
+    ax2.set_ylabel('Resid. [mJy]')
+    
+    for ax in [ax1, ax2]:
+        ax.set_xlim(0, max(bls) * 1.05 / 1e6)
+    ax1.tick_params(labelbottom=False)   
+
+    for ax in [ax0, ax1, ax2, ax3]:
+        ax.axhline(0, c='c', ls='--', zorder=10)
+
+    ff = '{}/profile_compare_cleanRobust{}_frankResidRobust{}.png'.format(
+        model["base"]["save_dir"], model["clean"]["robust"], resid_im_robust)
+    print('    saving figure to {}'.format(ff))
+    plt.savefig(ff, dpi=300)
+    
+    return fig
+
+
+def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, xy_bounds=[-7,7], include_rave=True):
+    """
+    Generate a figure comparing clean, frank, and optionally rave 2d images
+
+    Parameters
+    ----------
+    fits : nested list
+        Clean, frank, rave profiles to be plotted. Output of `input_output.load_bestfit_profiles`
+    model : dict
+        Dictionary containing pipeline parameters
+    resid_im_robust : float, default=2.0
+        Robust weighting parameter used for imaging frank residual visibilities.
+    npix : int
+        Number of pixels along one axis used to make frank images
+    xy_bounds : list of float, default=[-7,7]
+        Plot axis bounds for (assumed square) images        
+    include_rave : bool, default=True
+        Whether to include rave results in figure 
+
+    Returns
+    -------
+    fig : `plt.figure` instance
+        The generated figure
+    """
+
+    print('  Figures: making image comparison figure')
+
+    # load best-fit profiles
+    if include_rave is True:
+        [[rc, Ic, Iec], [grid, Vc]], [[rr, Ir, Ier_lo, Ier_hi], [grid, Vr]], [[rf, If, Ief], [grid, Vf], sol] = fits
+    else:
+        [[rc, Ic, Iec], [grid, Vc]], _, [[rf, If, Ief], [grid, Vf], sol] = fits
+
+    # get clean images
+    base_path = "{}/{}.combined.{}corrected.briggs.{}.{}.{}".format(
+        model["base"]["input_dir"], 
+        model["base"]["disk"], 
+        model["base"]["SMG_sub"],
+        model["clean"]["robust"], 
+        model["clean"]["npix"], 
+        model["clean"]["pixel_scale"]
+        )
+    clean_fits = base_path + ".pbcor.fits" 
+    model_fits = base_path + ".model.fits"
+
+    clean_image, clean_beam = load_fits_image(clean_fits)
+    # convert clean image from Jy / beam to Jy / arcsec^2
+    bmaj, bmin = clean_beam * 3600
+    print('    clean beam: bmaj {} x bmin {} arcsec'.format(bmaj, bmin))
+    beam_area = np.pi * bmaj * bmin / (4 * np.log(2))
+    clean_image = clean_image / beam_area 
+
+    # convert clean model image from Jy / pixel to Jy / arcsec^2
+    model_image = load_fits_image(model_fits, aux_image=True)    
+    model_image = model_image / model["clean"]["pixel_scale"] ** 2
+
+    # set clean image pixel size (assuming square image)
+    clean_im_xmax = model["clean"]["pixel_scale"] * model["clean"]["npix"] / 2
+    clean_extent = [clean_im_xmax, -clean_im_xmax, -clean_im_xmax, clean_im_xmax]
+
+    if include_rave is True:
+        # make rave pseudo-2d image
+        rave_im_xmax = model["rave"]["pixel_scale"] * len(rr) / 2 
+        rave_extent = [rave_im_xmax, -rave_im_xmax, -rave_im_xmax, rave_im_xmax]    
+        rave_image, _, _ = sweep_profile(rr, Ir, project=True,
+            xmax=rave_im_xmax, ymax=rave_im_xmax, dr=model["rave"]["pixel_scale"], 
+            phase_shift=True, geom=sol.geometry
+            )
+        rave_image = jy_convert(rave_image, 'sterad_arcsec2')
+
+        # make rave residual image (again assuming square images)
+        rave_resid_im_path = parse_rave_filename(model, file_type='rave_residual_image')
+        rave_resid_im = np.load(rave_resid_im_path)
+
+        # convert Jy / pixel to Jy / arcsec
+        rave_resid_im /= model["rave"]["pixel_scale"] ** 2 
+        rave_resid_Imax = np.nanmax(abs(rave_resid_im))
+
+    # make frank pseudo-2d image
+    xf, yf, frank_image = make_image(sol, npix, project=True)
+    frank_image = frank_image.T
+    frank_image = jy_convert(frank_image, 'sterad_arcsec2')
+    frank_extent = [xf[-1], xf[0], yf[-1], yf[0]]
+    frank_pixel_scale = np.diff(xf).mean()
+
+    frank_resid_vis = load_bestfit_frank_uvtable(model, resid_table=True)
+    # generate frank residual image
+    frank_resid_im = dirty_image(frank_resid_vis, robust=resid_im_robust, npix=npix, pixel_scale=frank_pixel_scale)
+    frank_resid_Imax = np.nanmax(abs(frank_resid_im))
+    frank_resid_extent = [xf[-1], xf[0], yf[0], yf[-1]]
+
+    # make figure
+    fig = plt.figure(figsize=(10,6))
+    fig.suptitle("{} -- robust = {} for clean (and rave if included); {} for frank imaged residuals".format(
+        model["base"]["disk"],
+        model["clean"]["bestfit"]["robust"],
+        resid_im_robust)
+        )
+    gs = GridSpec(2, 3, figure=fig, hspace=0.01, wspace=0.2, left=0.04, right=0.97, top=0.98, bottom=0.01)
+
+    ax4 = fig.add_subplot(gs[0, 0])
+    ax5 = fig.add_subplot(gs[1, 0])
+    ax6 = fig.add_subplot(gs[0, 2]) 
+    ax7 = fig.add_subplot(gs[1, 2])
+    ax8 = fig.add_subplot(gs[0, 1])
+    ax9 = fig.add_subplot(gs[1, 1])
+
+    # plot clean image
+    norm = Normalize(vmin=np.nanmin(clean_image) * 1e3, vmax=np.nanmax(clean_image) * 1e3)
+    plot_image(clean_image * 1e3, clean_extent, ax4, norm=norm,
+               cbar_label='$I_{clean}$ [mJy arcsec$^{-2}$]'
+               )
+
+    # plot clean model image
+    plot_image(model_image * 1e3, clean_extent, ax5, cmap="Reds",
+               norm=get_image_cmap_norm(model_image * 1e3, stretch='asinh'), 
+               cbar_label='$I_{clean\ model}$ [mJy arcsec$^{-2}$]'
+               )            
+
+    if include_rave is True:
+        # plot rave pseudo-image
+        plot_image(rave_image * 1e3, rave_extent, ax6, 
+                cbar_label='$I_{rave}$ [mJy arcsec$^{-2}$]'
+                )
+
+        # plot (clean - rave) image using symmetric colormap
+        rave_resid_norm = Normalize(vmin=-rave_resid_Imax * 1e3, 
+                                    vmax=rave_resid_Imax * 1e3)
+        plot_image(rave_resid_im * 1e3, rave_extent, ax7, cmap="RdBu_r",
+                norm=rave_resid_norm, 
+                cbar_label='$I_{clean - rave}$ [mJy arcsec$^{-2}$]'
+                )
+
+    # plot frank pseudo-image 
+    plot_image(frank_image * 1e3, frank_extent, ax8,
+               cbar_label='$I_{frank}$ [mJy arcsec$^{-2}$]'
+               )   
+
+    # plot frank imaged residuals using symmetric colormap
+    frank_resid_norm = Normalize(vmin=-frank_resid_Imax * 1e3, 
+                                 vmax=frank_resid_Imax * 1e3)
+    plot_image(frank_resid_im * 1e3, frank_resid_extent, ax9, cmap="RdBu_r", 
+               norm=frank_resid_norm, 
+               cbar_label='$\mathcal{F}(V_{frank\ resid.}$) [mJy arcsec$^{-2}$]'
+               ) 
+    ax9.set_title('Pixel scale {:.1f} mas'.format(frank_pixel_scale * 1e3))
+
+    for ax in [ax4, ax5, ax6, ax7, ax8, ax9]:
+        ax.set_xlim(xy_bounds[1], xy_bounds[0])
+        ax.set_ylim(xy_bounds[0], xy_bounds[1])
+
+    ff = '{}/image_compare_cleanRobust{}_frankResidRobust{}.png'.format(
+        model["base"]["save_dir"], model["clean"]["robust"], resid_im_robust)
+    print('    saving figure to {}'.format(ff))
+    plt.savefig(ff, dpi=300)
+    
     return fig
