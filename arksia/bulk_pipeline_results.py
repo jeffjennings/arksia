@@ -1,6 +1,7 @@
 """This module contains a function to obtain results from fits/analysis of multiple sources
 (written by Jeff Jennings)."""
 
+import os
 import json
 import numpy as np 
 import matplotlib.pyplot as plt 
@@ -11,7 +12,8 @@ from arksia.input_output import load_bestfit_profiles
 def main(gen_par_f='./pars_gen.json',
          source_par_f='./pars_source.json', 
          phys_par_f='./summary_disc_parameters.csv',
-         profiles_txt=True, profiles_fig=True, robust=2.0,
+         profiles_txt=True, 
+         profiles_fig=True, robust=0.5,
          include_rave=True
                    ):
     """
@@ -52,10 +54,17 @@ def main(gen_par_f='./pars_gen.json',
     fig1, axs1 = plt.subplots(nrows=5, ncols=4, figsize=(10, 10), squeeze=True)
     figs, axs = [fig0, fig1], [axs0, axs1]
 
+    gen_pars = json.load(open(gen_par_f, 'r'))
     for ii, jj in enumerate(disk_names):
         # generate model for each source
+
+        gen_pars['base']['input_dir'] = f"./{jj}"
+        gen_pars_current = os.path.join(os.path.dirname(gen_par_f), 'pars_gen_temp.json')
+        with open(gen_pars_current, 'w') as f:
+            json.dump(gen_pars, f)
+
         class parsed_args():
-            base_parameter_filename = gen_par_f
+            base_parameter_filename = gen_pars_current
             source_parameter_filename = source_par_f
             physical_parameter_filename = phys_par_f
             disk = jj
@@ -147,6 +156,8 @@ def main(gen_par_f='./pars_gen.json',
 
     plt.figure(fig0); plt.tight_layout(); plt.savefig(ff0, dpi=300)
     plt.figure(fig1); plt.tight_layout(); plt.savefig(ff1, dpi=300)
+
+    os.remove(gen_pars_current)
 
     return figs
     
