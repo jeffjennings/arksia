@@ -36,6 +36,60 @@ def plot_image(image, extent, ax, norm=None, cmap='inferno', title=None,
     ax.set_title(title)  
 
 
+def clean_diagnostic_figure(model, clean_image, clean_profile, 
+                            model_image=None, model_profile=None):
+
+    print('  Figures: making clean diagnostic figure')
+
+    fig = plt.figure(figsize=(10,6))
+    fig.suptitle("{} -- robust = {}".format(model["base"]["disk"],
+                                            model["clean"]["robust"])
+                                            )
+    
+    gs = GridSpec(2, 2, figure=fig, hspace=0, left=0.09, right=0.97, top=0.94, bottom=0.19)
+    gs1 = GridSpec(2, 1, figure=fig, hspace=0, left=0.09, right=0.97, top=0.9, bottom=0.09)
+
+    ax0, ax1 = fig.add_subplot(gs[0]), fig.add_subplot(gs[1])
+    ax2 = fig.add_subplot(gs1[1])
+    
+    # plot clean image
+    clean_im_xmax = model["clean"]["pixel_scale"] * model["clean"]["npix"] / 2
+    clean_extent = [clean_im_xmax, -clean_im_xmax, -clean_im_xmax, clean_im_xmax]
+
+    plot_image(clean_image * 1e3, clean_extent, ax0, 
+            #    norm=get_image_cmap_norm(clean_image * 1e3, stretch='asinh'),               
+               cbar_label='$I_{clean}$ [mJy arcsec$^{-2}$]'
+               )
+
+    # plot clean model image
+    if model_image is not None:
+        plot_image(model_image * 1e3, clean_extent, ax1, cmap="Reds",
+                norm=get_image_cmap_norm(model_image * 1e3, stretch='asinh'), 
+                cbar_label='$I_{clean\ model}$ [mJy arcsec$^{-2}$]'
+                )    
+    
+    # plot radial brightness profiles
+    if model_profile is not None:
+        ax2.plot(model_profile[0], model_profile[1], '#a4a4a4', label='.model')
+
+    ax2.plot(clean_profile[0], clean_profile[1], 'r', label='.image')
+    ax2.fill_between(clean_profile[0], 
+                     clean_profile[1] - clean_profile[2], 
+                     clean_profile[1] + clean_profile[2], 
+                     color='r', alpha=0.4
+                     )
+    
+    ax2.set_xlabel('r ["]')
+    ax2.set_ylabel('I [Jy / sr]')
+    ax2.legend()
+    
+    ff = f"{model['base']['clean_dir']}/clean_profiles_robust{model['clean']['robust']}.png"
+    print('    saving figure to {}'.format(ff))
+    plt.savefig(ff, dpi=300)
+
+    return fig 
+
+
 def profile_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, include_rave=True):
     """
     Generate a figure comparing clean, frank, and optionally rave radial brightness and visibility profiles.
