@@ -132,17 +132,21 @@ def main(gen_par_f='./pars_gen.json',
                 
                     if hh == 1:
                         # 1 sigma uncertainty band
-                        ax[ii].fill_between(rf * model["base"]["dist"], 
+                        band = ax[ii].fill_between(rf * model["base"]["dist"], 
                                             (ll - Ies_interp[kk][0]) / 1e6, (ll + Ies_interp[kk][1]) / 1e6, 
                                         color=cols[kk], alpha=0.4)
-                
+                        # prevent 1 sigma band from altering y-limits
+                        band.remove()
+                        ax[ii].relim()
+                        ax[ii].add_collection(band, autolim=False)
+
                 ax[ii].axhline(y=0, ls='--', c='k')
 
                 fstar_ujy = model["frank"]["fstar"] * 1e6
-                ax[ii].text(0.6, 0.9, f"{jj}\n$Fstar {fstar_ujy:.0f} uJy", transform=ax[ii].transAxes)
+                ax[ii].set_title(f"{jj}, " + r"$F_* =$ " + f"{fstar_ujy:.0f} uJy", fontsize=10)
 
-                if ii == len(disk_names) - 1:
-                    ax[ii].legend(loc='center right')
+                if ii == 0:
+                    ax[ii].legend(loc='upper right', fontsize=8)
                     ax[ii].set_xlabel('r [au]')
                     ax[ii].set_ylabel(r'I [$10^5$ Jy sterad$^{-1}$]')
 
