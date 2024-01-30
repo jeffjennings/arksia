@@ -184,21 +184,45 @@ def model_setup(parsed_args):
         model["rave"]["pixel_scale"] = disk_pars["rave"]["pixel_scale"]
     
     if model["base"]["run_frank"] is True:
-        os.makedirs(model["base"]["frank_dir"], exist_ok=True)
-        # handle non-list inputs
-        if type(model["frank"]["alpha"]) in [int, float]:
-            model["frank"]["alpha"] = [model["frank"]["alpha"]]
-        if type(model["frank"]["wsmooth"]) in [int, float]:
-            model["frank"]["wsmooth"] = [model["frank"]["wsmooth"]]
-        if type(model["frank"]["scale_height"]) in [int, float]:
-            model["frank"]["scale_height"] = [model["frank"]["scale_height"]]
-        
-        # enforce a Normal fit if finding scale height (LogNormal fit not compatible with vertical inference)
-        if model["frank"]["scale_height"] is not None:
-            print("  Model setup: 'scale_height' is not None in your parameter file -- enforcing frank 'method=Normal' and 'max_iter=2000'")
-            model["frank"]["method"] = "Normal"
-            model["frank"]["max_iter"] = 2000
-        
+        if model["base"]["reproduce_best_frank"] is True:
+            print("\n  Model setup: Overriding 'frank' choices in your parameter file to reproduce best-fit model (without scale-height inference)\n")
+      
+            model["frank"]["rout"] = disk_pars["frank"]["bestfit"]["rout"]
+            model["frank"]["N"] = disk_pars["frank"]["bestfit"]["N"]
+            model["frank"]["alpha"] = [disk_pars["frank"]["bestfit"]["alpha"]]
+            model["frank"]["wsmooth"] = [disk_pars["frank"]["bestfit"]["wsmooth"]]
+            model["frank"]["method"] = disk_pars["frank"]["bestfit"]["method"]
+            model["frank"]["I_scale"] = 1e2
+            model["frank"]["max_iter"] = 1000
+            model["frank"]["set_fstar"] = "MCMC"
+            model["frank"]["scale_height"] = None
+            model["frank"]["save_solution"] = True
+            model["frank"]["save_profile_fit"] = True
+            model["frank"]["save_vis_fit"] = True
+            model["frank"]["save_uvtables"] = True
+            model["frank"]["make_quick_fig"] = True
+            model["plot"]["image_xy_bounds"] = [-disk_pars["frank"]["bestfit"]["rout"], disk_pars["frank"]["bestfit"]["rout"]]
+            model["plot"]["frank_resid_im_robust"] = 0.5
+
+        else:
+            os.makedirs(model["base"]["frank_dir"], exist_ok=True)
+            # handle non-list inputs
+            if type(model["frank"]["alpha"]) in [int, float]:
+                model["frank"]["alpha"] = [model["frank"]["alpha"]]
+            if type(model["frank"]["wsmooth"]) in [int, float]:
+                model["frank"]["wsmooth"] = [model["frank"]["wsmooth"]]
+            if type(model["frank"]["scale_height"]) in [int, float]:
+                model["frank"]["scale_height"] = [model["frank"]["scale_height"]]
+            
+            # enforce a Normal fit if finding scale height 
+            # (LogNormal fit is not supported for vertical inference)
+            if model["frank"]["scale_height"] is not None:
+                print("""  Model setup: 'scale_height' is not None in your parameter file 
+                      -- enforcing frank 'method=Normal' and 'max_iter=2000'
+                      """)
+                model["frank"]["method"] = "Normal"
+                model["frank"]["max_iter"] = 2000
+
     if model["base"]["run_parametric"] is True:
         os.makedirs(model["base"]["parametric_dir"], exist_ok=True)
         # handle non-list input
@@ -220,7 +244,9 @@ def model_setup(parsed_args):
         try:
             model["frank"]["fstar"] = phys_pars["Fstar_MCMC"] / 1e3
         except TypeError:
-            print(f"  Model setup: {parsed_args.physical_parameter_filename} has no stellar flux for {model['base']['disk']} --> using SED estimate of stellar flux")
+            print(f"""Model setup: {parsed_args.physical_parameter_filename} 
+                  has no stellar flux for {model['base']['disk']} --> using SED estimate of stellar flux
+                  """)
             model["frank"]["fstar"] = phys_pars["Fstar_SED"] / 1e6
     else:
         raise ValueError(f"Parameter ['frank']['set_fstar'] {model['frank']['set_fstar']} must be one of ['MCMC', 'SED', 'custom']") 
