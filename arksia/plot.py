@@ -38,6 +38,26 @@ def plot_image(image, extent, ax, norm=None, cmap='inferno', title=None,
 
 def clean_diagnostic_figure(model, clean_image, clean_profile, 
                             model_image=None, model_profile=None):
+    """Generate a figure showing a clean .model, .image, and their radial profiles
+    
+    Parameters
+    ----------
+    model : dict
+        Dictionary containing pipeline parameters
+    clean_image : .fits image
+        Clean .image
+    clean_profile : list
+        Radial brightness profile of clean .image. List like [x, y, y_uncertainty]
+    model_image : .fits image, optional
+        Clean .model
+    model_profile : list
+        Radial brightness profile of clean .model. List like [x, y]
+
+    Returns
+    -------
+    fig : `plt.figure` instance
+        The generated figure
+    """
 
     print('  Figures: making clean diagnostic figure')
 
