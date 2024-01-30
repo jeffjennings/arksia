@@ -333,15 +333,7 @@ def extract_clean_profile(model):
                 model_fits.split('/')[-1])
             )
  
-    plt.figure()
-    plt.title(f"{model['base']['disk']}, robust {model['clean']['robust']}")
-    plt.plot(r_mod, I_mod, '#a4a4a4', label='clean model')
-    plt.plot(r, I, 'r', label='clean image')
-    plt.fill_between(r, I - I_err, I + I_err, color='r', alpha=0.4)
-    plt.xlabel('r ["]')
-    plt.ylabel('I [Jy / sr]')
-    plt.legend()
-    plt.savefig(f"{model['base']['clean_dir']}/clean_profiles.png", dpi=300)
+    clean_diag_fig = plot.clean_diagnostic_figure(model, clean_image, [r, I, I_err], model_image, [r_mod, I_mod])
     
 
 def process_rave_fit(model):
