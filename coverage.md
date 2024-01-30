@@ -7,6 +7,6 @@
 | arksia/imager.py                   |        9 |        0 |    100% |
 | arksia/input\_output.py            |       89 |       26 |     71% |
 | arksia/parametric\_fitter.py       |      148 |       77 |     48% |
-| arksia/pipeline.py                 |      301 |       58 |     81% |
-| arksia/plot.py                     |      366 |       26 |     93% |
-|                          **TOTAL** | **1182** |  **221** | **81%** |
+| arksia/pipeline.py                 |      301 |       41 |     86% |
+| arksia/plot.py                     |      375 |       29 |     92% |
+|                          **TOTAL** | **1191** |  **207** | **83%** |
