@@ -73,6 +73,19 @@ def test_pipeline_frank_fit():
     _run_pipeline(gen_pars_file)
 
 
+def test_pipeline_frank_reproduce_bestfit():
+    """Run the pipeline to perform a frank fit, using bestfit parameters in 'source_pars'"""
+
+    # Default generic parameters file
+    gen_pars = pipeline.load_default_parameters()
+
+    gen_pars = update_frank_pars(gen_pars)
+    gen_pars['base']['reproduce_best_frank'] = True
+    gen_pars_file = save_custom_gen_pars(gen_pars)
+
+    _run_pipeline(gen_pars_file)
+
+
 def test_pipeline_frank_logfit():
     """Run the pipeline to perform a frank fit in log(brightness)"""
 
