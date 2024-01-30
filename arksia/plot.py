@@ -35,6 +35,8 @@ def plot_image(image, extent, ax, norm=None, cmap='inferno', title=None,
         cbar.set_label(cbar_label)
     ax.set_title(title)  
 
+    return im, cbar
+
 
 def clean_diag_figure(model, clean_image, clean_profile, 
                             model_image=None, model_profile=None):
@@ -513,9 +515,10 @@ def profile_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, inclu
         [[rc, Ic, Iec], [grid, Vc]], _, [[rf, If, Ief], [grid, Vf], sol] = fits
 
     fig = plt.figure(figsize=(10,6))
-    fig.suptitle("{} -- robust = {} for clean and rave".format(
+    fig.suptitle(r"{} -- robust = {} for clean and rave. F$_*$ = {:.0f} uJy for frank".format(
         model["base"]["disk"],
-        model["clean"]["bestfit"]["robust"])
+        model["clean"]["bestfit"]["robust"],
+        model["frank"]["fstar"] * 1e6)
         )
 
     gs = GridSpec(4, 2, figure=fig, hspace=0, left=0.09, right=0.97, top=0.94, bottom=0.09)
@@ -552,8 +555,12 @@ def profile_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, inclu
     
         Ie_lo_mjy_as2 = jy_convert(Ies_jy_sr[ii][0], 'sterad_arcsec2') * 1e3
         Ie_hi_mjy_as2 = jy_convert(Ies_jy_sr[ii][1], 'sterad_arcsec2') * 1e3
-        ax0.fill_between(rs[ii], I_mjy_as2 - Ie_lo_mjy_as2, I_mjy_as2 + Ie_hi_mjy_as2, 
+        band = ax0.fill_between(rs[ii], I_mjy_as2 - Ie_lo_mjy_as2, I_mjy_as2 + Ie_hi_mjy_as2, 
                          color=cols[ii], alpha=0.4)
+        # prevent 1 sigma band from altering y-limits
+        band.remove()
+        ax0.relim()
+        ax0.add_collection(band, autolim=False)
 
     # plot clean, rave, frank Re(V), binned vis.
     [u, v, vis, weights] = get_vis(model)
@@ -774,19 +781,18 @@ def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, xy_boun
 
     # make figure
     fig = plt.figure(figsize=(10,6))
-    fig.suptitle("{} -- robust = {} for clean (and rave if included); {} for frank imaged residuals".format(
-        model["base"]["disk"],
-        model["clean"]["bestfit"]["robust"],
-        resid_im_robust)
+    fig.suptitle(f"{ model['base']['disk']} -- robust = {model['clean']['bestfit']['robust']} for clean and rave; {resid_im_robust} for frank imaged residuals",
+        fontsize=8
         )
     gs = GridSpec(2, 3, figure=fig, hspace=0.01, wspace=0.2, left=0.04, right=0.97, top=0.98, bottom=0.01)
 
     ax4 = fig.add_subplot(gs[0, 0])
     ax5 = fig.add_subplot(gs[1, 0])
-    ax6 = fig.add_subplot(gs[0, 2]) 
-    ax7 = fig.add_subplot(gs[1, 2])
     ax8 = fig.add_subplot(gs[0, 1])
-    ax9 = fig.add_subplot(gs[1, 1])
+    ax9 = fig.add_subplot(gs[1, 1])    
+    if include_rave is True:
+        ax6 = fig.add_subplot(gs[0, 2]) 
+        ax7 = fig.add_subplot(gs[1, 2])
 
     # plot clean image
     norm = Normalize(vmin=np.nanmin(clean_image) * 1e3, vmax=np.nanmax(clean_image) * 1e3)
@@ -826,11 +832,15 @@ def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, xy_boun
                norm=frank_resid_norm, 
                cbar_label='$\mathcal{F}(V_{frank\ resid.}$) [mJy arcsec$^{-2}$]'
                ) 
-    ax9.set_title('Pixel scale {:.1f} mas'.format(frank_pixel_scale * 1e3))
+    ax9.set_title('Pixel scale {:.1f} mas'.format(frank_pixel_scale * 1e3), fontsize=8)
 
-    for ax in [ax4, ax5, ax6, ax7, ax8, ax9]:
+    axs = [ax4, ax5, ax8, ax9]
+    if include_rave is True:
+        axs += [ax6, ax7]
+    for ax in axs:
         ax.set_xlim(xy_bounds[1], xy_bounds[0])
         ax.set_ylim(xy_bounds[0], xy_bounds[1])
+        ax.tick_params(axis='both', which='both', labelsize=8)
 
     ff = '{}/image_compare_cleanRobust{}_frankResidRobust{}.png'.format(
         model["base"]["save_dir"], model["clean"]["robust"], resid_im_robust)
