@@ -612,11 +612,11 @@ def fit_parametric(fits, model):
     Returns
     -------
     PFits : list of `ParametricFit` objects
-        Results of the parameteric fitting optimization loop
+        Results of the parameteric fitting optimization
         (see `parametric_fitter.ParametricFit`)
-    frank_profile : list
-        The best-fit frank brigthness profile to which a parametric form is 
-        being fit (see `input_output.load_bestfit_profiles`)
+    fit_region : list
+        The brightness profile [radial points, brightness, uncertainty] 
+        to which a parametric form is being fit
     figs : list of `plt.figure`
         Generated figures, each showing the fit for one parametric form
     """
@@ -627,12 +627,22 @@ def fit_parametric(fits, model):
     _, _, results = fits
     frank_profile = results[0]
 
+    fit_region = frank_profile * 1
+    
+    if model['parametric']['fit_range'] is not None:
+        print(f"    restricting fit region to {model['parametric']['fit_range']} arcsec")
+        # restrict region of profile to fit parametric form to
+        idx = [i for i,x in enumerate(frank_profile[0]) if model['parametric']['fit_range'][0] <= x <= model['parametric']['fit_range'][1]]
+        fit_region[0] = fit_region[0][idx]
+        fit_region[1] = fit_region[1][idx]
+        fit_region[2] = fit_region[2][idx]
+
     # run parametric fits
     figs = []
     PFits = []
     for pp in model['parametric']['form']:
         print(f"    fitting parametric form {pp}")
-        PFit = parametric_fitter.ParametricFit(frank_profile, 
+        PFit = parametric_fitter.ParametricFit(fit_region, 
                                             model, 
                                             func_form=pp,
                                             learn_rate=model['parametric']['learn_rate'], 
