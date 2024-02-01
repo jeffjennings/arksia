@@ -148,7 +148,7 @@ def main(gen_par_f='./pars_gen.json',
                 if ii == 0:
                     ax[ii].legend(loc='upper right', fontsize=8)
                     ax[ii].set_xlabel('r [au]')
-                    ax[ii].set_ylabel(r'I [$10^5$ Jy sterad$^{-1}$]')
+                    ax[ii].set_ylabel(r'I [MJy sterad$^{-1}$]')
 
     if profiles_fig:
         print('  Survey summary: making survey summary figure')

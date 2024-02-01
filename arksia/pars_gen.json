@@ -41,6 +41,7 @@
   },
 
   "parametric" : {
+    "reference"             : "frank",
     "form"                  : ["asym_gauss"],
     "fit_range"             : null,
     "device"                : null,

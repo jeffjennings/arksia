@@ -41,6 +41,7 @@
     },
   
     "parametric" : {
+      "reference"             : "Which best-fit radial profile to fit a parametric form to. Either 'frank' or 'clean'.",      
       "form"                  : "A string, or list of parametric functional forms to fit to a nonparametric profile. One or more of ['asym_gauss', 'triple_gauss', 'double_powerlaw', 'double_powerlaw_erf', 'double_powerlaw_gauss', 'double_powerlaw_double_gauss', 'single_erf_powerlaw', 'double_erf_powerlaw'] (see 'parametric_forms.py').",
       "fit_range"             : "Radial range over which to fit the parametric form, unit=[arcsec]. If null, form will be fit to full radial profile.",
       "device"                : "The backend device on which to run the parametric fitter using JAX. Can be null, 'cpu', 'gpu', 'tpu', or one of `jax.devices()`. If null, JAX will use a GPU or TPU if available, else fall back to the CPU.",
