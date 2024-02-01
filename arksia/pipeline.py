@@ -631,6 +631,14 @@ def fit_parametric(fits, model):
     if model['parametric']['reference'] == 'frank':
         _, _, results = fits
         reference_profile = results[0]
+    else:
+        results, _, _ = fits
+        reference_profile = results[0]
+        # remove nan
+        good_idx = ~np.isnan(reference_profile[1])
+        for rr in range(3):
+            reference_profile[rr] = reference_profile[rr][good_idx]
+    fit_region = reference_profile * 1
     
     if model['parametric']['fit_range'] is not None:
         print(f"    restricting fit region to {model['parametric']['fit_range']} arcsec")
@@ -719,6 +727,8 @@ def main(*args):
     if model["base"]["run_parametric"] is True:
         if model["parametric"]["reference"] == "frank":
             fits = input_output.load_bestfit_profiles(model, include_clean=False, include_rave=False)
+        else:
+            fits = input_output.load_bestfit_profiles(model, include_clean=True, include_rave=False)
         parametric_fits, fit_region, figs = fit_parametric(fits, model)
 
 if __name__ == "__main__":

@@ -455,8 +455,8 @@ def parametric_fit_figure(model, fit, reference, fit_region=None):
     fit_final = fit.parametric_model(fit.bestfit_params, rr)
     resid = II - fit_final
 
-    axes[0].plot(rr, II / 1e6, '#0DB61F', label='frank')
-    # frank 1 sigma
+    axes[0].plot(rr, II / 1e6, '#0DB61F', label='reference')
+    # 1 sigma
     # band = axes[0].fill_between(rr, (II - ss) / 1e6, (II + ss) / 1e6, color='k', alpha=0.4)    
     # prevent 1 sigma band from altering y-limits
     # reset_axis_limits(axes[0], band)
@@ -489,7 +489,7 @@ def parametric_fit_figure(model, fit, reference, fit_region=None):
     axes[1].set_xlabel(r'Iteration')    
     axes[1].set_ylabel(r'Loss')    
 
-    ff = f"{model['base']['parametric_dir']}/parametric_fit_{fit.functional_form}.png"
+    ff = f"{model['base']['parametric_dir']}/parametric_fit_to_{model['parametric']['reference']}_{fit.functional_form}.png"
     print(f"    saving figure to {ff}")
     plt.savefig(ff, dpi=300)
 
