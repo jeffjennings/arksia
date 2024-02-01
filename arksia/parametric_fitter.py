@@ -10,13 +10,13 @@ from arksia import parametric_forms
 
 class ParametricFit():
     """
-    Result of a frank fit with a Gaussian brightness model.
+    Result of a parametric fit to a nonparametric brightness profile
 
     Parameters
     ----------
     truth : nested list
-        Nonparametric brightness profile to which a functional form will be fit.
-        Radial points of fit, brightness values, 1\sigma uncertainty.
+        Brightness profile to which a functional form will be fit.
+        List of [radial points, brightness values, 1 sigma uncertainty].
     model : dict
         Dictionary containing pipeline parameters
     func_form : list of str
@@ -60,9 +60,11 @@ class ParametricFit():
         
         form = self._form
 
-        if form == 'asym_gauss':
+        if form == 'gauss':
+            return parametric_forms.gauss(params, x) 
+        elif form == 'asym_gauss':
             return parametric_forms.asym_gauss(params, x) 
-        if form == 'triple_gauss':
+        elif form == 'triple_gauss':
             return parametric_forms.triple_gauss(params, x) 
         
         elif form == 'double_powerlaw':
@@ -156,7 +158,13 @@ class ParametricFit():
         fwhm = (self._x[idx] - Rc) * 2
         sigma = fwhm / (8 * jnp.log(2)) ** 0.5
 
-        if form == 'asym_gauss':
+        if form == 'gauss':
+            self._initial_params["Rc"] = Rc
+            self._initial_params["a"] = amax
+            self._initial_params["sigma"] = sigma
+            self._initial_params["b"] = 0.0
+
+        elif form == 'asym_gauss':
             self._initial_params["Rc"] = Rc
             self._initial_params["a"] = amax
             self._initial_params["sigma1"] = sigma
@@ -229,7 +237,7 @@ class ParametricFit():
             self._initial_params["alpha"] = 1.0
 
         else:
-            raise ValueError(f"{form} invalid")
+            raise ValueError(f"functional form {form} invalid")
         
         optimizer = optax.adam(self._learn_rate)
 
@@ -238,7 +246,7 @@ class ParametricFit():
 
     @property
     def functional_form(self):
-        """String of the name of the fit functional form"""
+        """String name of the fit functional form"""
         return self._form
     
     @property
