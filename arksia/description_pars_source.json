@@ -19,7 +19,8 @@
             "bestfit"         : {"alpha"   : "Best-fit value for the order parameter for the power spectrum's inverse Gamma prior", 
                                  "wsmooth" : "Best-fit value for the strength of smoothing applied to the power spectrum",
                                  "method"  : "Best-fit method: 'Normal' for in linear brighness, 'LogNormal' for logarithmic brightness"
-                                }    
+                                },
+            "gauss_fit_r"     : "List of [lower radius, upper radius] (unit=[arcsec]). Region of profile over which a Gaussian fit yields a reasonable result."
           }    
     }
  }
