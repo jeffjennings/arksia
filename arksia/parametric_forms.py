@@ -16,15 +16,17 @@ def _gauss_internal(r: jnp.ndarray, Rc: jnp.float32, a: jnp.float32, sigma: jnp.
     
     return a * jnp.exp(-(r - Rc) ** 2 / (2 * sigma ** 2)) + b
 
+
+def gauss(params: optax.Params, r: jnp.ndarray):
     """
     Gaussian function \Sigma(r) of the form: 
 
         ..math::
 
-            \Sigma(r) = a * \exp(-(r - R_c)^2 / (2 * \sigma^2)
-    """        
-
-    return a * jnp.exp(-(r - Rc) ** 2 / (2 * sigma ** 2))
+            \Sigma(r) = a * \exp(-(r - R_c)^2 / (2 * \sigma^2) + b
+    """         
+    
+    return _gauss_internal(r, params['Rc'], params['a'], params['sigma'], params['b'])
 
 
 def asym_gauss(params: optax.Params, r: jnp.ndarray):
