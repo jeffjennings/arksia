@@ -5,7 +5,17 @@ import jax.numpy as jnp
 from jax.scipy.special import erf
 import optax
 
-def gauss(r: jnp.ndarray, Rc: jnp.float32, a: jnp.float32, sigma: jnp.float32):
+def _gauss_internal(r: jnp.ndarray, Rc: jnp.float32, a: jnp.float32, sigma: jnp.float32, b: jnp.float32=0):
+    """
+    Gaussian function for internal use, \Sigma(r) of the form: 
+
+        ..math::
+
+            \Sigma(r) = a * \exp(-(r - R_c)^2 / (2 * \sigma^2) + b
+    """         
+    
+    return a * jnp.exp(-(r - Rc) ** 2 / (2 * sigma ** 2)) + b
+
     """
     Gaussian function \Sigma(r) of the form: 
 
@@ -28,8 +38,8 @@ def asym_gauss(params: optax.Params, r: jnp.ndarray):
     """      
 
     return jnp.piecewise(r, [r < params['Rc'], r >= params['Rc']], 
-                        [lambda r : gauss(r, params['Rc'], params['a'], params['sigma1']),
-                         lambda r : gauss(r, params['Rc'], params['a'], params['sigma2'])]
+                        [lambda r : _gauss_internal(r, params['Rc'], params['a'], params['sigma1']),
+                         lambda r : _gauss_internal(r, params['Rc'], params['a'], params['sigma2'])]
                          )
 
 
@@ -38,11 +48,11 @@ def triple_gauss(params: optax.Params, r: jnp.ndarray):
     Sum of three Gaussian functions \Sigma(r)
     """      
 
-    gauss1 = gauss(r, params['R1'], params['a1'], params['sigma1'])
-    gauss2 = gauss(r, params['R2'], params['a2'], params['sigma2'])
-    gauss3 = gauss(r, params['R3'], params['a3'], params['sigma3'])
+    gaussian1 = _gauss_internal(r, params['R1'], params['a1'], params['sigma1'])
+    gaussian2 = _gauss_internal(r, params['R2'], params['a2'], params['sigma2'])
+    gaussian3 = _gauss_internal(r, params['R3'], params['a3'], params['sigma3'])
 
-    return gauss1 + gauss2 + gauss3
+    return gaussian1 + gaussian2 + gaussian3
 
 
 def double_powerlaw(r: jnp.ndarray, Rc: jnp.float32, a: jnp.ndarray, alpha1: jnp.float32, 
@@ -90,7 +100,7 @@ def double_powerlaw_gauss(params: optax.Params, r: jnp.ndarray):
               a_2 * [(r / R_2)^{\alpha_1 * \gamma} + (r / R_2)^{\alpha_2 * \gamma}]^{-1 / \gamma}
     """      
 
-    gaussian = gauss(r, params['R1'], params['a1'], params['sigma'])
+    gaussian = _gauss_internal(r, params['R1'], params['a1'], params['sigma'])
 
     dpl = double_powerlaw(r, params['R2'], params['a2'], params['alpha1'], params['alpha2'], params['gamma'])
     
@@ -108,8 +118,8 @@ def double_powerlaw_double_gauss(params: optax.Params, r: jnp.ndarray):
               a_3 * [(r / R_3)^{\alpha_1 * \gamma} + (r / R_3)^{\alpha_2 * \gamma}]^{-1 / \gamma}
     """      
 
-    gaussian1 = gauss(r, params['R1'], params['a1'], params['sigma1'])
-    gaussian2 = gauss(r, params['R2'], params['a2'], params['sigma2'])
+    gaussian1 = _gauss_internal(r, params['R1'], params['a1'], params['sigma1'])
+    gaussian2 = _gauss_internal(r, params['R2'], params['a2'], params['sigma2'])
 
     dpl = double_powerlaw(r, params['R3'], params['a3'], params['alpha1'], params['alpha2'], params['gamma'])
     
