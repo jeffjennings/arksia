@@ -233,6 +233,10 @@ def model_setup(parsed_args):
             if pp not in valid_funcs:
                 raise ValueError(f"{pp} is not one of {valid_funcs}")
 
+        supported_references = ['clean', 'frank']
+        if model["parametric"]["reference"] not in supported_references:
+            raise ValueError(f"{model['parametric']['reference']} must be one of {supported_references}")
+
     # frank: stellar flux to remove from visibilities as point-source
     if model["frank"]["set_fstar"] == "custom":
         model["frank"]["fstar"] = disk_pars["frank"]["custom_fstar"] / 1e6
@@ -599,7 +603,7 @@ def run_frank(model):
     
 
 def fit_parametric(fits, model):
-    """Perform one or more parametric fits to a nonparametric brightness profile
+    """Perform one or more parametric fits to a reference brightness profile
 
     Parameters
     ----------
@@ -621,22 +625,21 @@ def fit_parametric(fits, model):
         Generated figures, each showing the fit for one parametric form
     """
 
-    print(f"  Parametric fit: fitting {model['parametric']['form']} to frank best-fit profile")
+    print(f"  Parametric fit: fitting {model['parametric']['form']} to best-fit {model['parametric']['reference']} profile")
 
-    # get frank best-fit profile
-    _, _, results = fits
-    frank_profile = results[0]
-
-    fit_region = frank_profile * 1
+    # get best-fit profile
+    if model['parametric']['reference'] == 'frank':
+        _, _, results = fits
+        reference_profile = results[0]
     
     if model['parametric']['fit_range'] is not None:
         print(f"    restricting fit region to {model['parametric']['fit_range']} arcsec")
         # restrict region of profile to fit parametric form to
-        idx = [i for i,x in enumerate(frank_profile[0]) if model['parametric']['fit_range'][0] <= x <= model['parametric']['fit_range'][1]]
+        idx = [i for i,x in enumerate(reference_profile[0]) if model['parametric']['fit_range'][0] <= x <= model['parametric']['fit_range'][1]]
         fit_region[0] = fit_region[0][idx]
         fit_region[1] = fit_region[1][idx]
         fit_region[2] = fit_region[2][idx]
-
+    
     # run parametric fits
     figs = []
     PFits = []
@@ -652,13 +655,13 @@ def fit_parametric(fits, model):
 
         print(f"      initial params {PFit.initial_params}\n      final {PFit.bestfit_params}\n      loss {PFit.loss_history}")
 
-        ff = f"{model['base']['parametric_dir']}/parametric_fit_{pp}.obj"
+        ff = f"{model['base']['parametric_dir']}/parametric_fit_to_{model['parametric']['reference']}_{pp}.obj"
         print(f"      saving fit results to {ff}")
         with open(ff, 'wb') as f:
             pickle.dump(PFit, f)
 
         # plot results
-        fig = plot.parametric_fit_figure(model, PFit, frank_profile, fit_region)
+        fig = plot.parametric_fit_figure(model, PFit, reference_profile, fit_region)
         figs.append(fig)
 
     return PFits, fit_region, figs
@@ -714,7 +717,8 @@ def main(*args):
         fig3 = plot.aspect_ratio_figure(model)
 
     if model["base"]["run_parametric"] is True:
-        fits = input_output.load_bestfit_profiles(model, include_clean=False, include_rave=False)
+        if model["parametric"]["reference"] == "frank":
+            fits = input_output.load_bestfit_profiles(model, include_clean=False, include_rave=False)
         parametric_fits, fit_region, figs = fit_parametric(fits, model)
 
 if __name__ == "__main__":
