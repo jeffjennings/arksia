@@ -15,6 +15,13 @@ from arksia.input_output import get_vis, load_bestfit_frank_uvtable, load_fits_i
 from arksia.extract_radial_profile import radial_profile_from_image
 from arksia.imager import dirty_image
 
+def reset_axis_limits(ax, collection):
+    # prevent a plotted quantity 'collection' from altering axis 'ax' limits
+    collection.remove()
+    ax.relim()
+    ax.add_collection(collection, autolim=False)
+
+
 def plot_image(image, extent, ax, norm=None, cmap='inferno', title=None, 
                 cbar_label=None, cbar_pad=0.1):
     """Plot a 2D image, optionally with colorbar. Args follow `plt.imshow`."""
@@ -448,9 +455,11 @@ def parametric_fit_figure(model, fit, reference, fit_region=None):
     fit_final = fit.parametric_model(fit.bestfit_params, rr)
     resid = II - fit_final
 
-    axes[0].plot(rr, II / 1e6, 'k', label='frank')
+    axes[0].plot(rr, II / 1e6, '#0DB61F', label='frank')
     # frank 1 sigma
-    axes[0].fill_between(rr, (II - ss) / 1e6, (II + ss) / 1e6, color='k', alpha=0.4)    
+    # band = axes[0].fill_between(rr, (II - ss) / 1e6, (II + ss) / 1e6, color='k', alpha=0.4)    
+    # prevent 1 sigma band from altering y-limits
+    # reset_axis_limits(axes[0], band)
 
     if fit_region is not None:
         axes[0].plot(fit_region[0], fit_region[1] / 1e6, 'k', label='fit region')
@@ -562,9 +571,7 @@ def profile_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, inclu
         band = ax0.fill_between(rs[ii], I_mjy_as2 - Ie_lo_mjy_as2, I_mjy_as2 + Ie_hi_mjy_as2, 
                          color=cols[ii], alpha=0.4)
         # prevent 1 sigma band from altering y-limits
-        band.remove()
-        ax0.relim()
-        ax0.add_collection(band, autolim=False)
+        reset_axis_limits(ax0, band)
 
     # plot clean, rave, frank Re(V), binned vis.
     [u, v, vis, weights] = get_vis(model)
