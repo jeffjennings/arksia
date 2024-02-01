@@ -299,8 +299,9 @@ def extract_clean_profile(model):
         model_image = None
 
     # profile of clean image.
-    # for radial profile on east side of disk,
-    # range in azimuth (PA +- range) over which to average 
+    # for radial profile on each side of disk,
+    # range in azimuth (PA +- range) over which to average. 
+    # f factor removes angles at which resolution is degraded by a factor of >= x in 1.x
     f = 1.3
     phic_rad = extract_radial_profile.find_phic(model["base"]["geom"]["inc"] * np.pi / 180, f)
     phic_deg = phic_rad / deg_to_rad

@@ -55,14 +55,20 @@ def main(gen_par_f='./pars_gen.json',
     figs, axs = [fig0, fig1], [axs0, axs1]
 
     gen_pars = json.load(open(gen_par_f, 'r'))
-    for ii, jj in enumerate(disk_names):
-        # generate model for each source
+    source_pars = json.load(open(source_par_f, 'r'))
 
+    for ii, jj in enumerate(disk_names):
+        # update generic parameters that vary by source
         gen_pars['base']['input_dir'] = f"./{jj}"
+        disk_pars = source_pars[jj]
+        gen_pars['clean']['robust'] = disk_pars["clean"]["bestfit"]["robust"]
+
+        # save updated gen_pars
         gen_pars_current = os.path.join(os.path.dirname(gen_par_f), 'pars_gen_temp.json')
         with open(gen_pars_current, 'w') as f:
             json.dump(gen_pars, f)
 
+        # generate model for each source
         class parsed_args():
             base_parameter_filename = gen_pars_current
             source_parameter_filename = source_par_f
