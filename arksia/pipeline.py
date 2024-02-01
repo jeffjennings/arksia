@@ -658,10 +658,10 @@ def fit_parametric(fits, model):
             pickle.dump(PFit, f)
 
         # plot results
-        fig = plot.parametric_fit_figure(PFit, frank_profile, model)
+        fig = plot.parametric_fit_figure(model, PFit, frank_profile, fit_region)
         figs.append(fig)
 
-    return PFits, frank_profile, figs
+    return PFits, fit_region, figs
 
 
 def main(*args):
@@ -715,7 +715,7 @@ def main(*args):
 
     if model["base"]["run_parametric"] is True:
         fits = input_output.load_bestfit_profiles(model, include_clean=False, include_rave=False)
-        parametric_fits, frank_profile, figs = fit_parametric(fits, model)
+        parametric_fits, fit_region, figs = fit_parametric(fits, model)
 
 if __name__ == "__main__":
     main()
