@@ -401,23 +401,24 @@ def aspect_ratio_figure(model):
     return fig
 
 
-def parametric_fit_figure(fit, reference, model):
+def parametric_fit_figure(model, fit, reference, fit_region=None):
     """
     Generate a figure showing results of parametric fits to nonparametric frank
       brightness profiles.
 
     Parameters
     ----------
+    model : dict
+        Dictionary containing pipeline parameters    
     fit: dict
         Dictionary containing initial and final fit parameters for parametric
         model, and loss values
-
     reference : list
-        Reference profile radial points, brightness, 1 sigma uncertainty
-
-    model : dict
-        Dictionary containing pipeline parameters
-        
+        Reference profile to which parametric form was fit. List of 
+        [reference profile radial points, brightness, 1 sigma uncertainty]
+    fit_region : list, optional, default=None
+        Portion of reference profile to which parametric form was fit. List of 
+        [radial points, brightness, 1 sigma uncertainty]
     Returns
     -------
     fig : `plt.figure` instance
@@ -451,7 +452,10 @@ def parametric_fit_figure(fit, reference, model):
     # frank 1 sigma
     axes[0].fill_between(rr, (II - ss) / 1e6, (II + ss) / 1e6, color='k', alpha=0.4)    
 
-    axes[0].plot(rr, fit_initial / 1e6, 'c', label="initial guess")
+    if fit_region is not None:
+        axes[0].plot(fit_region[0], fit_region[1] / 1e6, 'k', label='fit region')
+
+    axes[0].plot(rr, fit_initial / 1e6, 'y--', label="initial guess")
     axes[0].plot(rr, fit_final / 1e6, 'r', label="best fit")
     
     axes[2].plot(rr, resid / 1e6, '.', ms=2, c='#a4a4a4', 
