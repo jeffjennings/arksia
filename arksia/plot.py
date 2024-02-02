@@ -382,16 +382,16 @@ def aspect_ratio_figure(model):
         hmax = hgrid[logp_fine.argmax()]
 
         axes[ii].plot(h, logp, 'r.', label='PDF samples', zorder=10)
-        axes[ii].plot(hgrid, logp_fine, 'k', label='PDF interp.')
+        axes[ii].plot(hgrid, logp_fine, 'c', label='PDF interp.')
 
-        axes[ii].plot(hgrid[good_idx], cdf, 'c', label='CDF')
+        axes[ii].plot(hgrid[good_idx], cdf, 'm', label='CDF')
 
-        axes[ii].axvline(h16, ls='--', c='g', label='$\mu$')
-        axes[ii].axvline(h50, ls='--', c='c', label='$-1\sigma$')
-        axes[ii].axvline(h84, ls='--', c='r', label='$+1\sigma$')
-        axes[ii].axvline(hmax, ls='--', c='m', label='point estimate')
+        axes[ii].axvline(h50, c='k', label='$\mu \pm 1\sigma$')
+        axes[ii].fill_betweenx(y=np.array([0,1]), x1=h16, x2=h84, color='k', alpha=0.4)
+        axes[ii].axvline(hmax, ls='--', c='g', label='point estimate')
 
         axes[ii].set_xscale('log')
+        axes[ii].set_ylim((0, 1))
 
         axes[ii].set_title(r'$\alpha$ = {}, w$_{{smooth}}$ = {:.0e}, h={:.3f}$_{{-{:.3f}}}^{{+{:.3f}}}$'.format(alpha, wsmooth, h50, h50 - h16, h84 - h50)) 
 
