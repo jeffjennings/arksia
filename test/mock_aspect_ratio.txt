@@ -1,0 +1,3 @@
+# Columns: source  distance [pc]  inclination [deg]  h: 16th percentile  h: 50th percentile  h: 84th percentile
+a 100 80 0.1 0.2 0.3
+b 50 40 0.4 0.5 0.6
