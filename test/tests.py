@@ -4,7 +4,7 @@ import os
 import json
 import numpy as np 
 
-from arksia import input_output, pipeline, bulk_pipeline_run, bulk_pipeline_results
+from arksia import input_output, pipeline, analysis, bulk_pipeline_run, bulk_pipeline_results
 
 tmp_dir = '/tmp/arksia/tests'
 os.makedirs(tmp_dir, exist_ok=True)
@@ -205,3 +205,11 @@ def test_bulk_pipeline_results():
                                gen_par_f=gen_pars_file,
                                phys_par_f=phys_pars_file,
                                include_rave=False)
+
+
+def test_analysis_belt_width():
+    analysis.resolving_belt_width_figure('test/mock_pars_source.json',
+                                         'test/mock_parametric_sol.obj',
+                                         'test/vis_combined.npz',
+                                         os.path.join(tmp_dir, 'frank_resolving_belts.png')
+                                         )
