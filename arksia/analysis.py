@@ -137,6 +137,22 @@ def resolving_belt_width_figure(source_par_f="./pars_source.json",
 def aspect_ratio_trend_figure(fit_summary='./frank_scale_heights.txt',
                               save_f='./aspect_ratio_trends.png'
                               ):
+    """
+    Generate a figure showing source aspect ratios inferred with frank as a function
+      of physical and observational parameters
+    
+    Parameters
+    ----------
+    fit_summary : str
+        Path to .txt file with aspect ratio fit results
+    save_f: str
+        Path to save the figure to
+
+    Returns
+    -------
+    fig : `plt.figure` instance
+        The generated figure
+    """     
 
     names, *_ = np.genfromtxt(fit_summary, dtype='str').T
     _, dist, inc, h16, h50, h84 = np.genfromtxt(fit_summary).T
