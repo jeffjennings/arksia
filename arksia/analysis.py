@@ -76,9 +76,9 @@ def resolving_belt_width_figure(source_par_f="./pars_source.json",
     source_par_f : str
         Path to source parameter file containing entries for sources with Gaussian fits
     para_sol_f : str
-        Path to parametric fit '.obj' file. If None, default pipeline save location is used.
+        Path to parametric fit '.obj' files (for all sources). If None, default pipeline per-source path is used.
     vis_f : str
-        Path to '.npz' visibility data file. If None, default pipeline save location is used.
+        Path to '.npz' visibility data files (for all sources). If None, default pipeline per-source path is used.
     save_f: str
         Path to save the figure to
 
@@ -135,7 +135,8 @@ def resolving_belt_width_figure(source_par_f="./pars_source.json",
 
 
 def aspect_ratio_trend_figure(fit_summary='./frank_scale_heights.txt',
-                              save_f='./aspect_ratio_trends.png'
+                              para_sol_f=None,
+                              save_f='./frank_aspect_ratio_trends.png'
                               ):
     """
     Generate a figure showing source aspect ratios inferred with frank as a function
@@ -145,6 +146,8 @@ def aspect_ratio_trend_figure(fit_summary='./frank_scale_heights.txt',
     ----------
     fit_summary : str
         Path to .txt file with aspect ratio fit results
+    para_sol_f : str
+        Path to parametric fit '.obj' files (for all sources). If None, default pipeline per-source path is used.        
     save_f: str
         Path to save the figure to
 
@@ -161,7 +164,8 @@ def aspect_ratio_trend_figure(fit_summary='./frank_scale_heights.txt',
     frac_width = []
     for ii, dd in enumerate(names):
         # load the Gaussian fits to the frank radial brightness profiles
-        para_sol_f = f"./{dd}/parametric/parametric_fit_gauss.obj"
+        if para_sol_f is None:
+            para_sol_f = f"./{dd}/parametric/parametric_fit_gauss.obj"
         with open(para_sol_f, 'rb') as f: 
             para_sol = pickle.load(f)
 
