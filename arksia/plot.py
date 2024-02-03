@@ -1,12 +1,10 @@
 """This module contains functions for plotting pipeline results 
 (written by Jeff Jennings)."""
 
-import json 
 import numpy as np 
 import matplotlib.pyplot as plt 
 from matplotlib.gridspec import GridSpec
 from matplotlib.colors import Normalize
-from scipy.interpolate import interp1d 
 
 from frank.utilities import UVDataBinner, make_image, sweep_profile, generic_dht, jy_convert
 from mpol.plot import get_image_cmap_norm
@@ -14,6 +12,7 @@ from mpol.plot import get_image_cmap_norm
 from arksia.input_output import get_vis, load_bestfit_frank_uvtable, load_fits_image, parse_rave_filename
 from arksia.extract_radial_profile import radial_profile_from_image
 from arksia.imager import dirty_image
+from arksia.analysis import h_distribution
 
 def reset_axis_limits(ax, collection):
     # prevent a plotted quantity 'collection' from altering axis 'ax' limits
@@ -354,32 +353,7 @@ def aspect_ratio_figure(model):
         else:
             h, logev = hs[jj:jj + np.diff(idx)[0]], logevs[jj:jj + np.diff(idx)[0]]
         
-        # interpolate
-        h_interp = interp1d(h, logev, kind='quadratic')
-        hgrid = np.logspace(np.log10(h[0]), np.log10(h[-1]), 300)
-        logev_fine = h_interp(hgrid)
-
-        # normalize
-        logev -= logev_fine.max()
-        logev_fine -= logev_fine.max()
-   
-        # h is log-spaced 
-        dh = hgrid * (hgrid[1] / hgrid[0] - 1)
-
-        # cumulative distribution
-        cdf = np.cumsum(10 ** logev_fine * dh)
-        cdf /= cdf.max()
-        cdf, good_idx = np.unique(cdf, return_index=True) # prevent repeat entries of 1.0
-
-        # cumulative dist percentiles
-        pct = interp1d(cdf, hgrid[good_idx], kind='quadratic')
-        h16, h50, h84 = pct([0.16, 0.5, 0.84])
-
-        logp_fine = 10 ** logev_fine
-        logp = 10 ** logev
-
-        # point estimate of h 
-        hmax = hgrid[logp_fine.argmax()]
+        hgrid, good_idx, logp, logp_fine, cdf, h16, h50, h84, hmax = h_distribution(h, logev)
 
         axes[ii].plot(h, logp, 'r.', label='PDF samples', zorder=10)
         axes[ii].plot(hgrid, logp_fine, 'c', label='PDF interp.')
@@ -393,7 +367,7 @@ def aspect_ratio_figure(model):
         axes[ii].set_xscale('log')
         axes[ii].set_ylim((0, 1))
 
-        axes[ii].set_title(r'$\alpha$ = {}, w$_{{smooth}}$ = {:.0e}, h={:.3f}$_{{-{:.3f}}}^{{+{:.3f}}}$'.format(alpha, wsmooth, h50, h50 - h16, h84 - h50)) 
+        axes[ii].set_title(r'$\alpha$ = {}, w$_{{smooth}}$ = {:.0e}, h={:.4f}$_{{-{:.4f}}}^{{+{:.4f}}}$'.format(alpha, wsmooth, h50, h50 - h16, h84 - h50)) 
 
     # show labels on last panel
     plt.legend()
