@@ -8,6 +8,31 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 
 def h_distribution(h, logev):
+    """
+    Calculate PDF and CDF distributions of aspect ratio for frank 1+1D fits to a source.
+    
+    Parameters
+    ----------
+    h : array
+        Aspect ratios sampled in frank 1+1D fits
+    logev : array
+        log(evidence) values for the corresponding fits
+
+    Returns
+    -------
+    logp : array
+        log probability corresponding to input 'logev'
+    [hgrid, logp_fine] : list of arrays
+        Dense grids corresponding to 'h' and 'logp', used for interpolation
+    [cdf, good_idx] : list of arrays
+        Cumulative distribution function of aspect ratios 'h' and indices corresponding
+        to 'hgrid' where CDF has unique values
+    [h16, h50, h84] : list of float
+        16th, 50th and 84th percentiles of 'cdf'
+    hmax : float
+        Point esimate of best estimate for 'h'
+    """    
+
     # interpolate
     h_interp = interp1d(h, logev, kind='quadratic')
     hgrid = np.logspace(np.log10(h[0]), np.log10(h[-1]), 300)
@@ -35,7 +60,7 @@ def h_distribution(h, logev):
     # point estimate of h 
     hmax = hgrid[logp_fine.argmax()]
 
-    return hgrid, good_idx, logp, logp_fine, cdf, h16, h50, h84, hmax
+    return logp, [hgrid, logp_fine], [cdf, good_idx], [h16, h50, h84], hmax
 
 
 def resolving_belt_width_figure(source_par_f="./pars_source.json",

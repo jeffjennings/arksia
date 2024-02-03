@@ -353,7 +353,7 @@ def aspect_ratio_figure(model):
         else:
             h, logev = hs[jj:jj + np.diff(idx)[0]], logevs[jj:jj + np.diff(idx)[0]]
         
-        hgrid, good_idx, logp, logp_fine, cdf, h16, h50, h84, hmax = h_distribution(h, logev)
+        logp, [hgrid, logp_fine], [cdf, good_idx], [h16, h50, h84], hmax = h_distribution(h, logev)
 
         axes[ii].plot(h, logp, 'r.', label='PDF samples', zorder=10)
         axes[ii].plot(hgrid, logp_fine, 'c', label='PDF interp.')
