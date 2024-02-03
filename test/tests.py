@@ -213,3 +213,11 @@ def test_analysis_belt_width():
                                          'test/vis_combined.npz',
                                          os.path.join(tmp_dir, 'frank_resolving_belts.png')
                                          )
+    
+
+def test_aspect_ratio_trend():
+    analysis.aspect_ratio_trend_figure('test/mock_aspect_ratio.txt',
+                                       'test/mock_parametric_sol.obj',
+                                         os.path.join(tmp_dir, 'frank_aspect_ratio_trends.png')
+                                         )
+        
