@@ -79,6 +79,8 @@ The pipeline can be run from the terminal for fits/analysis of a single source w
 ### Setting up frank fits ###
 - When performing a new `frank` fit, it's recommended to set `method` to `"LogNormal"` to perform fits in logarithmic brightness space. This is enforced in some parts of the pipeline because the logarithmic fits are in general a better choice. The exception is that when running a frank 1+1D fit to find _h_, `method` must be `"Normal"` (it will be enforced).
 
+- When running a 1+1D fit to determine _h = H / r_, it's suggested to first search for _h_ over a grid `np.logspace(-2.5,0,10)`, then run a grid over a smaller range in the region of the peak.
+
 ### Setting up parametric fits ###
 - To install the needed dependencies for parametric fits, `pip install arksia[analysis]`
     * If when running a parametric fit you receive the warning `WARNING:jax._src.xla_bridge:CUDA backend failed to initialize`, update CUDA with `pip install -U "jax[cuda12_pip]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html`
