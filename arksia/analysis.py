@@ -133,3 +133,54 @@ def resolving_belt_width_figure(source_par_f="./pars_source.json",
 
     return fig 
 
+
+def aspect_ratio_trend_figure(fit_summary='./frank_scale_heights.txt',
+                              save_f='./aspect_ratio_trends.png'
+                              ):
+
+    names, *_ = np.genfromtxt(fit_summary, dtype='str').T
+    _, dist, inc, h16, h50, h84 = np.genfromtxt(fit_summary).T
+
+    centroid = []
+    frac_width = []
+    for ii, dd in enumerate(names):
+        # load the Gaussian fits to the frank radial brightness profiles
+        para_sol_f = f"./{dd}/parametric/parametric_fit_gauss.obj"
+        with open(para_sol_f, 'rb') as f: 
+            para_sol = pickle.load(f)
+
+        rc = para_sol.bestfit_params['Rc']
+        centroid.append(float(rc / dist[ii]))
+        sigma = para_sol.bestfit_params['sigma']
+        fwhm = np.sqrt(8 * np.log(2)) * sigma
+        frac_width.append(float(fwhm / rc))
+
+    fig, axs = plt.subplots(2, 2, figsize=(10,10))
+    axs = axs.ravel()
+    fig.suptitle("Aspect ratio inference with frank 1+1D and Gaussian fits to frank radial belts", fontsize=10)
+
+    yerr = [h50 - h16, h84 - h50]
+    kwargs = {'fmt':'.', 'c':'k', 'ecolor':'#a4a4a4'}
+
+    axs[0].errorbar(frac_width, h50, yerr=yerr, **kwargs)
+    axs[0].set_xlabel(r"Fractional width = FWHM / $r_{centroid}$")
+
+    axs[1].errorbar(frac_width, h50, yerr=yerr, **kwargs)
+    axs[1].set_xlabel(r"Fractional width = FWHM / $r_{centroid}$")
+    for i, lab in enumerate(names):
+        axs[1].annotate(lab, (frac_width[i] + 0.02, h50[i]), fontsize=6)
+
+    axs[2].errorbar(centroid, h50, yerr=yerr, **kwargs)
+    axs[2].set_xlabel(r"Centroid [au]")
+
+    axs[3].errorbar(inc, h50, yerr=yerr, **kwargs)
+    axs[3].set_xlabel(r"Inclination [deg]")    
+
+    for aa in axs:
+        aa.set_yscale('log')
+        aa.set_ylabel(r"Vertical aspect ratio $h=H/r$")        
+    
+    print(f"    saving figure to {save_f}")
+    plt.savefig(save_f, dpi=300, bbox_inches='tight')
+
+    return fig 
