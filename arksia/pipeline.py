@@ -490,8 +490,14 @@ def run_frank(model):
         setattr(sol, 'logevidence', logev)
 
         # save fit outputs
+        if scale_height is None: 
+            save_dir = model["base"]["frank_dir"]
+        else:
+            save_dir = f"{model['base']['frank_dir']}/nonzero_h"
+            os.makedirs(save_dir, exist_ok=True)
+            
         save_prefix = "{}/{}_alpha{}_w{}_rout{}_h{:.3f}_fstar{:.0f}uJy_method{}".format(
-                    model["base"]["frank_dir"], model["base"]["disk"], 
+                    save_dir, model["base"]["disk"], 
                     alpha, wsmooth, sol.Rmax, h,
                     model["frank"]["fstar"] * 1e6,
                     model["frank"]["method"]
