@@ -28,7 +28,7 @@ def h_distribution(h, logev):
         Cumulative distribution function of aspect ratios 'h' and indices corresponding
         to 'hgrid' where CDF has unique values
     [h16, h50, h84] : list of float
-        16th, 50th and 84th percentiles of 'cdf'
+        16th, 50th, 84th, 99.7th percentiles of 'cdf'
     hmax : float
         Point esimate of best estimate for 'h'
     """    
@@ -52,7 +52,7 @@ def h_distribution(h, logev):
 
     # cumulative dist percentiles
     pct = interp1d(cdf, hgrid[good_idx], kind='quadratic')
-    h16, h50, h84 = pct([0.16, 0.5, 0.84])
+    h16, h50, h84, h99_7 = pct([0.16, 0.5, 0.84, 0.997])
 
     logp_fine = 10 ** logev_fine
     logp = 10 ** logev
@@ -60,7 +60,7 @@ def h_distribution(h, logev):
     # point estimate of h 
     hmax = hgrid[logp_fine.argmax()]
 
-    return logp, [hgrid, logp_fine], [cdf, good_idx], [h16, h50, h84], hmax
+    return logp, [hgrid, logp_fine], [cdf, good_idx], [h16, h50, h84, h99_7], hmax
 
 
 def resolving_belt_width_figure(source_par_f="./pars_source.json",
