@@ -12,7 +12,7 @@ os.makedirs(tmp_dir, exist_ok=True)
 def save_custom_gen_pars(gen_pars):
     """Save an altered generic parameters file"""
 
-    gen_pars['base']['input_dir'] = 'test'
+    gen_pars['base']['input_dir'] = 'test/mockAS209'
     gen_pars['base']['output_dir'] = tmp_dir
 
     gen_pars_file = os.path.join(tmp_dir, 'gen_pars.json')
@@ -39,10 +39,10 @@ def _run_pipeline(gen_pars_file):
     """Generic routine to invoke pipeline"""
 
     # Dummy source-specific parameters file
-    source_pars_file = 'test/mock_pars_source.json'
+    source_pars_file = 'test/mockAS209/mock_pars_source.json'
 
     # Dummy physical parameters file
-    phys_pars_file = 'test/mock_pars_phys.csv'
+    phys_pars_file = 'test/mockAS209/mock_pars_phys.csv'
 
     # Call pipeline
     pipeline.main(['-b', gen_pars_file, '-s', source_pars_file, '-p', phys_pars_file, '-d', 'mockAS209'])
@@ -185,8 +185,8 @@ def test_bulk_pipeline_run():
     """Run the pipeline to produce figures comparing clean and frank bestfit models"""
     gen_pars = pipeline.load_default_parameters()
     gen_pars_file = save_custom_gen_pars(gen_pars)
-    source_pars_file = 'test/mock_pars_source.json'
-    phys_pars_file = 'test/mock_pars_phys.csv'
+    source_pars_file = 'test/mockAS209/mock_pars_source.json'
+    phys_pars_file = 'test/mockAS209/mock_pars_phys.csv'
 
     bulk_pipeline_run.main(gen_par_f=gen_pars_file,
                            source_par_f=source_pars_file,
@@ -198,26 +198,25 @@ def test_bulk_pipeline_results():
     """Run the pipeline to produce figures comparing clean and frank bestfit models"""
     gen_pars = pipeline.load_default_parameters()
     gen_pars_file = save_custom_gen_pars(gen_pars)
-    source_pars_file = 'test/mock_pars_source.json'
-    phys_pars_file = 'test/mock_pars_phys.csv'
+    source_pars_file = 'test/mockAS209/mock_pars_source.json'
+    phys_pars_file = 'test/mockAS209/mock_pars_phys.csv'
 
-    bulk_pipeline_results.main(source_par_f=source_pars_file, 
-                               gen_par_f=gen_pars_file,
+    bulk_pipeline_results.main(gen_par_f=gen_pars_file,
+                               source_par_f=source_pars_file, 
                                phys_par_f=phys_pars_file,
                                include_rave=False)
 
 
 def test_analysis_belt_width():
-    analysis.resolving_belt_width_figure('test/mock_pars_source.json',
-                                         'test/mock_parametric_sol.obj',
-                                         'test/vis_combined.npz',
+    analysis.resolving_belt_width_figure('test/mockAS209/mock_pars_source.json',
+                                         'test',
                                          os.path.join(tmp_dir, 'frank_resolving_belts.png')
                                          )
     
 
 def test_aspect_ratio_trend():
-    analysis.aspect_ratio_trend_figure('test/mock_aspect_ratio.txt',
-                                       'test/mock_parametric_sol.obj',
+    analysis.aspect_ratio_trend_figure('test/mockAS209/mock_aspect_ratios.txt',
+                                       'test',
                                          os.path.join(tmp_dir, 'frank_aspect_ratio_trends.png')
                                          )
         
