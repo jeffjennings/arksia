@@ -130,7 +130,8 @@ def resolving_belt_width_figure(source_par_f="./pars_source.json",
     return fig 
 
 
-def aspect_ratio_trend_figure(fit_summary='./frank_scale_heights.txt',
+def aspect_ratio_trend_figure(fit_summary='./frank_aspect_ratios.txt',
+                              results_base_dir = '.',
                               save_f='./frank_aspect_ratio_trends.png'
                               ):
     """
@@ -140,7 +141,9 @@ def aspect_ratio_trend_figure(fit_summary='./frank_scale_heights.txt',
     Parameters
     ----------
     fit_summary : str
-        Path to .txt file with aspect ratio fit results       
+        Path to .txt file with aspect ratio fit results    
+    results_base_dir : str
+        Path to parent directory for pipeline results (pipeline file structure assumed)
     save_f: str
         Path to save the figure to
 
@@ -160,7 +163,7 @@ def aspect_ratio_trend_figure(fit_summary='./frank_scale_heights.txt',
 
     for ii, dd in enumerate(names):
         # load the Gaussian fits to the frank radial brightness profiles
-        para_sol_f = f"./{dd}/parametric/parametric_fit_gauss.obj"
+        para_sol_f = os.path.join(results_base_dir, f"{dd}/parametric/parametric_fit_gauss.obj")
         with open(para_sol_f, 'rb') as f: 
             para_sol = pickle.load(f)
 
