@@ -158,16 +158,21 @@ def test_pipeline_extract_clean_profile():
     
 
 def test_pipeline_parametric_fit():
-    """Run the pipeline to perform a parametric fit of a frank brightness profile"""
+    """Run the pipeline to perform a parametric fit of a frank brightness profile
+    over each of the supported parametric forms"""
     gen_pars = pipeline.load_default_parameters()
 
     gen_pars['base']['run_parametric'] = True
-    gen_pars['parametric']['form'] = 'asym_gauss'
     gen_pars['parametric']['niter'] = 50
 
-    gen_pars_file = save_custom_gen_pars(gen_pars)
+    for pp in ['gauss', 'asym_gauss', 'triple_gauss', 'double_powerlaw', 
+               'double_powerlaw_erf', 'double_powerlaw_gauss', 'double_powerlaw_double_gauss',
+               'single_erf_powerlaw', 'double_erf_powerlaw']:
+        gen_pars['parametric']['form'] = pp
 
-    _run_pipeline(gen_pars_file)
+        gen_pars_file = save_custom_gen_pars(gen_pars)
+
+        _run_pipeline(gen_pars_file)
 
 
 def test_pipeline_model_comparison_figs():
