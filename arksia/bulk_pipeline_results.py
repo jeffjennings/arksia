@@ -9,6 +9,9 @@ import matplotlib.pyplot as plt
 from arksia.pipeline import model_setup
 from arksia.input_output import load_bestfit_profiles
 
+def main(gen_par_f='./pars_gen.json',
+         source_par_f='./pars_source.json', 
+         phys_par_f='./summary_disc_parameters.csv',
          profiles_txt=True, profiles_fig=True, robust=0.5,
          include_rave=False
          ):
