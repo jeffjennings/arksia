@@ -1,6 +1,7 @@
 """This module contains functions for some basic analysis and associated plotting of pipeline results 
 (written by Jeff Jennings)."""
 
+import os
 import json 
 import pickle
 import numpy as np
@@ -64,8 +65,7 @@ def h_distribution(h, logev):
 
 
 def resolving_belt_width_figure(source_par_f="./pars_source.json",
-                                para_sol_f=None,
-                                vis_f=None,
+                                results_base_dir=".",
                                 save_f="./frank_resolving_belts.png"):
     """
     Generate a figure showing the previously fitted Gaussian width of 
@@ -75,10 +75,8 @@ def resolving_belt_width_figure(source_par_f="./pars_source.json",
     ----------
     source_par_f : str
         Path to source parameter file containing entries for sources with Gaussian fits
-    para_sol_f : str
-        Path to parametric fit '.obj' files (for all sources). If None, default pipeline per-source path is used.
-    vis_f : str
-        Path to '.npz' visibility data files (for all sources). If None, default pipeline per-source path is used.
+    results_base_dir : str
+        Path to parent directory for pipeline results (pipeline file structure assumed)        
     save_f: str
         Path to save the figure to
 
@@ -98,15 +96,13 @@ def resolving_belt_width_figure(source_par_f="./pars_source.json",
         disk_names.append(dd)
 
         # load the Gaussian fit to the frank profile
-        if para_sol_f is None:
-            para_sol_f = f"./{dd}/parametric/parametric_fit_gauss.obj"
+        para_sol_f = os.path.join(results_base_dir, f"{dd}/parametric/parametric_fit_gauss.obj")
         with open(para_sol_f, 'rb') as f: 
             para_sol = pickle.load(f)
         sigma.append(para_sol.bestfit_params['sigma'])
 
         # load the corresponding project visibility dataset
-        if vis_f is None:
-            vis_f = f"{dd}/vis_combined.npz"
+        vis_f = os.path.join(results_base_dir, f"{dd}/vis_combined.npz")
         dat = np.load(vis_f)
         u, v = [dat[i] for i in ['u', 'v']]
 
