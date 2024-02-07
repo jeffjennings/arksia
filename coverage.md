@@ -7,7 +7,7 @@
 | arksia/extract\_radial\_profile.py |      164 |       22 |     87% |
 | arksia/imager.py                   |        9 |        0 |    100% |
 | arksia/input\_output.py            |       89 |       26 |     71% |
-| arksia/parametric\_fitter.py       |      155 |       82 |     47% |
+| arksia/parametric\_fitter.py       |      155 |        5 |     97% |
 | arksia/pipeline.py                 |      323 |       53 |     84% |
 | arksia/plot.py                     |      364 |       29 |     92% |
-|                          **TOTAL** | **1302** |  **229** | **82%** |
+|                          **TOTAL** | **1302** |  **152** | **88%** |
