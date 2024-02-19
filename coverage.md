@@ -2,7 +2,7 @@
 |----------------------------------- | -------: | -------: | ------: |
 | arksia/\_\_init\_\_.py             |        1 |        0 |    100% |
 | arksia/analysis.py                 |       90 |        5 |     94% |
-| arksia/bulk\_pipeline\_results.py  |       89 |       11 |     88% |
+| arksia/bulk\_pipeline\_results.py  |       94 |       10 |     89% |
 | arksia/bulk\_pipeline\_run.py      |       18 |        1 |     94% |
 | arksia/extract\_radial\_profile.py |      164 |       22 |     87% |
 | arksia/imager.py                   |        9 |        0 |    100% |
@@ -11,4 +11,4 @@
 | arksia/parametric\_forms.py        |       39 |        0 |    100% |
 | arksia/pipeline.py                 |      323 |       53 |     84% |
 | arksia/plot.py                     |      364 |       29 |     92% |
-|                          **TOTAL** | **1341** |  **152** | **89%** |
+|                          **TOTAL** | **1346** |  **151** | **89%** |
