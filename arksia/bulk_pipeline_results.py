@@ -108,32 +108,29 @@ no_clean = ['HD32297', 'HD15115', 'HD14055', 'HD197481', 'HD39060']
             print('  Survey summary: saving radial profiles to {}'.format(ff))
 
             # save .txt file per source with clean,rave,frank profiles
-            header=f"dist={model['base']['dist']} [au].\nAll brightnesses in [Jy/steradian].\nUncertainties not comparable across models. "
+            header=f"dist={model['base']['dist']} [au].\nAll brightnesses in [Jy/steradian].\nUncertainties not comparable across models.\nColumns: r [au]\t\tI_frank\t\tsigma_frank\t\t"
+            profiles = np.array([rf * model["base"]["dist"], If, Ief])
+
+            if jj not in no_clean:
+                header += "I_clean\t\tsigma_clean\t\t"
+                profiles = np.append(profiles, [Ic_interp, Iec_interp], axis=0)
 
             if include_rave:
-                profiles = np.array([rf * model["base"]["dist"], Ic_interp, Iec_interp, 
-                              If, Ief, Ir_interp, Ier_lo_interp, Ier_hi_interp
-                              ])
-                header += "Rave uncertainties have unique lower and upper bounds.\nColumns: "
-                header += "r [au]\t\tI_clean\t\tsigma_clean\t\tI_frank\t\tsigma_frank\t\tI_rave\t\tsigma_lower_rave\t\tsigma_upper_rave"
-            else:
-                profiles = np.array([rf * model["base"]["dist"], Ic_interp, Iec_interp,
-                              If, Ief
-                              ])
-                header += "\nColumns: r [au]\t\tI_clean\t\tsigma_clean\t\tI_frank\t\tsigma_frank"               
+                header += "I_rave\t\tsigma_lower_rave\t\tsigma_upper_rave\nRave uncertainties have unique lower and upper bounds."
+                profiles = np.append(profiles, [Ir_interp, Ier_lo_interp, Ier_hi_interp], axis=0)
             
             np.savetxt(ff, profiles.T, header=header)
 
 
         if profiles_fig:
-            # generate, save figures for brightness profiles of all sources and brightness profiles with uncertainties
+            # generate, save figures for brightness profiles of all sources with and without uncertainties
             for hh in range(2):
                 fig = figs[hh]
                 ax = axs[hh]
 
                 # flatten axes
                 ax = [bb for aa in ax for bb in aa]
-                cols, labs = ['C1', 'C2'], ['clean', 'frank']
+                cols, labs = ['C2', 'C1'], ['frank', 'clean']
                 if include_rave: 
                     cols, labs = cols.append('C3'), labs.append('rave')                    
 
