@@ -9,9 +9,10 @@ import matplotlib.pyplot as plt
 from arksia.pipeline import model_setup
 from arksia.input_output import load_bestfit_profiles
 
-def main(gen_par_f='./pars_gen.json',
-         source_par_f='./pars_source.json', 
-         phys_par_f='./summary_disc_parameters.csv',
+# sources for which cleaan profile extraction routine 
+# (see `arksia.extract_radial_profile`) invalid (edge-on without cavity)
+no_clean = ['HD32297', 'HD15115', 'HD14055', 'HD197481', 'HD39060']
+
          profiles_txt=True, profiles_fig=True, robust=0.5,
          include_rave=False
          ):
