@@ -84,18 +84,23 @@ no_clean = ['HD32297', 'HD15115', 'HD14055', 'HD197481', 'HD39060']
             [[rr, Ir, Ier_lo, Ier_hi], [grid, Vr]] = fits[1]        
 
         # interpolate clean and rave profiles onto frank radial points 
-        Ic_interp = np.interp(rf, rc, Ic)
-        Iec_interp = np.interp(rf, rc, Iec)
+        Is_interp = [If]
+        Ies_interp = [[Ief, Ief]]
+
+        if jj not in no_clean:
+            Ic_interp = np.interp(rf, rc, Ic)
+            Iec_interp = np.interp(rf, rc, Iec)
+
+            Is_interp.append(Ic_interp)
+            Ies_interp.append([Iec_interp, Iec_interp])
+
         if include_rave:
             Ir_interp = np.interp(rf, rr, Ir)
             Ier_lo_interp = np.interp(rf, rr, Ier_lo)
             Ier_hi_interp = np.interp(rf, rr, Ier_hi)
 
-            Is_interp = [Ic_interp, Ir_interp, If]
-            Ies_interp = [[Iec_interp, Iec_interp], [Ier_lo_interp, Ier_hi_interp], [Ief, Ief]]
-        else:
-            Is_interp = [Ic_interp, If]
-            Ies_interp = [[Iec_interp, Iec_interp], [Ief, Ief]]
+            Is_interp.append(Ir_interp)
+            Ies_interp.append([Ier_lo_interp, Ier_hi_interp])
 
 
         if profiles_txt:
