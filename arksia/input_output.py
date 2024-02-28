@@ -78,7 +78,7 @@ def get_vis(model):
 
         # input filenames
         vis_paths = []
-        for ii in ['ACA', '12m', '12mSB', '12mLB']:
+        for ii in ['ACA', '12m', '12mSB', '12mMB', '12mLB']:
             vis_paths.append("{}/{}.{}.continuum.fav.tav.{}corrected.txt".format(
                 model["base"]["input_dir"], model["base"]["disk"], ii, model["base"]["SMG_sub"]
                 )
