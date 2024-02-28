@@ -193,7 +193,7 @@ def test_bulk_pipeline_run():
     source_pars_file = 'test/mockAS209/mock_pars_source.json'
     phys_pars_file = 'test/mockAS209/mock_pars_phys.csv'
 
-    bulk_pipeline_run.main(gen_par_f=gen_pars_file,
+    bulk_pipeline_run.survey_pipeline(gen_par_f=gen_pars_file,
                            source_par_f=source_pars_file,
                            phys_par_f=phys_pars_file,
                            )
@@ -206,7 +206,7 @@ def test_bulk_pipeline_results():
     source_pars_file = 'test/mockAS209/mock_pars_source.json'
     phys_pars_file = 'test/mockAS209/mock_pars_phys.csv'
 
-    bulk_pipeline_results.main(gen_par_f=gen_pars_file,
+    bulk_pipeline_results.survey_summary(gen_par_f=gen_pars_file,
                                source_par_f=source_pars_file, 
                                phys_par_f=phys_pars_file,
                                include_rave=False)
