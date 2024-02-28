@@ -13,9 +13,7 @@ from arksia.input_output import load_bestfit_profiles
 # (see `arksia.extract_radial_profile`) invalid (edge-on without cavity)
 no_clean = ['HD32297', 'HD15115', 'HD14055', 'HD197481', 'HD39060']
 
-def main(gen_par_f='./pars_gen.json', 
-         source_par_f='./pars_source.json',
-         phys_par_f='./summary_disc_parameters.csv',
+def survey_summary_figs(gen_par_f='./pars_gen.json', 
          profiles_txt=True, profiles_fig=True, robust=0.5,
          include_rave=False
          ):
@@ -177,4 +175,4 @@ def main(gen_par_f='./pars_gen.json',
     return figs
     
 if __name__ == "__main__":
-    main()
+    survey_summary_figs()
