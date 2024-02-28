@@ -4,7 +4,7 @@
 import os
 import json
 
-def main(gen_par_f='./pars_gen.json', 
+def survey_pipeline_wrapper(gen_par_f='./pars_gen.json', 
          source_par_f='./pars_source.json',
          phys_par_f='./summary_disc_parameters.csv',
          ):
@@ -41,4 +41,4 @@ def main(gen_par_f='./pars_gen.json',
     os.remove(gen_pars_current)
 
 if __name__ == "__main__":
-    main()
+    survey_pipeline_wrapper()
