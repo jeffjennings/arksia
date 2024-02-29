@@ -354,7 +354,7 @@ def aspect_ratio_figure(model):
             h, logev = hs[jj:jj + np.diff(idx)[0]], logevs[jj:jj + np.diff(idx)[0]]
         
         logp, [hgrid, logp_fine], [cdf, good_idx], [h16, h50, h84, h99_7], hmax = h_distribution(h, logev)
-
+        print(f"    aspect ratio CDF: percentiles [h16, h50, h84, h99_7]: {[h16, h50, h84, h99_7]}")
         axes[ii].plot(h, logp, 'r.', label='PDF samples', zorder=10)
         axes[ii].plot(hgrid, logp_fine, 'c', label='PDF interp.')
 
