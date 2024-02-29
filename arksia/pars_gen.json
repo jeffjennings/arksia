@@ -37,7 +37,8 @@
     "save_profile_fit"      : true,
     "save_vis_fit"          : true,
     "save_uvtables"         : true,
-    "make_quick_fig"        : true    
+    "make_quick_fig"        : true,
+    "make_full_fig"         : true
   },
 
   "parametric" : {
