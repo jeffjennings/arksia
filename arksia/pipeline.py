@@ -15,7 +15,7 @@ from frank.constants import deg_to_rad
 from frank.utilities import jy_convert
 from frank.debris_fitters import FrankDebrisFitter
 from frank.io import save_fit
-from frank.make_figs import make_quick_fig
+from frank.make_figs import make_quick_fig, make_full_fig
 from frank.geometry import FixedGeometry
 from frank.utilities import get_fit_stat_uncer
 
@@ -526,6 +526,11 @@ def run_frank(model):
                         bbox_inches='tight')
             plt.close()            
 
+            if model["frank"]["make_quick_fig"] is True:
+                qfig2, qaxes2 = make_full_fig(*uv_data, sol, bin_widths=model["plot"]["bin_widths"],
+                            save_prefix=save_prefix + '_frank_fit_full.png',
+                            )
+            
             # reprojected frank residual visibilities
             frank_resid_vis = [uv_data[0], uv_data[1], uv_data[2] - sol.predict(uv_data[0], uv_data[1]), uv_data[3]]
             plot.frank_image_diag_figure(model, sol, frank_resid_vis, 
