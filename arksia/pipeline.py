@@ -525,11 +525,6 @@ def run_frank(model):
             plt.savefig(save_prefix + '_frank_fit_quick.png', dpi=300,
                         bbox_inches='tight')
             plt.close()            
-
-            if model["frank"]["make_quick_fig"] is True:
-                qfig2, qaxes2 = make_full_fig(*uv_data, sol, bin_widths=model["plot"]["bin_widths"],
-                            save_prefix=save_prefix + '_frank_fit_full.png',
-                            )
             
             # reprojected frank residual visibilities
             frank_resid_vis = [uv_data[0], uv_data[1], uv_data[2] - sol.predict(uv_data[0], uv_data[1]), uv_data[3]]
@@ -538,6 +533,11 @@ def run_frank(model):
                                          resid_im_robust=model["plot"]["frank_resid_im_robust"],
                                          save_prefix=save_prefix
                                          )
+
+        if model["frank"]["make_quick_fig"] is True:
+            make_full_fig(*uv_data, sol, bin_widths=model["plot"]["bin_widths"],
+                        save_prefix=save_prefix + '_frank_fit_full.png',
+                        )            
 
         return sol, FF
 
