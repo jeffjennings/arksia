@@ -360,7 +360,7 @@ def extract_clean_profile(model):
                 model_fits.split('/')[-1])
             )
  
-    clean_diag_fig = plot.clean_diag_figure(model, clean_image, [r, I, I_err], model_image, [r_mod, I_mod])
+        clean_diag_fig = plot.clean_diag_figure(model, clean_image, [r, I, I_err], model_image, [r_mod, I_mod])
     
 
 def process_rave_fit(model):

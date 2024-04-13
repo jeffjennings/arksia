@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 from arksia.pipeline import model_setup
 from arksia.input_output import load_bestfit_profiles
 
-# sources for which cleaan profile extraction routine 
-# (see `arksia.extract_radial_profile`) invalid (edge-on without cavity)
+# sources for which cleaan profile extraction routine is invalid
+# (edge-on sources without a cavity; see `arksia.extract_radial_profile`)
 no_clean = ['HD32297', 'HD15115', 'HD14055', 'HD197481', 'HD39060']
 
 def survey_summary(gen_par_f='./pars_gen.json', 

@@ -673,7 +673,7 @@ def profile_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, inclu
     return fig
 
 
-def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, xy_bounds=[-7,7], include_rave=True):
+def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, xy_bounds=[-7,7], include_rave=True,):
     """
     Generate a figure comparing clean, frank, and optionally rave 2d images
 
@@ -725,9 +725,14 @@ def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, xy_boun
     beam_area = np.pi * bmaj * bmin / (4 * np.log(2))
     clean_image = clean_image / beam_area 
 
-    # convert clean model image from Jy / pixel to Jy / arcsec^2
-    model_image = load_fits_image(model_fits, aux_image=True)    
-    model_image = model_image / model["clean"]["pixel_scale"] ** 2
+    include_clean_model = True
+    try:
+        # convert clean model image from Jy / pixel to Jy / arcsec^2
+        model_image = load_fits_image(model_fits, aux_image=True)    
+        model_image = model_image / model["clean"]["pixel_scale"] ** 2
+    except FileNotFoundError:
+        print('clean .model image not found - bypassing')
+        include_clean_model = False
 
     # set clean image pixel size (assuming square image)
     clean_im_xmax = model["clean"]["pixel_scale"] * model["clean"]["npix"] / 2
@@ -785,11 +790,12 @@ def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, xy_boun
                cbar_label='$I_{clean}$ [mJy arcsec$^{-2}$]'
                )
 
-    # plot clean model image
-    plot_image(model_image * 1e3, clean_extent, ax5, cmap="Reds",
-               norm=get_image_cmap_norm(model_image * 1e3, stretch='asinh'), 
-               cbar_label='$I_{clean\ model}$ [mJy arcsec$^{-2}$]'
-               )            
+    if include_clean_model is True:
+        # plot clean model image
+        plot_image(model_image * 1e3, clean_extent, ax5, cmap="Reds",
+                norm=get_image_cmap_norm(model_image * 1e3, stretch='asinh'), 
+                cbar_label='$I_{clean\ model}$ [mJy arcsec$^{-2}$]'
+                )            
 
     if include_rave is True:
         # plot rave pseudo-image
