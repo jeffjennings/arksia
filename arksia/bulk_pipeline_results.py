@@ -107,7 +107,7 @@ def survey_summary(gen_par_f='./pars_gen.json',
 
 
         if profiles_txt:
-            ff = '{}/{}_radial_profiles.txt'.format(model["base"]["save_dir"], jj)
+            ff = f'{model["base"]["save_dir"]}/{jj}_radial_profiles.txt'
             print('  Survey summary: saving radial profiles to {}'.format(ff))
 
             # save .txt file per source with clean,rave,frank profiles
@@ -165,8 +165,8 @@ def survey_summary(gen_par_f='./pars_gen.json',
         print('  Survey summary: making survey summary figure')
     fig1.suptitle(r'$1\sigma$ uncertainties do not include systematic unc., and are not comparable across models')    
 
-    ff0 = '{}/survey_profile_summary.png'.format(model["base"]["save_dir"])
-    ff1 = '{}/survey_profile_summary_unc.png'.format(model["base"]["save_dir"])
+    ff0 = f'{model["base"]["save_dir"]}/../survey_profile_summary.png'
+    ff1 = f'{model["base"]["save_dir"]}/../survey_profile_summary_unc.png'
     print('    saving figures to {} and {}'.format(ff0, ff1))
 
     plt.figure(fig0); plt.tight_layout(); plt.savefig(ff0, dpi=300)
