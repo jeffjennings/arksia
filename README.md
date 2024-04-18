@@ -34,7 +34,25 @@
 
 </p>
 
-This package is intended for members of the ARKS collaboration to conduct imaging and analysis on the large program data, and ultimately for anyone to reproduce this aspect of the collaboration's published results. It is designed as a pipeline to be run from the command line for rapid reproducibility or simple variations on the published analysis. 
+This package is intended for members of the ARKS collaboration to conduct some aspects of imaging and analysis on the large program data, and ultimately for anyone to reproduce this aspect of the collaboration's published results. It is designed as a pipeline to be run from the command line for rapid reproducibility or simple variations on the published analysis. 
+
+Citation
+--------
+If you use `arksia`, please cite:
+```
+@software{arksia,
+author       = {Jeff Jennings and
+                Sebastian Marino and   
+                Yinuo Han},
+title        = {jeffjennings/arksia: v0.2.1 Release},
+month        = apr,
+year         = 2024,
+publisher    = {Zenodo},
+version      = {v0.2.1},
+doi          = {10.5281/zenodo.10993146},
+url          = {https://doi.org/10.5281/zenodo.10993146}
+}
+```
 
 Install
 -------
