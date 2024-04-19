@@ -6,7 +6,7 @@ import json
 import numpy as np 
 import matplotlib.pyplot as plt 
 
-from arksia.pipeline import model_setup
+from arksia.pipeline import model_setup, process_rave_fit
 from arksia.input_output import load_bestfit_profiles
 
 # sources for which cleaan profile extraction routine is invalid
@@ -17,7 +17,7 @@ def survey_summary(gen_par_f='./pars_gen.json',
          source_par_f='./pars_source.json',
          phys_par_f='./summary_disc_parameters.csv',
          profiles_txt=True, profiles_fig=True, robust=0.5,
-         include_rave=False
+         include_rave=True
          ):
     """
     Generate summary radial profile results across multiple survey sources.
@@ -79,6 +79,8 @@ def survey_summary(gen_par_f='./pars_gen.json',
             disk = jj
         model = model_setup(parsed_args)
 
+        # process_rave_fit(model)
+
         # best-fit clean, rave, frank profile for each source
         fits = load_bestfit_profiles(model, robust, include_rave=include_rave)
         [[rc, Ic, Iec], [grid, Vc]] = fits[0]
@@ -135,7 +137,8 @@ def survey_summary(gen_par_f='./pars_gen.json',
                 ax = [bb for aa in ax for bb in aa]
                 cols, labs = ['C2', 'C1'], ['frank', 'clean']
                 if include_rave: 
-                    cols, labs = cols.append('C3'), labs.append('rave')                    
+                    cols.append('C3')
+                    labs.append('rave')                    
 
                 for kk, ll in enumerate(Is_interp):     
                     # plot profile
