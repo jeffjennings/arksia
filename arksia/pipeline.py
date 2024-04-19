@@ -389,13 +389,14 @@ def process_rave_fit(model):
 
     print(f'  Rave profiles: processing {fit_path}')
 
-    r, I_err_lo, I, I_err_hi = np.load(fit_path)
+    r, I_err_lo, I, I_err_hi = rave_profile
+    r /= model['base']['dist']
     I_err_lo = I - I_err_lo
     I_err_hi = I_err_hi - I
 
     I = jy_convert(I, 'arcsec2_sterad')
     I_err_lo = jy_convert(I_err_lo, 'arcsec2_sterad')
-    I_err_hi = jy_convert(I_err_hi, 'arcsec2_sterad')    
+    I_err_hi = jy_convert(I_err_hi, 'arcsec2_sterad')
 
     ff = "{}/rave_profile_robust{}.txt".format(
         model["base"]["rave_dir"], model["clean"]["robust"])
