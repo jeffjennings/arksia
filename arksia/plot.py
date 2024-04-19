@@ -9,7 +9,7 @@ from matplotlib.colors import Normalize
 from frank.utilities import UVDataBinner, make_image, sweep_profile, generic_dht, jy_convert
 from mpol.plot import get_image_cmap_norm
 
-from arksia.input_output import get_vis, load_bestfit_frank_uvtable, load_fits_image, parse_rave_filename
+from arksia.input_output import get_vis, load_bestfit_frank_uvtable, load_fits_image
 from arksia.extract_radial_profile import radial_profile_from_image
 from arksia.imager import dirty_image
 from arksia.analysis import h_distribution
@@ -561,7 +561,7 @@ def profile_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, inclu
     
     if include_rave is True:
         # plot 1d rave residual brightness   
-        rave_resid_im_path = parse_rave_filename(model, file_type='rave_residual_image')
+        # rave_resid_im_path = parse_rave_filename(model, file_type='rave_residual_image') # TODO
         rave_resid_im = np.load(rave_resid_im_path)
         
         # convert Jy / pixel to Jy / arcsec
@@ -749,7 +749,7 @@ def image_comparison_figure(fits, model, resid_im_robust=2.0, npix=1000, xy_boun
         rave_image = jy_convert(rave_image, 'sterad_arcsec2')
 
         # make rave residual image (again assuming square images)
-        rave_resid_im_path = parse_rave_filename(model, file_type='rave_residual_image')
+        # rave_resid_im_path = parse_rave_filename(model, file_type='rave_residual_image') # TODO
         rave_resid_im = np.load(rave_resid_im_path)
 
         # convert Jy / pixel to Jy / arcsec
