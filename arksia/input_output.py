@@ -136,59 +136,6 @@ def get_last2d(image):
     return image[tuple(slc)]
 
 
-def parse_rave_filename(model, file_type='rave_fit'):
-    """Interpret rave filenames for generalizing the loading of rave results.
-
-    Parameters
-    ----------
-    model : dict
-        Dictionary containing pipeline parameters
-    file_type : str, default='rave_fit'
-        Which type of rave file to load: 
-          - 'rave_fit' for a rave brightness profile
-          - 'rave_residual_image' for a 2d rave residual image
-
-    Returns
-    -------
-    file_path : str
-        Path to the desired rave file
-    """    
-
-    if model["clean"]["robust"] == 0.5:
-        rave_str = "1"
-    else:
-        rave_str = "2"
-
-    # one source has different rave parameter choices
-    if model['base']['disk'] == "HD161868" and rave_str == "2":
-        raveN = 7
-    else: 
-        raveN = 5
-
-    if file_type == 'rave_fit':
-        # adjust rave fit paths here if neeeded
-        file_path = "{}/{}-{}_inc=90_N={}_radial_{}0arcsec.npy".format(
-            model["base"]["input_dir"], 
-            model["base"]["disk"], 
-            rave_str,
-            raveN,
-            model["rave"]["pixel_scale"]
-            )
-    
-    elif file_type == 'rave_residual_image':
-        file_path = "{}/{}-{}_inc=90_N={}_2Dresiduals.npy".format(
-            model["base"]["input_dir"], 
-            model["base"]["disk"], 
-            rave_str,
-            raveN
-            )        
-
-    else: 
-        raise ValueError("'file_type' {} must be one of 'rave_fit', 'rave_residual_image'".format(file_type))
-    
-    return file_path
-
-
 def load_bestfit_frank_uvtable(model, resid_table=False):
     """
     Load the frank best-fit 2D reprojected visibilities.
