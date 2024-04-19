@@ -377,9 +377,17 @@ def process_rave_fit(model):
         Radial points `r` [arcsec], brightness `I` [Jy/sr] and brightness 
         uncertainty `I_err` [Jy/sr] for the RAVE radial profile
     """
-    
-    fit_path = input_output.parse_rave_filename(model, file_type='rave_fit')
-    print('  Rave profiles: processing {}'.format(fit_path))
+
+    try: 
+        # fit_path = f"{model['base']['input_dir']}/{model['base']['disk']}_rave_radialprofile.npy"
+        fit_path = f"{model['base']['input_dir']}/../../../ARKS/dust_products/radial_profiles_intermediate/rave_fits/{model['base']['disk']}_rave_radialprofile.npy" # TODO
+        rave_profile = np.load(fit_path)
+    except IOError:
+        # fit_path = f"{model['base']['input_dir']}/{model['base']['disk']}_fave_radialprofile.npy"
+        fit_path = f"{model['base']['input_dir']}/../../../ARKS/dust_products/radial_profiles_intermediate/rave_fits/{model['base']['disk']}_fave_radialprofile.npy" # TODO
+        rave_profile = np.load(fit_path)
+
+    print(f'  Rave profiles: processing {fit_path}')
 
     r, I_err_lo, I, I_err_hi = np.load(fit_path)
     I_err_lo = I - I_err_lo
