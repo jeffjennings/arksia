@@ -126,6 +126,7 @@ def survey_summary(gen_par_f='./pars_gen.json',
         u, v, V = frank_geom.apply_correction(u, v, V)
         bls = np.hypot(u, v)
         bin_obs = UVDataBinner(bls, V, weights, 20e3)
+        bin_obs2 = UVDataBinner(bls, V, weights, 50e3)
             
         if profiles_txt:
             ff = f'{model["base"]["save_dir"]}/{jj}_radial_profiles.txt'
@@ -165,7 +166,8 @@ def survey_summary(gen_par_f='./pars_gen.json',
                         ax[ii].plot(rf * model["base"]["dist"], ll / 1e6, c=cols[kk], label=labs[kk], zorder=-kk)
                     else:
                         # plot observed Re(V)
-                        ax[ii].plot(bin_obs.uv / 1e6, bin_obs.V.real * 1e3, c='#a4a4a4', marker='x', ls='None', zorder=-9)                        
+                        ax[ii].plot(bin_obs.uv / 1e6, bin_obs.V.real * 1e3, c='#a4a4a4', marker='x', ls='None', zorder=-9)
+                        ax[ii].plot(bin_obs2.uv / 1e6, bin_obs2.V.real * 1e3, c='k', marker='+', ls='None', zorder=-8)
 
                         # plot visibility model
                         ax[ii].plot(grid / 1e6, Vs_interp[kk] * 1e3, c=cols[kk], label=labs[kk], zorder=-kk)
