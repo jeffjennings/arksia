@@ -178,13 +178,13 @@ def survey_summary(gen_par_f='./pars_gen.json',
                         # 1 sigma uncertainty band
                         band = ax[ii].fill_between(rf * model["base"]["dist"], 
                                             (ll - Ies_interp[kk][0]) / 1e6, (ll + Ies_interp[kk][1]) / 1e6, 
-                                        color=cols[kk], alpha=0.4)
+                                        color=cols[kk], alpha=0.4, zorder=-kk)
                         # prevent 1 sigma band from altering y-limits
                         band.remove()
                         ax[ii].relim()
                         ax[ii].add_collection(band, autolim=False)
 
-                ax[ii].axhline(y=0, ls='--', c='k')
+                ax[ii].axhline(y=0, ls='--', c='k', zorder=-10)
 
                 fstar_ujy = model["frank"]["fstar"] * 1e6
                 ax[ii].set_title(f"{jj}, " + r"$F_* =$ " + f"{fstar_ujy:.0f} uJy", fontsize=10)
