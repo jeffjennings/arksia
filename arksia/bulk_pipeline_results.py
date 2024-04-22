@@ -58,7 +58,9 @@ def survey_summary(gen_par_f='./pars_gen.json',
 
     fig0, axs0 = plt.subplots(nrows=5, ncols=4, figsize=(10, 10), squeeze=True)
     fig1, axs1 = plt.subplots(nrows=5, ncols=4, figsize=(10, 10), squeeze=True)
-    figs, axs = [fig0, fig1], [axs0, axs1]
+    fig2, axs2 = plt.subplots(nrows=5, ncols=4, figsize=(10, 10), squeeze=True)
+    fig3, axs3 = plt.subplots(nrows=5, ncols=4, figsize=(10, 10), squeeze=True)
+    figs, axs = [fig0, fig1, fig2, fig3], [axs0, axs1, axs2, axs3]
 
     gen_pars = json.load(open(gen_par_f, 'r'))
     source_pars = json.load(open(source_par_f, 'r'))
@@ -145,8 +147,8 @@ def survey_summary(gen_par_f='./pars_gen.json',
 
 
         if profiles_fig:
-            # generate, save figures for brightness profiles of all sources with and without uncertainties
-            for hh in range(2):
+            # generate, save figures for brightness profiles of all sources with and without uncertainties, visibility models
+            for hh in range(4):
                 fig = figs[hh]
                 ax = axs[hh]
 
@@ -157,10 +159,21 @@ def survey_summary(gen_par_f='./pars_gen.json',
                     cols.append('C3')
                     labs.append('rave')                    
 
-                for kk, ll in enumerate(Is_interp):     
-                    # plot profile
-                    ax[ii].plot(rf * model["base"]["dist"], ll / 1e6, c=cols[kk], label=labs[kk])
-                
+                for kk, ll in enumerate(Is_interp):   
+                    if hh < 2:  
+                        # plot profile
+                        ax[ii].plot(rf * model["base"]["dist"], ll / 1e6, c=cols[kk], label=labs[kk], zorder=-kk)
+                    else:
+                        # plot observed Re(V)
+                        ax[ii].plot(bin_obs.uv / 1e6, bin_obs.V.real * 1e3, c='#a4a4a4', marker='x', ls='None', zorder=-9)                        
+
+                        # plot visibility model
+                        ax[ii].plot(grid / 1e6, Vs_interp[kk] * 1e3, c=cols[kk], label=labs[kk], zorder=-kk)
+
+                        ax[ii].set_xlim(0, max(bls / 1e6))
+                        if hh == 3: 
+                            ax[ii].set_ylim(min(min(Vf), np.nanmin(Vr), np.nanmin(Vc)) * 1e3, 1.5 * Vf.mean() * 1e3)
+
                     if hh == 1:
                         # 1 sigma uncertainty band
                         band = ax[ii].fill_between(rf * model["base"]["dist"], 
@@ -178,19 +191,25 @@ def survey_summary(gen_par_f='./pars_gen.json',
 
                 if ii == 0:
                     ax[ii].legend(loc='upper right', fontsize=8)
-                    ax[ii].set_xlabel('r [au]')
-                    ax[ii].set_ylabel(r'I [MJy sterad$^{-1}$]')
+                    if hh < 2:
+                        ax[ii].set_xlabel('r [au]')
+                        ax[ii].set_ylabel(r'I [MJy sterad$^{-1}$]')
+                    else:
+                        ax[ii].set_xlabel(r'Baseline [M$\lambda$]')
+                        ax[ii].set_ylabel(r'Re(V) [mJy]')                        
 
     if profiles_fig:
         print('  Survey summary: making survey summary figure')
     fig1.suptitle(r'$1\sigma$ uncertainties do not include systematic unc., and are not comparable across models')    
 
-    ff0 = f'{model["base"]["save_dir"]}/../survey_profile_summary.png'
-    ff1 = f'{model["base"]["save_dir"]}/../survey_profile_summary_unc.png'
-    print('    saving figures to {} and {}'.format(ff0, ff1))
+    ff2 = f'{model["base"]["save_dir"]}/../survey_visibility_summary.png'
+    ff3 = f'{model["base"]["save_dir"]}/../survey_visibility_summary_zoom.png'
+    print('    saving figures to:\n      {},\n {},\n {},\n{}'.format(ff0, ff1, ff2, ff3))
 
     plt.figure(fig0); plt.tight_layout(); plt.savefig(ff0, dpi=300)
     plt.figure(fig1); plt.tight_layout(); plt.savefig(ff1, dpi=300)
+    plt.figure(fig2); plt.tight_layout(); plt.savefig(ff2, dpi=300)
+    plt.figure(fig3); plt.tight_layout(); plt.savefig(ff3, dpi=300)
 
     os.remove(gen_pars_current)
 
