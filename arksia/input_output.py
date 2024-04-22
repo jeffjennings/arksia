@@ -217,7 +217,7 @@ def load_bestfit_profiles(model, include_clean=True, include_rave=True):
     rf, If, Ief = sol.r, sol.I, get_fit_stat_uncer(sol)
 
     # dense grid for visibility profile
-    grid = np.logspace(np.log10(1e3), np.log10(1e6), 10**3)
+    grid = np.logspace(np.log10(1e3), np.log10(1e7), 10**3)
     # frank visibility profile
     Vf = sol.predict_deprojected(grid)
     

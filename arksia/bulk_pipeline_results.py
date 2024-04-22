@@ -92,10 +92,13 @@ def survey_summary(gen_par_f='./pars_gen.json',
         Is_interp = [If]
         Ies_interp = [[Ief, Ief]]
 
-        if jj not in no_clean:
-            Ic_interp = np.interp(rf, rc, Ic)
-            Iec_interp = np.interp(rf, rc, Iec)
-
+        Ic_interp = np.interp(rf, rc, Ic)
+        Iec_interp = np.interp(rf, rc, Iec)
+        if jj in no_clean:
+            dummy = np.array([np.nan] * len(rc))
+            Is_interp.append(dummy)
+            Ies_interp.append([dummy, dummy])
+        else:            
             Is_interp.append(Ic_interp)
             Ies_interp.append([Iec_interp, Iec_interp])
 
