@@ -6,8 +6,11 @@ import json
 import numpy as np 
 import matplotlib.pyplot as plt 
 
+from frank.geometry import FixedGeometry
+from frank.utilities import UVDataBinner
+
 from arksia.pipeline import model_setup, process_rave_fit
-from arksia.input_output import load_bestfit_profiles
+from arksia.input_output import load_bestfit_profiles, get_vis
 
 # sources for which cleaan profile extraction routine is invalid
 # (edge-on sources without a cavity; see `arksia.extract_radial_profile`)
@@ -91,6 +94,7 @@ def survey_summary(gen_par_f='./pars_gen.json',
         # interpolate clean and rave profiles onto frank radial points 
         Is_interp = [If]
         Ies_interp = [[Ief, Ief]]
+        Vs_interp = [Vf]
 
         Ic_interp = np.interp(rf, rc, Ic)
         Iec_interp = np.interp(rf, rc, Iec)
@@ -98,9 +102,11 @@ def survey_summary(gen_par_f='./pars_gen.json',
             dummy = np.array([np.nan] * len(rc))
             Is_interp.append(dummy)
             Ies_interp.append([dummy, dummy])
+            Vs_interp.append(np.array([np.nan] * len(grid)))
         else:            
             Is_interp.append(Ic_interp)
             Ies_interp.append([Iec_interp, Iec_interp])
+            Vs_interp.append(Vc)
 
         if include_rave:
             Ir_interp = np.interp(rf, rr, Ir)
