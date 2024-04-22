@@ -115,8 +115,16 @@ def survey_summary(gen_par_f='./pars_gen.json',
 
             Is_interp.append(Ir_interp)
             Ies_interp.append([Ier_lo_interp, Ier_hi_interp])
+            Vs_interp.append(Vr)
 
-
+        # bin observed vis
+        u, v, V, weights = get_vis(model)
+        V = V - model["frank"]["fstar"]
+        frank_geom = FixedGeometry(**model["base"]["geom"]) 
+        u, v, V = frank_geom.apply_correction(u, v, V)
+        bls = np.hypot(u, v)
+        bin_obs = UVDataBinner(bls, V, weights, 20e3)
+            
         if profiles_txt:
             ff = f'{model["base"]["save_dir"]}/{jj}_radial_profiles.txt'
             print('  Survey summary: saving radial profiles to {}'.format(ff))
