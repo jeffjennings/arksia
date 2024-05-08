@@ -67,7 +67,8 @@ def survey_summary(gen_par_f='./pars_gen.json',
 
     for ii, jj in enumerate(disk_names):
         # update generic parameters that vary by source
-        gen_pars['base']['input_dir'] = f"./{jj}"
+        gen_pars['base']['input_dir'] = f"{os.path.dirname(gen_pars['base']['input_dir'])}/{jj}"
+        # gen_pars['base']['input_dir'] = f"./{jj}"
         disk_pars = source_pars[jj]
         gen_pars['clean']['robust'] = disk_pars["clean"]["bestfit"]["robust"]
 
