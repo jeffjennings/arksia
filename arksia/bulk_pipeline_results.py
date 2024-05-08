@@ -174,7 +174,11 @@ def survey_summary(gen_par_f='./pars_gen.json',
 
                         ax[ii].set_xlim(0, max(bls / 1e6))
                         if hh == 3: 
-                            ax[ii].set_ylim(min(min(Vf), np.nanmin(Vr), np.nanmin(Vc)) * 1e3, 1.5 * Vf.mean() * 1e3)
+                            if include_rave:
+                                global_min = min(min(Vf), np.nanmin(Vr), np.nanmin(Vc)) * 1e3
+                            else:
+                                global_min = min(min(Vf), np.nanmin(Vc)) 
+                            ax[ii].set_ylim(global_min * 1e3, 1.5 * Vf.mean() * 1e3)
 
                     if hh == 1:
                         # 1 sigma uncertainty band
