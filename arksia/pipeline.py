@@ -379,12 +379,12 @@ def process_rave_fit(model):
     """
 
     try: 
-        # fit_path = f"{model['base']['input_dir']}/{model['base']['disk']}_rave_radialprofile.npy"
-        fit_path = f"{model['base']['input_dir']}/../../../ARKS/dust_products/radial_profiles_intermediate/rave_fits/{model['base']['disk']}_rave_radialprofile.npy" # TODO
+        fit_path = f"{model['base']['input_dir']}/{model['base']['disk']}_rave_radialprofile.npy"
+        # fit_path = f"{model['base']['input_dir']}/../../../ARKS/dust_products/radial_profiles_intermediate/rave_fits/{model['base']['disk']}_rave_radialprofile.npy" # TODO
         rave_profile = np.load(fit_path)
     except IOError:
-        # fit_path = f"{model['base']['input_dir']}/{model['base']['disk']}_fave_radialprofile.npy"
-        fit_path = f"{model['base']['input_dir']}/../../../ARKS/dust_products/radial_profiles_intermediate/rave_fits/{model['base']['disk']}_fave_radialprofile.npy" # TODO
+        fit_path = f"{model['base']['input_dir']}/{model['base']['disk']}_fave_radialprofile.npy"
+        # fit_path = f"{model['base']['input_dir']}/../../../ARKS/dust_products/radial_profiles_intermediate/rave_fits/{model['base']['disk']}_fave_radialprofile.npy" # TODO
         rave_profile = np.load(fit_path)
 
     print(f'  Rave profiles: processing {fit_path}')
