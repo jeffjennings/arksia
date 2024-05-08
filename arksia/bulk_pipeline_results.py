@@ -206,21 +206,22 @@ def survey_summary(gen_par_f='./pars_gen.json',
                         ax[ii].set_ylabel(r'Re(V) [mJy]')                        
 
     if profiles_fig:
-        print('  Survey summary: making survey summary figure')
-    fig1.suptitle(r'$1\sigma$ uncertainties do not include systematic unc., and are not comparable across models')    
+        ff0 = f'{model["base"]["save_dir"]}/../survey_profile_summary.png'
+        ff1 = f'{model["base"]["save_dir"]}/../survey_profile_summary_unc.png'
+        ff2 = f'{model["base"]["save_dir"]}/../survey_visibility_summary.png'
+        ff3 = f'{model["base"]["save_dir"]}/../survey_visibility_summary_zoom.png'
+        print('  Survey summary: saving figures to:\n      {},\n {},\n {},\n{}'.format(ff0, ff1, ff2, ff3))
 
-    ff2 = f'{model["base"]["save_dir"]}/../survey_visibility_summary.png'
-    ff3 = f'{model["base"]["save_dir"]}/../survey_visibility_summary_zoom.png'
-    print('    saving figures to:\n      {},\n {},\n {},\n{}'.format(ff0, ff1, ff2, ff3))
+        fig1.suptitle(r'$1\sigma$ uncertainties do not include systematic unc., and are not comparable across models')    
 
-    plt.figure(fig0); plt.tight_layout(); plt.savefig(ff0, dpi=300)
-    plt.figure(fig1); plt.tight_layout(); plt.savefig(ff1, dpi=300)
-    plt.figure(fig2); plt.tight_layout(); plt.savefig(ff2, dpi=300)
-    plt.figure(fig3); plt.tight_layout(); plt.savefig(ff3, dpi=300)
+        plt.figure(fig0); plt.tight_layout(); plt.savefig(ff0, dpi=300)
+        plt.figure(fig1); plt.tight_layout(); plt.savefig(ff1, dpi=300)
+        plt.figure(fig2); plt.tight_layout(); plt.savefig(ff2, dpi=300)
+        plt.figure(fig3); plt.tight_layout(); plt.savefig(ff3, dpi=300)
 
-    os.remove(gen_pars_current)
+        os.remove(gen_pars_current)
 
-    return figs
+        return figs
     
 if __name__ == "__main__":
     survey_summary()
