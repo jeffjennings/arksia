@@ -5,6 +5,7 @@
 import numpy as np 
 
 from mpol.gridding import DirtyImager
+from mpol.coordinates import GridCoords
 
 def dirty_image(vis, robust, npix, pixel_scale, casa_vis=True):
     """
@@ -35,9 +36,9 @@ def dirty_image(vis, robust, npix, pixel_scale, casa_vis=True):
         vis[2] = np.conj(vis[2])
 
     # generate dirty image at same pixel scale as clean image
-    imager = DirtyImager.from_image_properties( 
-        cell_size=pixel_scale,
-        npix=npix,
+    coords = GridCoords(cell_size=pixel_scale, npix=npix)
+    imager = DirtyImager( 
+        coords=coords,
         uu=vis[0] / 1e3,
         vv=vis[1] / 1e3,
         weight=vis[3],
