@@ -190,6 +190,12 @@ def frank_image_diag_figure(model, sol, frank_resid_vis, resid_im_robust=2.0,
                     bbox_inches='tight')
         plt.close()
 
+        from astropy.io import fits 
+        hdu = fits.PrimaryHDU(frank_image)
+        hdu.writeto(save_prefix + f"_frank_image.fits", overwrite=True) 
+        hdu_resid = fits.PrimaryHDU(frank_resid_im)
+        hdu_resid.writeto(save_prefix + f"_frank_residRobust{resid_im_robust}.fits", overwrite=True) 
+
     return fig, axes
 
 
