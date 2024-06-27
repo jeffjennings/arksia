@@ -10,5 +10,5 @@
 | arksia/parametric\_fitter.py       |      155 |        5 |     97% |
 | arksia/parametric\_forms.py        |       39 |        0 |    100% |
 | arksia/pipeline.py                 |      331 |       59 |     82% |
-| arksia/plot.py                     |      369 |       30 |     92% |
-|                          **TOTAL** | **1384** |  **154** | **89%** |
+| arksia/plot.py                     |      374 |       30 |     92% |
+|                          **TOTAL** | **1389** |  **154** | **89%** |
