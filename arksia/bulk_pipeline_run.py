@@ -7,7 +7,7 @@ import json
 def survey_pipeline(gen_par_f='./pars_gen.json', 
          source_par_f='./pars_source.json',
          phys_par_f='./summary_disc_parameters.csv',
-        reproduce_best_frank_fits=False,
+         reproduce_best_frank_fits=False,
          ):
     """
     Run the arksia pipeline across multiple survey sources.
