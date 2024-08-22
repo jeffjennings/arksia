@@ -9,6 +9,6 @@
 | arksia/input\_output.py            |       76 |       14 |     82% |
 | arksia/parametric\_fitter.py       |      155 |        5 |     97% |
 | arksia/parametric\_forms.py        |       39 |        0 |    100% |
-| arksia/pipeline.py                 |      331 |       59 |     82% |
+| arksia/pipeline.py                 |      334 |       59 |     82% |
 | arksia/plot.py                     |      374 |       30 |     92% |
-|                          **TOTAL** | **1389** |  **154** | **89%** |
+|                          **TOTAL** | **1392** |  **154** | **89%** |
