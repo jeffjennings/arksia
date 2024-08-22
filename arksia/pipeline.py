@@ -528,12 +528,16 @@ def run_frank(model):
                         save_prefix=None,
                         )
             # add 1 sigma statistical uncertainty band to plot
-            sigmaI = get_fit_stat_uncer(sol)
-            qaxes[0].fill_between(sol.r, (sol.I - sigmaI) / 1e10, (sol.I + sigmaI) / 1e10, color='r', alpha=0.2)
-            qaxes[1].fill_between(sol.r, (sol.I - sigmaI) / 1e10, (sol.I + sigmaI) / 1e10, color='r', alpha=0.2)
+            sigmaI = get_fit_stat_uncer(sol, return_linear=False)
+            if model["frank"]["method"] == "LogNormal":
+                qaxes[0].fill_between(sol.r, np.exp(np.log(sol.I) - sigmaI) / 1e10, np.exp(np.log(sol.I) + sigmaI) / 1e10, color='r', alpha=0.2)
+                qaxes[1].fill_between(sol.r, np.exp(np.log(sol.I) - sigmaI) / 1e10, np.exp(np.log(sol.I) + sigmaI) / 1e10, color='r', alpha=0.2)
+            else:
+                qaxes[0].fill_between(sol.r, (sol.I - sigmaI) / 1e10, (sol.I + sigmaI) / 1e10, color='r', alpha=0.2)
+                qaxes[1].fill_between(sol.r, (sol.I - sigmaI) / 1e10, (sol.I + sigmaI) / 1e10, color='r', alpha=0.2)                                
             plt.savefig(save_prefix + '_frank_fit_quick.png', dpi=300,
                         bbox_inches='tight')
-            plt.close()            
+            plt.close()
             
             # reprojected frank residual visibilities
             frank_resid_vis = [uv_data[0], uv_data[1], uv_data[2] - sol.predict(uv_data[0], uv_data[1]), uv_data[3]]
