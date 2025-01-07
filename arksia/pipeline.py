@@ -202,7 +202,7 @@ def model_setup(parsed_args):
             model["frank"]["save_uvtables"] = True
             model["frank"]["make_quick_fig"] = True
             model["plot"]["image_xy_bounds"] = [-disk_pars["frank"]["bestfit"]["rout"], disk_pars["frank"]["bestfit"]["rout"]]
-            model["plot"]["frank_resid_im_robust"] = 0.5
+            # model["plot"]["frank_resid_im_robust"] = 0.5
 
         else:
             os.makedirs(model["base"]["frank_dir"], exist_ok=True)
